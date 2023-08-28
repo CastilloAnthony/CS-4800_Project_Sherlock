@@ -12,4 +12,4 @@ This program is designed for California State University Stanislaus' CS-4800 202
 - Store Given IP Addresses for future examination
 - Poll servers every (elapsed period) and stores that info
 - Display an uptime/downtime histogram
-- ETC.
+- TBD
