@@ -1,1 +1,1 @@
-# CS-4800_Server-Status-Checker123
+# CS-4800_Server-Status-Checker
