@@ -1,0 +1,3 @@
+Push and pull your code every 10 minutes just so that we aren't stepping on people's toes
+We need to pick a technique Camel Case, underscores(snakecase)
+
