@@ -8,8 +8,9 @@ This program is designed for California State University Stanislaus' CS-4800 202
 - Vel Perez-Barba
 
 ## Capabilities
-- Accept User Given IP Addresses
-- Store Given IP Addresses for future examination
-- Poll servers every (elapsed period) and stores that info
-- Display an uptime/downtime histogram
+- Accept user given IP addresses and Website
+- Store given IP addresses for future examination
+- Poll IP addresses, websites, and servers every (elapsed period) and stores that info
+- Display an uptime/downtime histogram, pie chart, or using some other means
+- A webui will be used to manage the program.
 - TBD
