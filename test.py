@@ -21,3 +21,4 @@ class ThisIsAClass(): # An example class for how all other classes should look l
     def aPublicFunction(self): # A public function meant to be called from outside of the class 
         pass
 # end ThisIsAClass
+#This is my fight song
