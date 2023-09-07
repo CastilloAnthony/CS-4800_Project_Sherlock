@@ -65,7 +65,7 @@ class Server():
     def _addNewClient(self): # CORE
         # Assigns a new client a guid and adds that client to the list of identified clients.
         # Are we using private/public key authentication?
-        # newClient = {'guid':'6B29FC40-CA47-1067-B31D-00DD010662DA', 'ip':'10.0.0.30', 'name':'Anthony's Phone', 'key':'randomDigits'}
+        # newClient = {'guid':'6B29FC40-CA47-1067-B31D-00DD010662DA', 'ip':'10.0.0.30', 'name':'Anthony's Phone', 'MAC':'A1:B2:C3:D4:E5:F6', 'key':'randomDigits'}
         # clientList.append(newClient)
         # etc.
         pass
@@ -100,7 +100,7 @@ class Client():
 
     def _connectToServer(self, serverIp): # CORE
         # Performs an authentication handshake with the server.
-        # Sends some identifier information to the server (name of device, public key).
+        # Sends some identifier information to the server (name of device, public key, MAC address).
         pass
 
     def _requestDataFromServer(self, serverIp): # CORE
