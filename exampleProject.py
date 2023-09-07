@@ -28,6 +28,7 @@ class Server():
         # What Networking Adapters are available on this device? Networking Adapters (i.e., ethernet, wireless adapter, bluetooth?, etc.)
         # Which do we want to use?
         # What ports are we going to use? 5555? 7777?
+        # Need to consider the local device's firewall (Windows 10, Mac, Linux) if we want to allow other devices to connect to the server.
         pass
 
     def _initializeDatabase(self): # CORE
