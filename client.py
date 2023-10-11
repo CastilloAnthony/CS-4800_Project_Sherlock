@@ -1,4 +1,15 @@
-class Homepage():
+import json # For transferring data between server and client
+import multiprocessing # For concurrent processing (interface handling, generation of graphs, etc.)
+
+class ConnectionAgent():
+    def __init__(self):
+        pass
+
+    def __del__(self):
+        pass
+#end ConnectionAgent
+
+class Homepage(): # Controller(or Boundary?)
     def __init__(self):
         pass
 
@@ -21,16 +32,19 @@ class Homepage():
         pass
 #end Homepage
 
-class ConnectionAgent():
+class TrackWebsite(): # Controller(or Boundary?)
     def __init__(self):
         pass
 
     def __del__(self):
         pass
-#end ConnectionAgent
+#end TrackWebsite
 
-class EditPreset():
+class EditPreset(): # Controller(or Boundary?)
     def __init__(self):
+        pass
+
+    def __del__(self):
         pass
 #end EditPreset
 
