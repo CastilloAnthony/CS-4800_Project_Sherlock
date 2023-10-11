@@ -19,11 +19,15 @@ class Homepage():
 
     def deletePreset(self):
         pass
-# end Homepage
+#end Homepage
 
 class ConnectionAgent():
     def __init__(self):
         pass
+
+    def __del__(self):
+        pass
+#end ConnectionAgent
 
 class EditPreset():
     def __init__(self):
