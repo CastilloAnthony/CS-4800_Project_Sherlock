@@ -1,0 +1,13 @@
+I thought these shortcuts were neat
+
+cursor over line + (ctrl + c) + (ctrl + v) = Copy a line to a new line
+
+cursor over line + (ctrl + x) = Delete Line
+
+alt + upArrow/downArrow = Moves line up or down
+
+alt + mouseClick = to change line to different spot
+
+highlight word + (ctrl + d) = highlights next instance of highlighted word
+
+ctrl + p = search for a file
