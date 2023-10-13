@@ -120,6 +120,9 @@ class DBConnectionAgent():
         if self.__db != False:
             pass
     
+    def clearDB(self, column):
+        self.__db[column].delete_many({})
+
     def insertPosts(self, post:dict):
         posts = self.__db.posts
         post_id = posts.insert_one(post).inserted_id
