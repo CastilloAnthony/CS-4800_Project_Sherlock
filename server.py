@@ -8,8 +8,10 @@ class Server(): # The main server handler class
     def __init__(self):
         self.__DBconneciton = False
         self.__clientManager = False
+
     def __del__(self):
-        pass
+        del self.__DBconneciton
+        del self.__clientManager
 
     def startDB(self):
         """Creates the database and then sets up a conneciton agent
@@ -26,6 +28,12 @@ class Server(): # The main server handler class
     
     def _clientListener(self):
         pass
+
+    def pollWebsites(self):
+        pass
+    
+    def mainLoop(self):
+        pass
 # end Server
 
 class DBConnectionAgent():
@@ -34,6 +42,7 @@ class DBConnectionAgent():
         self.__db = False
 
     def __del__(self):
+        self.disconnect()
         del self.__client
         del self.__db
 
@@ -55,6 +64,9 @@ class DBConnectionAgent():
             self.__client = False
             return False
         
+    def disconnect(self):
+        pass
+
     def getDBs(self):
         """Returns a List of databases for the connected system
 
@@ -79,12 +91,12 @@ class DBConnectionAgent():
         else:
             return False
 
-    def addToDB(self, column, content):
+    def addToDB(self, column:str, content:dict):
         """Adds data into the DB at the specified column
 
         Args:
             column (string): The column we wish to add data into
-            content (unspecified): The content to add into the DB
+            content (dict): The content to add into the DB
 
         Returns:
             bool: Success/Failure to add content to the DB
@@ -98,13 +110,23 @@ class DBConnectionAgent():
         else:
             return False
 
-    def removeFromDB(self, column, content):
-        pass
+    def removeFromDB(self, column, query:dict):
+        self.__db[column].delete_one(query)
 
-    def requestFromDB(self, column):
+    def removeManyFromDB(self, column, query:dict):
+        self.__db[column].delete_many(query)
+
+    def requestFromDB(self, column, query:dict):
         if self.__db != False:
             pass
-    
+
+    def insertPosts(self, post:dict):
+        posts = self.__db.posts
+        post_id = posts.insert_one(post).inserted_id
+        print(post_id)
+
+    def getPost(self, query:dict):
+        return self.posts.find_one(query)
     
 #end DBConnecitonAgent
 
@@ -118,6 +140,7 @@ class ClientListener():
         pass
 
     def _listen(self):
+        # Listens on port 77777
         while True:
             break
 
@@ -163,7 +186,16 @@ class Client():
     def setUUID(self, uuid):
         self.__uuid = uuid
 
-    def getClientInfo(self):
+    def getName(self):
+        return self.__name
+    
+    def getAddress(self):
+        return self.__address
+    
+    def getUUID(self):
+        return self.__uuid
+    
+    def getInfo(self):
         return {"name":self.__name, "address":self.__address, "uuid":self.__uuid}
 #end Client
 
