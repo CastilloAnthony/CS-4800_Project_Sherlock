@@ -1,50 +1,61 @@
 # use website: https://www.mongodb.com/try/download/community
 # download mongodb version 7.0
 import pymongo
-def main():
+class Database:
+    def __init__(self):
+        self.myclient = False
+        self.mydb = False
+        self.mycol = False
     
-
-    # myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-    # mydb = myclient["mydatabase"]
-    # mycol = mydb["customers"]
-
-    # mydict = { "name": "John", "address": "Highway 37" }
-
-    # x = mycol.insert_one(mydict)
-
-
-    # dblist = myclient.list_database_names()
-    # if "mydatabase" in dblist:
-    # print("The database exists.")
+    def connect(self):
+        self.myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+        self.mydb = self.myclient["mydatabase"]
+        self.mycol = self.mydb["customers"]
+        
+    def insertPost(self, post:dict):
+        post_id = self.mycol.insert_one(post).inserted_id
+        print(post_id)
+        
+    def insertPosts(self, post:dict):
+        post_id = self.mycol.insert_many(post).inserted_ids
+        print(post_id)
+        
+    def getPost(self, query:dict):
+        return self.mycol.find_one(query)
     
-    # mydict = { "name": "Peter", "address": "Lowstreet 27" }
-
-    # x = mycol.insert_one(mydict)
-
-    # print(x.inserted_id)
-
-    # mylist = [
-    # { "name": "Amy", "address": "Apple st 652"},
-    # { "name": "Hannah", "address": "Mountain 21"},
-    # { "name": "Michael", "address": "Valley 345"},
-    # { "name": "Sandy", "address": "Ocean blvd 2"},
-    # { "name": "Betty", "address": "Green Grass 1"},
-    # { "name": "Richard", "address": "Sky st 331"},
-    # { "name": "Susan", "address": "One way 98"},
-    # { "name": "Vicky", "address": "Yellow Garden 2"},
-    # { "name": "Ben", "address": "Park Lane 38"},
-    # { "name": "William", "address": "Central st 954"},
-    # { "name": "Chuck", "address": "Main Road 989"},
-    # { "name": "Viola", "address": "Sideway 1633"}
-    # ]
-
-    # x = mycol.insert_many(mylist)
-
-    # #print list of the _id values of the inserted documents:
-    # print(x.inserted_ids)
+    def getPosts(self, query:dict):
+        return self.mycol.find(query)
     
-    # return x
+    def printPosts(self):
+        for post in self.mycol.find():
+            print.pprint(post)
+
+    def returnPosts(self):
+        for post in self.mycol.find():
+            yield post
+
+    def deletePost(self, query:dict):
+        self.mycol.delete_one(query)
+    
+    #collection.delete_many(filter, collation=None, 
+    # hint=None, session=None)
+    
+    def deleteAllPosts(self,query:dict):
+        self.mycol.delete_many(query)
     
     
 
-main()
+
+x = Database()
+x.connect()
+
+mydict = [
+    { "name": "Dan", "address": "Taco 4251" },
+    { "name": "Calvin", "address": "Taco 4251" },
+    { "name": "Alvin", "address": "Taco 4251" },
+    { "name": "Dalvin", "address": "Taco 4251" }
+]
+#x.insertPosts(mydict)
+x.deleteAllPosts({})
+
+# x.insertPosts(mydict)
