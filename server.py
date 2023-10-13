@@ -29,6 +29,9 @@ class Server(): # The main server handler class
     def _clientListener(self):
         pass
 
+    def pollWebsites(self):
+        pass
+    
     def mainLoop(self):
         pass
 # end Server
@@ -88,12 +91,12 @@ class DBConnectionAgent():
         else:
             return False
 
-    def addToDB(self, column, content):
+    def addToDB(self, column:str, content:dict):
         """Adds data into the DB at the specified column
 
         Args:
             column (string): The column we wish to add data into
-            content (unspecified): The content to add into the DB
+            content (dict): The content to add into the DB
 
         Returns:
             bool: Success/Failure to add content to the DB
@@ -107,16 +110,20 @@ class DBConnectionAgent():
         else:
             return False
 
-    def removeFromDB(self, column, content):
-        pass
+    def removeFromDB(self, column, query:dict):
+        self.__db[column].delete_one(query)
 
-    def requestFromDB(self, column):
+    def removeManyFromDB(self, column, query:dict):
+        self.__db[column].delete_many(query)
+
+    def requestFromDB(self, column, query:dict):
         if self.__db != False:
             pass
     
     def insertPosts(self, post:dict):
         posts = self.__db.posts
-        post_id = self.posts.insert_one(post).inserted_id
+        post_id = posts.insert_one(post).inserted_id
+        print(post_id)
 
     def getPost(self, query:dict):
         return self.posts.find_one(query)
@@ -146,6 +153,7 @@ class ClientListener():
         pass
 
     def _listen(self):
+        # Listens on port 77777
         while True:
             break
 
