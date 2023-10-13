@@ -161,7 +161,17 @@ class Client():
     def setUUID(self, uuid):
         self.__uuid = uuid
 
-    def getClientInfo(self):
+
+    def getName(self):
+        return self.__name
+    
+    def getAddress(self):
+        return self.__address
+    
+    def getUUID(self):
+        return self.__uuid
+    
+    def getInfo(self):
         return {"name":self.__name, "address":self.__address, "uuid":self.__uuid}
 #end Client
 
