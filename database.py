@@ -40,22 +40,34 @@ class Database:
     #collection.delete_many(filter, collation=None, 
     # hint=None, session=None)
     
-    def deleteAllPosts(self,query:dict):
+    def deletePosts(self,query:dict):
         self.mycol.delete_many(query)
-    
-    
+        
+# x = Database()
+# x.connect()
 
+class checkDatabase:
+    def __init__(self):
+        self.x = Database()
+        self.x.connect()
+    def check_insertPosts(self):
+        mydict = [
+            { "name": "Dan", "address": "Taco 4251" },
+            { "name": "Calvin", "address": "Taco 4251" },
+            { "name": "Alvin", "address": "Taco 4251" },
+            { "name": "Dalvin", "address": "Taco 4251" }
+        ]
+        self.x.insertPosts(mydict)
+    def check_deletePost(self):
+        self.x.deletePosts({})
+        print(x.getPost({"name":"Dan"}))
+        print(x.getPost({"name":"Dan"})["name"])
 
-x = Database()
-x.connect()
-
-mydict = [
-    { "name": "Dan", "address": "Taco 4251" },
-    { "name": "Calvin", "address": "Taco 4251" },
-    { "name": "Alvin", "address": "Taco 4251" },
-    { "name": "Dalvin", "address": "Taco 4251" }
-]
-#x.insertPosts(mydict)
-x.deleteAllPosts({})
-
-# x.insertPosts(mydict)
+    def input_dict():
+        name = input("enter your name\nname : ")
+        address = input("enter your address\naddress : ")
+        
+        self.x.insertPost({"name":name, "address":address})
+        
+x = checkDatabase()
+x.check_insertPosts()
