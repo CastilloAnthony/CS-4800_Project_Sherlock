@@ -14,11 +14,9 @@ class Database:
         
     def insertPost(self, post:dict):
         post_id = self.mycol.insert_one(post).inserted_id
-        print(post_id)
         
     def insertPosts(self, post:dict):
         post_id = self.mycol.insert_many(post).inserted_ids
-        print(post_id)
         
     def getPost(self, query:dict):
         return self.mycol.find_one(query)
@@ -50,6 +48,11 @@ class checkDatabase:
     def __init__(self):
         self.x = Database()
         self.x.connect()
+    
+    def check_insertPost(self):
+        dict = {"name":"Jill"}
+        self.x.insertPost(dict)
+        
     def check_insertPosts(self):
         mydict = [
             { "name": "Dan", "address": "Taco 4251" },
@@ -70,4 +73,4 @@ class checkDatabase:
         self.x.insertPost({"name":name, "address":address})
         
 x = checkDatabase()
-x.check_insertPosts()
+x.check_insertPost()
