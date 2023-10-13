@@ -14,7 +14,7 @@ class Server(): # The main server handler class
     def startDB(self):
         """Creates the database and then sets up a conneciton agent
         """
-        pass
+        myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
     def setupConnection(self, address="localhost", port="27017"):
         self.__DBconneciton = DBConnectionAgent()
@@ -105,26 +105,7 @@ class DBConnectionAgent():
         if self.__db != False:
             pass
     
-    def insertPosts(self, post:dict):
-        posts = self.db.posts
-        post_id = self.posts.insert_one(post).inserted_id
-
-    def getPost(self, query:dict):
-        return self.posts.find_one(query)
     
-    def getPosts(self, query:dict):
-        return self.posts.find(query)
-    
-    def printPosts(self):
-        for post in self.posts.find():
-            print.pprint(post)
-
-    def returnPosts(self):
-        for post in self.posts.find():
-            yield post
-
-    def deletePost(self, query:dict):
-        self.posts.delete_one(query)
 #end DBConnecitonAgent
 
 class ClientListener():
