@@ -104,6 +104,27 @@ class DBConnectionAgent():
     def requestFromDB(self, column):
         if self.__db != False:
             pass
+    
+    def insertPosts(self, post:dict):
+        posts = self.db.posts
+        post_id = self.posts.insert_one(post).inserted_id
+
+    def getPost(self, query:dict):
+        return self.posts.find_one(query)
+    
+    def getPosts(self, query:dict):
+        return self.posts.find(query)
+    
+    def printPosts(self):
+        for post in self.posts.find():
+            print.pprint(post)
+
+    def returnPosts(self):
+        for post in self.posts.find():
+            yield post
+
+    def deletePost(self, query:dict):
+        self.posts.delete_one(query)
 #end DBConnecitonAgent
 
 class ClientListener():
