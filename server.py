@@ -8,8 +8,10 @@ class Server(): # The main server handler class
     def __init__(self):
         self.__DBconneciton = False
         self.__clientManager = False
+
     def __del__(self):
-        pass
+        del self.__DBconneciton
+        del self.__clientManager
 
     def startDB(self):
         """Creates the database and then sets up a conneciton agent
@@ -26,6 +28,9 @@ class Server(): # The main server handler class
     
     def _clientListener(self):
         pass
+
+    def mainLoop(self):
+        pass
 # end Server
 
 class DBConnectionAgent():
@@ -34,6 +39,7 @@ class DBConnectionAgent():
         self.__db = False
 
     def __del__(self):
+        self.disconnect()
         del self.__client
         del self.__db
 
@@ -55,6 +61,9 @@ class DBConnectionAgent():
             self.__client = False
             return False
         
+    def disconnect(self):
+        pass
+
     def getDBs(self):
         """Returns a List of databases for the connected system
 
@@ -106,7 +115,7 @@ class DBConnectionAgent():
             pass
     
     def insertPosts(self, post:dict):
-        posts = self.db.posts
+        posts = self.__db.posts
         post_id = self.posts.insert_one(post).inserted_id
 
     def getPost(self, query:dict):
@@ -181,7 +190,6 @@ class Client():
 
     def setUUID(self, uuid):
         self.__uuid = uuid
-
 
     def getName(self):
         return self.__name
