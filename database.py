@@ -63,7 +63,7 @@ class checkDatabase:
         print(x.getPost({"name":"Dan"}))
         print(x.getPost({"name":"Dan"})["name"])
 
-    def input_dict():
+    def input_dict(self):
         name = input("enter your name\nname : ")
         address = input("enter your address\naddress : ")
         
