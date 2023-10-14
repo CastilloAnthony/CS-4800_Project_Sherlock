@@ -11,8 +11,16 @@ class Server(): # The main server handler class
         self.__clientManager = False
         self.__processes = {}
         self.__pipes = {}
+
     def __del__(self):
+        for i in self.__pipes:
+            print(self.__pipes[i].recv())
+            self.__pipes[i].close()
         for i in self.__processes:
+            print(self.__processes[i])
+            #if "stopped" not in self.__processes[i]:
+                #self.__processes[i].terminate()
+            self.__processes[i].join()
             self.__processes[i].close()
         del self.__DBconneciton
         del self.__clientManager
@@ -35,7 +43,7 @@ class Server(): # The main server handler class
         self.__pipes["ClientListener"] = parent_ClientListenerPipe
         self.__clientManager = ClientListener(child_ClientListenerPipe)
         self.__processes["ClientListener"] = mp.Process(name="ClientListenerProcess", target=self.__clientManager._listen())
-        #self.__processes["ClientListener"].start()
+        self.__processes["ClientListener"].start()
 
     def pollWebsites(self):
         pass
@@ -162,10 +170,11 @@ class ClientListener():
     def _listen(self):
         # Listens on port 77777
         self.__pipe.send(7)
-        while True:
-            break
-            yield
-        self.__pipe.close()
+        #while True:
+            #self.__pipe.send(7)
+        #self.__pipe.close()
+        print("Test")
+        return
 
     def _verifyClient(self, client):
         if client in self.__knownClients:
