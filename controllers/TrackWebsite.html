@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Horizontal Menu</title>
+        <style>
+            body{
+                text-align:center;
+            }
+            ul{
+                list-style-type:none;
+                padding:0;
+                margin:0;
+            }
+            li{float:left}
+            li a{
+                display:black;
+                padding:8px;
+                background-color:lightgray;
+                text-decoration: none;
+                color:black;
+            }
+            li a:hover{
+                background-color:black;
+                color:white;
+            }
+            li a.current{
+                background-color:green;
+                color:white;
+            }
+            li a:hover:not(.current){
+                background-color:black;
+                color:white;
+            }
+            li.right{
+                float:right;
+            }
+        </style>
+    </head>
+    <body>
+        <ul>
+            <li><a class="current" href="../homepage.html">Home</a></li>
+            <li><a href="trackWebsite.html">track Website</a></li>
+            <li><a href="DeleteWebsite.html">Delete Website</a></li>
+            <li><a href="AddPreset.html">Add Preset</a></li>
+            <li><a href="EditPreset.html">Edit Preset</a></li>
+            <li><a href="DeletePreset.html">Delete Preset</a></li>
+        </ul>
+        <br>
+        <br>
+        <h1 style="text-align:center;">Track Website</h1>
+        <form action="/action_page.php">
+            <label for="fname">url:</label>
+            <input type="text" id="fname" name="fname"><br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </body>
+</html>
