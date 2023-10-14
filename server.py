@@ -1,3 +1,5 @@
+import time
+import random
 import socket # Networking stuff
 import json # For transferring data between server and client
 import uuid # Universally Unique IDentifier (For User IDs and others things)
@@ -9,18 +11,26 @@ class Server(): # The main server handler class
     def __init__(self):
         self.__DBconneciton = False
         self.__clientManager = False
+        self.__q = mp.Queue(maxsize=100)
+        print('Queue Size: '+str(self.__q.qsize()))
         self.__processes = {}
         self.__pipes = {}
 
     def __del__(self):
+        time.sleep(10)
         for i in self.__pipes:
             print(self.__pipes[i].recv())
             self.__pipes[i].close()
         for i in self.__processes:
-            print(self.__processes[i])
-            #if "stopped" not in self.__processes[i]:
-                #self.__processes[i].terminate()
-            self.__processes[i].join()
+            print('Alive: '+str(self.__processes[i].is_alive()))
+            #print('Terminated: '+str(self.__processes[i].terminate()))
+            while not self.__q.empty():
+                print('Pulled '+str(self.__q.get())+' from queue.')
+                time.sleep(0.4)
+            if self.__processes[i].is_alive():
+                print('Terminated: '+str(self.__processes[i].terminate()))
+                self.__q.close()
+            print('Joined: '+str(self.__processes[i].join(timeout=3)))
             self.__processes[i].close()
         del self.__DBconneciton
         del self.__clientManager
@@ -39,10 +49,11 @@ class Server(): # The main server handler class
             print("Unable to connect to DB at "+"mongodb://"+address+":"+port+"/")
     
     def _startClientListener(self):
-        parent_ClientListenerPipe, child_ClientListenerPipe = mp.Pipe()
-        self.__pipes["ClientListener"] = parent_ClientListenerPipe
-        self.__clientManager = ClientListener(child_ClientListenerPipe)
-        self.__processes["ClientListener"] = mp.Process(name="ClientListenerProcess", target=self.__clientManager._listen())
+        #parent_ClientListenerPipe, child_ClientListenerPipe = mp.Pipe()
+        self.__q = mp.Queue(3)
+        #self.__pipes["ClientListener"] = parent_ClientListenerPipe
+        self.__clientManager = ClientListener(self.__q)
+        self.__processes["ClientListener"] = mp.Process(name="ClientListenerProcess", target=self.__clientManager._listen)
         self.__processes["ClientListener"].start()
 
     def pollWebsites(self):
@@ -157,23 +168,31 @@ class DBConnectionAgent():
 
 class ClientListener():
     # Functions should use multiprocessing for optimized response time
-    def __init__(self, pipe):
+    def __init__(self, queue):
         self.__knownClients = {}
         self.__processList = {}
-        self.__pipe = pipe
+        self.__q = queue
 
     def __del__(self):
         del self.__knownClients
         del self.__processList
-        del self.__pipe
+        del self.__q
 
     def _listen(self):
         # Listens on port 77777
-        self.__pipe.send(7)
-        #while True:
+        x = 0
+        while True:
+            x = random.randint(0,10)
+            print(x)
+            try:
+                self.__q.put(x, timeout=1)
+                print('Inserted '+str(x)+' into queue.')
+            except:
+                print('Queue is full.')
+            time.sleep(0.5)
+            pass
             #self.__pipe.send(7)
         #self.__pipe.close()
-        print("Test")
         return
 
     def _verifyClient(self, client):
