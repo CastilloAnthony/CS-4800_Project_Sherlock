@@ -9,11 +9,7 @@ import multiprocessing # For concurrent processing (interface handling, generati
 class Homepage(): # Controller
     def __init__(self):
         #self.database = Database()
-        self.__trackWebsite = TrackWebsite() # Controller
-        self.__deleteWebsite = DeleteWebsite() # Controller
-        self.__addPreset = AddPreset() # Controller
-        self.__editPreset = EditPreset() # Controller
-        self.__deletePreset = DeletePreset() # Controller
+        pass
 
     def __del__(self):
         pass

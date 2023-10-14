@@ -1,11 +1,16 @@
 import json # For transferring data between server and client
 import multiprocessing # For concurrent processing (interface handling, generation of graphs, etc.)
-from controllers import Homepage, TrackWebsite
+from controllers import Homepage, TrackWebsite, DeleteWebsite, AddPreset, EditPreset, DeletePreset
 
 class Client():
     # Communicates with Server
     def __init__(self):
-        self.__Homepage = Homepage() # Hosts 
+        self.__Homepage = Homepage() # Hosts
+        self.__trackWebsite = TrackWebsite() # Controller
+        self.__deleteWebsite = DeleteWebsite() # Controller
+        self.__addPreset = AddPreset() # Controller
+        self.__editPreset = EditPreset() # Controller
+        self.__deletePreset = DeletePreset() # Controller
 
     def __del__(self):
         pass
