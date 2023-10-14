@@ -4,6 +4,9 @@
         <meta charset="UTF-8">
         <title>Horizontal Menu</title>
         <style>
+            body{
+                text-align:center;
+            }
             ul{
                 list-style-type:none;
                 padding:0;
@@ -36,12 +39,20 @@
     </head>
     <body>
         <ul>
-            <li><a class="current" href="homepage.html">Home</a></li>
-            <li><a href="controllers/trackWebsite.html">track Website</a></li>
-            <li><a href="controllers/DeleteWebsite.html">Delete Website</a></li>
-            <li><a href="controllers/AddPreset.html">Add Preset</a></li>
-            <li><a href="controllers/EditPreset.html">Edit Preset</a></li>
-            <li><a href="controllers/DeletePreset.html">Delete Preset</a></li>
+            <li><a class="current" href="../homepage.html">Home</a></li>
+            <li><a href="trackWebsite.html">track Website</a></li>
+            <li><a href="DeleteWebsite.html">Delete Website</a></li>
+            <li><a href="AddPreset.html">Add Preset</a></li>
+            <li><a href="EditPreset.html">Edit Preset</a></li>
+            <li><a href="DeletePreset.html">Delete Preset</a></li>
         </ul>
+        <br>
+        <br>
+        <h1 style="text-align:center;">Track Website</h1>
+        <form action="/action_page.php">
+            <label for="fname">url:</label>
+            <input type="text" id="fname" name="fname"><br><br>
+            <input type="submit" value="Submit">
+        </form>
     </body>
 </html>
