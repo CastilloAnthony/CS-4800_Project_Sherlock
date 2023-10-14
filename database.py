@@ -1,5 +1,7 @@
 # use website: https://www.mongodb.com/try/download/community
 # download mongodb version 7.0
+
+
 import pymongo
 class Database:
     def __init__(self):
