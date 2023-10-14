@@ -5,7 +5,7 @@
     This is a multy line comment
     */
     $a = 10; //setting variable named 'a' to integer 10;
-    $b = 'apples' //setting variable 'b' to string apples
+    $b = 'apples'; //setting variable 'b' to string apples
     echo $a;
     echo "<br>";
     echo $b;
