@@ -1,7 +1,11 @@
+#CONTROLLERS
+#CONTROLLERS
+#CONTROLLERS
 import json # For transferring data between server and client
 import multiprocessing # For concurrent processing (interface handling, generation of graphs, etc.)
 from database import Database
 
+# ALL OF THESE RETURN TO CLIENT
 class ConnectionAgent():
     def __init__(self):
         pass

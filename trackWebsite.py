@@ -4,8 +4,9 @@ from database import Database
 
 class TrackWebsite(): # Controller(or Boundary?)
     def __init__(self):
-        self.database = Database()
-        self.database.connect()
+        # self.database = Database()
+        # self.database.connect()
+        
         self.status = {
             200: "Website Available",
             301: "Permanent Redirect",
@@ -34,19 +35,19 @@ class TrackWebsite(): # Controller(or Boundary?)
                 print('Web site does not exist') 
                 WebsiteDoesNotExist = True
             
-        dict = {"url":url}
+        # dict = {"url":url}
         
-        self.database.insertPost(dict)
-        print("inserted\n", url, "\nsuccessfully")
-        return dict
+        # self.database.insertPost(dict)
+        # print("inserted\n", url, "\nsuccessfully")
+        return url
         
-    def getWebsite(self, url:dict):
-        print(self.database.getPost(url)["url"])
-        self.database.getPost(url)["url"]
-        
+    # def getWebsite(self, url:dict):
+    #     # print(self.database.getPost(url)["url"])
+    #     # self.database.getPost(url)["url"]
+    #     return url
         
 
-track = TrackWebsite()
-track.getWebsite({"url":"https://google.com"})
+# track = TrackWebsite()
+# track.getWebsite({"url":"https://google.com"})
 
 
