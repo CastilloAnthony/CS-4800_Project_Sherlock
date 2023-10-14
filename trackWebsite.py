@@ -6,7 +6,14 @@ class TrackWebsite(): # Controller(or Boundary?)
     def __init__(self):
         self.database = Database()
         self.database.connect()
-        
+        self.status = {
+            200: "Website Available",
+            301: "Permanent Redirect",
+            302: "Temporary Redirect",
+            404: "Not Found",
+            500: "Internal Server Error",
+            503: "Service Unavailable"
+        }
     def __del__(self):
         pass
     
@@ -31,6 +38,15 @@ class TrackWebsite(): # Controller(or Boundary?)
         
         self.database.insertPost(dict)
         print("inserted\n", url, "\nsuccessfully")
+        return dict
+        
+    def getWebsite(self, url:dict):
+        print(self.database.getPost(url)["url"])
+        self.database.getPost(url)["url"]
+        
+        
 
 track = TrackWebsite()
-track.enterWebsite()
+track.getWebsite({"url":"https://google.com"})
+
+
