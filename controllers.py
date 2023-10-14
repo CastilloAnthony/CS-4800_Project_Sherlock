@@ -1,22 +1,19 @@
 #CONTROLLERS
 #CONTROLLERS
 #CONTROLLERS
-import json # For transferring data between server and client
 import multiprocessing # For concurrent processing (interface handling, generation of graphs, etc.)
-from database import Database
+#from database import Database 
 
 # ALL OF THESE RETURN TO CLIENT
-class ConnectionAgent():
-    def __init__(self):
-        pass
 
-    def __del__(self):
-        pass
-#end ConnectionAgent
-
-class Homepage(): # Controller(or Boundary?)
+class Homepage(): # Controller
     def __init__(self):
-        self.database = Database()
+        #self.database = Database()
+        self.__trackWebsite = TrackWebsite() # Controller
+        self.__deleteWebsite = DeleteWebsite() # Controller
+        self.__addPreset = AddPreset() # Controller
+        self.__editPreset = EditPreset() # Controller
+        self.__deletePreset = DeletePreset() # Controller
 
     def __del__(self):
         pass
@@ -37,10 +34,11 @@ class Homepage(): # Controller(or Boundary?)
         pass
 #end Homepage
 
-class TrackWebsite(): # Controller(or Boundary?)
+class TrackWebsite(): # Controller
     def __init__(self):
-        self.database = Database()
-        self.database.connect()
+        #self.database = Database()
+        #self.database.connect()
+        pass
         
     def __del__(self):
         pass
@@ -75,10 +73,26 @@ class TrackWebsite(): # Controller(or Boundary?)
         print(url)
         dict = {"url":url}
         
-        self.database.insertPost(dict)
+        #self.database.insertPost(dict)
 #end TrackWebsite
 
-class EditPreset(): # Controller(or Boundary?)
+class DeleteWebsite(): # Controller
+    def __init__(self):
+        pass
+
+    def __del__(self):
+        pass
+#end DeleteWebsite
+
+class AddPreset(): # Controller
+    def __init__(self):
+        pass
+
+    def __del__(self):
+        pass
+#end AddPreset
+
+class EditPreset(): # Controller
     def __init__(self):
         pass
 
@@ -86,3 +100,10 @@ class EditPreset(): # Controller(or Boundary?)
         pass
 #end EditPreset
 
+class DeletePreset(): # Controller
+    def __init__(self):
+        pass
+
+    def __del__(self):
+        pass
+#end DeletePreset

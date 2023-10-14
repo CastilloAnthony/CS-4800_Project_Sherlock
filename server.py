@@ -5,6 +5,7 @@ import multiprocessing # For concurrent processing (client requests, data retriv
 import pymongo
 
 class Server(): # The main server handler class
+    # Communicates with DB using DBconnection and Clients with clientManager
     def __init__(self):
         self.__DBconneciton = False
         self.__clientManager = False
@@ -37,6 +38,7 @@ class Server(): # The main server handler class
 # end Server
 
 class DBConnectionAgent():
+    # Communicates directly with DB and Server
     def __init__(self):
         self.__client = False
         self.__db = False
