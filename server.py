@@ -1,34 +1,41 @@
-#import mysql.connector # For database, unless we use MongoDB
-#import sql # For transferring data between server and client
+import socket # Networking stuff
+import json # For transferring data between server and client
 import uuid # Universally Unique IDentifier (For User IDs and others things)
-import multiprocessing # For concurrent processing (client requests, data retrival, etc.)
-import pymongo
+import multiprocessing as mp # For concurrent processing (client requests, data retrival, etc.)
+import pymongo # For communicating with the MongoDB
 
 class Server(): # The main server handler class
     # Communicates with DB using DBconnection and Clients with clientManager
     def __init__(self):
         self.__DBconneciton = False
         self.__clientManager = False
-
+        self.__processes = {}
+        self.__pipes = {}
     def __del__(self):
+        for i in self.__processes:
+            self.__processes[i].close()
         del self.__DBconneciton
         del self.__clientManager
 
     def startDB(self):
-        """Creates the database and then sets up a conneciton agent
+        """Creates the database and/or sets up a conneciton agent to the database (Might not need)
         """
-        myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+        #myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 
     def setupConnection(self, address="localhost", port="27017"):
         self.__DBconneciton = DBConnectionAgent()
         if self.__DBconneciton.connect(address, port):
             print("Successfully connected to DB at "+"mongodb://"+address+":"+port+"/")
-            self.__clientManager = ClientListener()
+            self._startClientListener()
         else:
             print("Unable to connect to DB at "+"mongodb://"+address+":"+port+"/")
     
-    def _clientListener(self):
-        pass
+    def _startClientListener(self):
+        parent_ClientListenerPipe, child_ClientListenerPipe = mp.Pipe()
+        self.__pipes["ClientListener"] = parent_ClientListenerPipe
+        self.__clientManager = ClientListener(child_ClientListenerPipe)
+        self.__processes["ClientListener"] = mp.Process(name="ClientListenerProcess", target=self.__clientManager._listen())
+        #self.__processes["ClientListener"].start()
 
     def pollWebsites(self):
         pass
@@ -120,11 +127,16 @@ class DBConnectionAgent():
 
     def requestFromDB(self, column, query:dict):
         if self.__db != False:
-            pass
+            return self.__db[column].find_one(query)
     
+    def requestManyFromDB(self, column, query:dict):
+        if self.__db != False:
+            return self.__db[column].find(query)
+
     def clearDB(self, column):
         self.__db[column].delete_many({})
 
+    '''
     def insertPosts(self, post:dict):
         posts = self.__db.posts
         post_id = posts.insert_one(post).inserted_id
@@ -132,22 +144,28 @@ class DBConnectionAgent():
 
     def getPost(self, query:dict):
         return self.posts.find_one(query)
-    
+    '''
 #end DBConnecitonAgent
 
 class ClientListener():
     # Functions should use multiprocessing for optimized response time
-    def __init__(self):
+    def __init__(self, pipe):
         self.__knownClients = {}
         self.__processList = {}
+        self.__pipe = pipe
 
     def __del__(self):
-        pass
+        del self.__knownClients
+        del self.__processList
+        del self.__pipe
 
     def _listen(self):
         # Listens on port 77777
+        self.__pipe.send(7)
         while True:
             break
+            yield
+        self.__pipe.close()
 
     def _verifyClient(self, client):
         if client in self.__knownClients:
@@ -157,7 +175,7 @@ class ClientListener():
 
     def _addClient(self, client):
         if not self._verifyClient(client):
-            newClient = Client()
+            newClient = ClientInfo()
             newClient.setName("test")
             newClient.setAddress("1.2.3.4")
             newClient.setUUID(uuid.uuid4())
@@ -173,7 +191,7 @@ class ClientListener():
         pass
 #end CLientListener
 
-class Client():
+class ClientInfo():
     def __init__(self):
         self.__name = False
         self.__address = False
