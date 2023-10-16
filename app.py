@@ -1,3 +1,7 @@
+#to get flask on your computers
+# pip install flask
+# python app.py
+
 from flask import Flask, render_template
 app = Flask(__name__)
 @app.route('/')
