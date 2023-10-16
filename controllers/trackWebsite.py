@@ -1,36 +1,3 @@
-#DEPRECIATED, DO NOT USE FILE
-#CONTROLLERS
-#CONTROLLERS
-#CONTROLLERS
-import multiprocessing # For concurrent processing (interface handling, generation of graphs, etc.)
-#from database import Database 
-
-# ALL OF THESE RETURN TO CLIENT
-
-class Homepage(): # Controller
-    def __init__(self):
-        #self.database = Database()
-        pass
-
-    def __del__(self):
-        pass
-
-    def trackWebsite(self):
-        pass
-
-    def deleteWebsite(self):
-        pass
-
-    def addPreset(self):
-        pass
-
-    def editPreset(self):
-        pass
-
-    def deletePreset(self):
-        pass
-#end Homepage
-
 class TrackWebsite(): # Controller
     def __init__(self):
         #self.database = Database()
@@ -72,36 +39,3 @@ class TrackWebsite(): # Controller
         
         #self.database.insertPost(dict)
 #end TrackWebsite
-
-class DeleteWebsite(): # Controller
-    def __init__(self):
-        pass
-
-    def __del__(self):
-        pass
-#end DeleteWebsite
-
-class AddPreset(): # Controller
-    def __init__(self):
-        pass
-
-    def __del__(self):
-        pass
-#end AddPreset
-
-class EditPreset(): # Controller
-    def __init__(self):
-        pass
-
-    def __del__(self):
-        pass
-#end EditPreset
-
-class DeletePreset(): # Controller
-    def __init__(self):
-        pass
-
-    def __del__(self):
-        pass
-#end DeletePreset
-
