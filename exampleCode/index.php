@@ -35,7 +35,7 @@
         <title>Document</title>
     </head>
     <body>
-        <form action="practice.php" method="GET">
+        <form action="practice.php" method="POST">
             <!--
                 GET: unsafe way to send info,
                 POST: safe way to send info,
