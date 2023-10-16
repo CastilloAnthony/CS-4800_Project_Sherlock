@@ -1,3 +1,4 @@
+# DEPRECIATED, DO NOT USE FILE
 import time
 import random
 import socket # Networking stuff
