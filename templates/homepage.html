@@ -2,40 +2,13 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Vertical Menu</title>
-        <link rel="stylesheet" href="style.css">
+        <title>Home Page</title>
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-            ul{
-                list-style-type:none;
-                padding:0;
-                margin:0;
-            }
-            li a{
-                display:block;
-                width:60px;
-                background-color:lightgray;
-                color:black;
-                text-decoration:none;
-                padding:8px 16px;
-            }
-            li a:hover{
-                background-color:black;
-                color:white;
-            }
-            li a.current{
-                background-color:green;
-                color:white;
-            }
-            li a:hover:not(.current){
-                background-color:black;
-                color:white;
-            }
-        </style>
     </head>
     <body>
         <ul>
-            <li><a class="current" href="">Home</a></li>
+            <li><a class="current" href="/">Home</a></li>
             <li><a href="trackWebsite">track Website</a></li>
             <li><a href="deleteWebsite">Delete Website</a></li>
             <li><a href="addPreset">Add Preset</a></li>
