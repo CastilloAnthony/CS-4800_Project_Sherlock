@@ -20,3 +20,12 @@ This program is designed for California State University Stanislaus' CS-4800 202
 
 ### Disclaimer
 - All aspects are subject to change as the project progresses.
+
+#### Explanation of Folders
+- client: Contains a python file for which the controllers will be working out of and the file will be used to communicate with the server.
+- controllers: These python files will be the controllers for our project.
+- exampleCode: Just some exploration on how things work and give a shot to some things.
+- server: Python files responsible for our server.
+- static: Holds a folder of images and a folder of css files.
+- templates: Hold html files that import from the static pictures and css folders.
+- oldFiles: Temporary Storage of old files. (Do we need them?)
