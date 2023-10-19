@@ -2,7 +2,7 @@
 # pip install flask
 # python app.py
 # this simply adds routes for the sites that will allow different sites to be hit. 
-
+# import pymongo
 from flask import Flask, render_template, request
 app = Flask(__name__)
 @app.route('/')
