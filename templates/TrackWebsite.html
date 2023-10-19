@@ -17,10 +17,16 @@
         <br>
         <br>
         <h1 style="text-align:center;color:white;">Track Website</h1>
-        <form style="text-align:center;" action="/action_page.php">
+        <form action="trackWebsite/newTrackedWebsite" method="POST">
+            <!--
+                GET: unsafe way to send info,
+                POST: safe way to send info,
+                REQUEST: if you don't know you used
+                        in the other php file,
+            -->
             <label style="color:white;" for="fname">url:</label>
-            <input type="text" id="fname" name="fname"><br><br>
-            <input type="submit" value="Submit">
+            <input type="text" name="url">
+            <button type="submit">Click Me!!!</button>
         </form>
     </body>
 </html>
