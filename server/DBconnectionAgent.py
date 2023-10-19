@@ -1,5 +1,5 @@
 import pymongo
-
+import time
 class DBConnectionAgent():
     # Communicates directly with DB and Server
     def __init__(self):
@@ -30,8 +30,11 @@ class DBConnectionAgent():
             return False
         
     def disconnect(self):
-        pass
+        self.__client.close()
 
+    def createNewDB(self, name):
+        self.__client[name]['Initial'].insert_one({'Created on':time.ctime()})
+    
     def getDBs(self):
         """Returns a List of databases for the connected system
 
@@ -75,21 +78,21 @@ class DBConnectionAgent():
         else:
             return False
 
-    def removeFromDB(self, column, query:dict):
+    def removeFromDB(self, column:str, query:dict):
         self.__db[column].delete_one(query)
 
-    def removeManyFromDB(self, column, query:dict):
+    def removeManyFromDB(self, column:str, query:dict):
         self.__db[column].delete_many(query)
 
-    def requestFromDB(self, column, query:dict):
+    def requestFromDB(self, column:str, query:dict):
         if self.__db != False:
             return self.__db[column].find_one(query)
     
-    def requestManyFromDB(self, column, query:dict):
+    def requestManyFromDB(self, column:str, query:dict):
         if self.__db != False:
             return self.__db[column].find(query)
 
-    def clearDB(self, column):
+    def clearDB(self, column:str):
         self.__db[column].delete_many({})
 
     '''

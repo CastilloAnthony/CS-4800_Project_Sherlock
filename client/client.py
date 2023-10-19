@@ -1,7 +1,13 @@
 import socket # Networking stuff
 import json # For transferring data between server and client
 import multiprocessing # For concurrent processing (interface handling, generation of graphs, etc.)
-from controllers import Homepage, TrackWebsite, DeleteWebsite, AddPreset, EditPreset, DeletePreset
+from ..controllers import addPreset
+import addPreset
+import deletePreset
+import deleteWebsite
+import editPreset
+import homepage
+import trackWebsite
 
 class Client():
     # Communicates with Server
