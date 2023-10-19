@@ -15,6 +15,26 @@ def index():
 def addPreset():
     return render_template('AddPreset.html')
 
+@app.route('/addPreset/newAddedPreset',methods=['POST'])
+def newAddedPreset():
+    url = request.form['url']
+    print('url: ', url)
+    trackWebsite = TrackWebsite()
+    print(type(trackWebsite))
+    
+    #request 1: INSERT URL: needs (UUID, request_type=[insert,remove,or request], column=[masterlist, websiteData, presets, users], 'query'=actual data)
+    # {'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}    
+    info = q.put({'id':uuid.uuid4(),
+                  'request_type':'insert',
+                  'column':'presets',
+                  'query':str(url)
+                  })
+    
+    #request 2: RETRIEVAL OF MASTER LIST
+    
+    # request 3 INSERT OF PRESET 
+    return 'URL INFO<br/> %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (info), url 
+
 @app.route('/deletePreset')
 def deletePreset():
     return render_template('DeletePreset.html')
@@ -27,9 +47,9 @@ def deleteWebsite():
 def editPreset():
     return render_template('EditPreset.html')
 
-@app.route('/trackWebsite') 
+@app.route('/trackWebsite') #add website // trackWebsite
 def trackWebsite():
-    return render_template('TrackWebsite.html')
+    return render_template('TrackWebsite.html') #add website // trackWebsite
     
 # We are going to request some data in
 # trackWebsite specifically the url
@@ -37,14 +57,14 @@ def trackWebsite():
 # can send it to the client
 
 @app.route('/trackWebsite/newTrackedWebsite',methods=['POST'])
-def newPreset():
+def addWebsite():
     url = request.form['url']
     print('url: ', url)
     trackWebsite = TrackWebsite()
     print(type(trackWebsite))
     
     #request 1: INSERT URL
-    info = trackWebsite.enterWebsite(str(url))
+    info = q(str(url))
     
     #request 2: RETRIEVAL OF MASTER LIST
     
@@ -64,6 +84,6 @@ def newPreset():
 def startFlask(q):#parameter: multiproccessor.Queue
     app.run(host="0.0.0.0", port=7777)#, debug=True)
 
-if __name__ == '__main__':
-    startFlask()
+# if __name__ == '__main__':
+#     startFlask()
     
