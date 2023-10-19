@@ -44,6 +44,7 @@ def newPreset():
     print(type(trackWebsite))
     
     info = trackWebsite.enterWebsite(str(url))
+    
     # call a function that
     # will give me some cool graphs and info on that website
     # Possibly a thing that sends
