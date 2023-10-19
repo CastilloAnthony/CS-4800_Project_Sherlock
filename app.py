@@ -25,13 +25,10 @@ def deleteWebsite():
 def editPreset():
     return render_template('EditPreset.html')
 
-
-
-
 @app.route('/trackWebsite')
 def trackWebsite():
     return render_template('TrackWebsite.html')
-
+    
 # We are going to request some data in
 # trackWebsite specifically the url
 # and then we will return the url so that we
@@ -41,11 +38,14 @@ def trackWebsite():
 def newPreset():
     url = request.form['url']
     print('url: ', url)
-    return 'Hello %s have fun learning python <br/> <a href="/">TrackWebsite</a>' % (url), url
+    # call a function that
+    # will give me some cool graphs and info on that website
+    # Possibly a thing that sends
+    # the url to the client right here
+    return 'URL = %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (url), url
 
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-    
     
