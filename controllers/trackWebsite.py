@@ -55,7 +55,17 @@ website_url = [
         "http://the-internet.herokuapp.com/status_codes/301",
         "http://the-internet.herokuapp.com/status_codes/500"
     ]
+website_single_url = "https://www.google.co.in"
+
 x = TrackWebsite()
-for url in website_url:
-    # x.enterWebsite(i)
-    print(x.enterWebsite(url))
+def use_all(website_url):
+    for url in website_url:
+        # x.enterWebsite(i)
+        print(x.enterWebsite(url))
+
+def get_one(website_single_url):
+    print(x.enterWebsite(website_single_url))
+    
+# Use one of these
+# get_one(website_single_url="https://www.google.co.in")
+# use_all(website_url=website_url)
