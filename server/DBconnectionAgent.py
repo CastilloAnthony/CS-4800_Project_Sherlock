@@ -1,5 +1,7 @@
 import pymongo
 import time
+import multiprocessing as mp
+import uuid
 class DBConnectionAgent():
     # Communicates directly with DB and Server
     def __init__(self):
@@ -92,6 +94,19 @@ class DBConnectionAgent():
         if self.__db != False:
             return self.__db[column].find(query)
 
+    def requestFromDBwithQ(self, queue:mp.Queue, ID:uuid.uuid4, column:str, query:dict): # Using multiprocessing Queue
+        #self._requestFromDBwithQ(self.__db, queue, ID, column, query)
+        if self.__db != False:
+            queue.put({ID:self.__db[column].find_one(query)})
+    
+    def _requestFromDBwithQ(db, queue:mp.Queue, ID:uuid.uuid4, column:str, query:dict): # Using multiprocessing Queue
+        if db != False:
+            queue.put({ID:db[column].find_one(query)})
+
+    def requestManyFromDBwithQ(self, queue:mp.Queue, ID:uuid.uuid4, column:str, query:dict): # Using mulitprocessing Queue
+        if self.__db != False:
+            queue.put({'ID':ID, 'data':self.__db[column].find(query)}) 
+    
     def clearDB(self, column:str):
         self.__db[column].delete_many({})
 

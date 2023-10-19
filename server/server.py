@@ -1,5 +1,7 @@
 import time
 import multiprocessing as mp
+import uuid
+import socket
 from DBconnectionAgent import DBConnectionAgent
 #from clientListener import ClientListener
 
@@ -8,7 +10,10 @@ class Server(): # The main server handler class
     def __init__(self):
         self.__DBconneciton = False
         self.__clientManager = False
+        self.__columns = ['masterList', 'websiteData', 'users']
+        self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
         self.__q = mp.Queue(maxsize=100)
+        self.__requests = []
         print('Queue Size: '+str(self.__q.qsize()))
         self.__processes = {}
         self.__pipes = {}
@@ -59,32 +64,57 @@ class Server(): # The main server handler class
             print("Unable to connect to DB at "+"mongodb://"+address+":"+port+"/")
 
     def sendToDB(self, column:str, content:dict):
-        if column == 'masterList':
+        if column in self.__columns:
             self.__DBconneciton.addToDB(column, content)
-        elif column == 'websiteData':
-            self.__DBconneciton.addToDB(column, content)
-        elif column == 'users':
-            self.__DBconneciton.addToDB(column, content)
+            #newUUID = str(uuid.uuid4())
+            #self.__processes[newUUID] = mp.Process(name ='SHERLOCK_Insert'+newUUID, target=self.__DBconneciton.addToDB, args=[column, content])
+            #self.__processes[newUUID].start()
+            #self.__DBconneciton.addToDB(column, content)
         else:
             return False
 
-    def sendManyToDB(self, column:str, contents:dict):
+    def sendManyToDB(self, column:str, contents:dict): # What would the format of 'contents' be for multiple inserts?
         pass
 
     def requestFromDB(self, column:str, query:dict):
-        self.__DBconneciton.addToDB(column, query)
+        if column in self.__columns:
+            newUUID = str(uuid.uuid4())
+            self.__requests.append(newUUID)
+            self.__processes[newUUID] = mp.Process(name ='Request'+newUUID, target=self.__DBconneciton.requestFromDBwithQ, args=[self.__q, column, query])
+            self.__processes[newUUID].start()
+        else:
+            return False
+        #self.__DBconneciton.addToDB(column, query)
     
     def requestManyFromDB(self, column:str, queries:dict):
-        self.__DBconneciton.addToDB(column, queries)
+        if column in self.__columns:
+            newUUID = str(uuid.uuid4())
+            #self.__processes[newUUID] = mp.Process(name ='Request'+newUUID, target=self.__DBconneciton.requestManyFromDBwithQ, args=[self.__q, column, queries])
+            #self.__processes[newUUID].start()
+        else:
+            return False
+        #self.__DBconneciton.addToDB(column, queries
+
+    def _returnData(self):
+        data = self.__q.get()
+        if data['ID'] in self.__requests:
+            pass
 
     def _pollWebsites(self):
-        tempList = self.__DBconneciton.addToDB('masterList', {})
+        #tempList = self.__DBconneciton.addToDB('masterList', {})
+        for i in self.__httpPorts:
+            website = 'www.google.com'
+            start = time.time()
+            socket.create_connection((website, i))
+            end = time.time()
+            print('Latency to ', website+':'+str(i), str(end-start)+'ms')
+            self.sendToDB('websiteData', {'website':'www.google.com', 'timestamp':time.ctime(), 'up':True,'latency':end-start})
     
     def mainLoop(self):
         pass
 
     def _startClientListener(self):
-        # Not needed
+        # DEPRECIATED
         #parent_ClientListenerPipe, child_ClientListenerPipe = mp.Pipe()
         self.__q = mp.Queue(3)
         #self.__pipes["ClientListener"] = parent_ClientListenerPipe
@@ -95,5 +125,8 @@ class Server(): # The main server handler class
 
 def testServer():
     newServer = Server()
+    newServer._pollWebsites()
+    #newServer.sendToDB('websiteData', {'website':'www.google.com', 'timestamp':time.ctime(), 'data':1035100})
 
-testServer()
+if __name__ == '__main__':
+    testServer()
