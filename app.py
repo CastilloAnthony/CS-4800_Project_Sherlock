@@ -43,12 +43,14 @@ def newPreset():
     trackWebsite = TrackWebsite()
     print(type(trackWebsite))
     
-    trackWebsite.enterWebsite(str(url))
+    info = trackWebsite.enterWebsite(str(url))
     # call a function that
     # will give me some cool graphs and info on that website
     # Possibly a thing that sends
     # the url to the client right here
-    return 'URL = %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (url), url
+    # return 'Hello %s %s have fun learning python <br/> <a href="/">Back Home</a>' % (first_name, last_name)
+    return 'URL INFO<br/> %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (info), url 
+
 
 
 

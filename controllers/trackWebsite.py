@@ -2,7 +2,8 @@
 import requests
 #pip install icecream
 from icecream import ic
-
+import socket
+import time
 class TrackWebsite: # Controller
     def __init__(self):
         #self.database = Database()
@@ -21,13 +22,16 @@ class TrackWebsite: # Controller
         pass
     
     def enterWebsite(self, url):
-        
+        # start = time.time()
+        # socket.create_connection((object['website'], port))
+        # # end = time.time()
         try:
             web_response = requests.get(url)
             url_info = {
                 'url':url,
                 'status_num':web_response.status_code,
                 'status_desc':self.statuses[web_response.status_code],
+                # 'latency': end - start,
                 # 'url_json':web_response.json()
             }
             ic(url_info)
