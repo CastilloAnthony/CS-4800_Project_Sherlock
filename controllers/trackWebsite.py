@@ -4,6 +4,7 @@ import requests
 from icecream import ic
 import socket
 import time
+
 class TrackWebsite: # Controller
     def __init__(self):
         #self.database = Database()
@@ -15,6 +16,7 @@ class TrackWebsite: # Controller
             404: "Not Found",
             500: "Internal Server Error",
             503: "Service Unavailable",
+            505: "HTTP not supported",
             999: "Shit's Fucked"
         }
         
@@ -61,15 +63,15 @@ website_url = [
     ]
 website_single_url = "https://www.google.co.in"
 
-# x = TrackWebsite()
-# def use_all(website_url):
-#     for url in website_url:
-#         # x.enterWebsite(i)
-#         print(x.enterWebsite(url))
+x = TrackWebsite()
+def use_all(website_url):
+    for url in website_url:
+        # x.enterWebsite(i)
+        print(x.enterWebsite(url))
 
-# def get_one(website_single_url):
-#     print(x.enterWebsite(website_single_url))
+def get_one(website_single_url):
+    print(x.enterWebsite(website_single_url))
     
 # Use one of these
 # get_one(website_single_url="https://www.google.co.in")
-# use_all(website_url=website_url)
+use_all(website_url=website_url)

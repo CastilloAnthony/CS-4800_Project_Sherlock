@@ -28,7 +28,7 @@ def deleteWebsite():
 def editPreset():
     return render_template('EditPreset.html')
 
-@app.route('/trackWebsite')
+@app.route('/trackWebsite') 
 def trackWebsite():
     return render_template('TrackWebsite.html')
     
@@ -44,7 +44,14 @@ def newPreset():
     trackWebsite = TrackWebsite()
     print(type(trackWebsite))
     
+    #request 1: INSERT URL
     info = trackWebsite.enterWebsite(str(url))
+    
+    #request 2: RETRIEVAL OF MASTER LIST
+    
+    # request 3 INSERT OF PRESET 
+    
+    
     # call a function that
     # will give me some cool graphs and info on that website
     # Possibly a thing that sends
@@ -55,7 +62,7 @@ def newPreset():
 
 
 
-def startFlask():
+def startFlask(q):#parameter: multiproccessor.Queue
     app.run(host="0.0.0.0", port=7777)#, debug=True)
 
 if __name__ == '__main__':
