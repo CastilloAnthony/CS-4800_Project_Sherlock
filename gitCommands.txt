@@ -1,0 +1,9 @@
+git pull
+git add <files to add>
+git commit -m "message"
+git push
+
+git revert
+git log
+git show <a commit's hash>
+git checkout <a commit's hash>

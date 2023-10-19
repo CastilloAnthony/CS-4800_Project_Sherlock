@@ -1,7 +1,0 @@
-static: Holds a folder of images and a folder of css files
-templates: Hold html files that import from the static pictures and css folders
-exampleCode: Just some exploration on how things work and give a shot to some things
-controllers: These python files will be the controllers for our project
-client: not sure yet :()
-_pycache_: not sure :()
-server: python files responsible for our server
