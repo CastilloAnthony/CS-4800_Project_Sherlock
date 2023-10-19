@@ -11,12 +11,14 @@ class Server(): # The main server handler class
     def __init__(self):
         self.__DBconneciton = False
         # self.__clientManager = False
-        self.__columns = ['masterList', 'websiteData', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
+        self.__columns = ['masterList', 'websiteData', 'presets', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
+        self.__requestTypes = ['insert', 'remove', 'request'] # 
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
         self.__pollingSpeed = 3 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
-        # self.__q = mp.Queue(maxsize=100)
-        # self.__requests = []
+        self.__newSitesQ = mp.Queue(maxsize=100)
+        self.__requestsQ = mp.Queue(maxsize=100)
+        self.__dataQ = mp.Queue(maxsize=100)
         # print('Queue Size: '+str(self.__q.qsize()))
         self.__processes = {}
         # self.__pipes = {}
@@ -55,7 +57,7 @@ class Server(): # The main server handler class
                     if self.__DBconneciton.useDB('SHERLOCK'):
                         print('Using the SHERLOCK database.')
                         for i in self.__sampleSites:
-                            self.sendToDB('masterList', {'website':i})
+                            self.sendToDB('masterList', {'url':i})
                     else:
                         print('Could not connect to the new SHERLOCK database.')
                 else:
@@ -109,29 +111,38 @@ class Server(): # The main server handler class
         #     return False
         #self.__DBconneciton.addToDB(column, queries
 
+    def _checkForRequests(self):
+        #{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}
+        #while self.__newSitesQ.empty() != False:
+            #newRequest = 
+            #self.sendToDB('masterList', {'url':self.__newSitesQ.get()})
+        pass
+
     def _pollWebsites(self):
         #tempList = self.__DBconneciton.addToDB('masterList', {})
         #masterList = ['www.google.com', 'www.instagram.com', 'csustan.edu']
+        self._checkForNewSites()
         masterList = self.requestManyFromDB('masterList', {})
         #print(masterList)
         for object in masterList:
             for port in self.__httpPorts:
                 try:
                     start = time.time()
-                    socket.create_connection((object['website'], port))
+                    socket.create_connection((object['url'], port))
                     end = time.time()
                     #print('Latency to ', website+':'+str(i), str(end-start)+'ms')
-                    self.sendToDB('websiteData', {'website':object['website'], 'port':port, 'timestamp':time.ctime(), 'up':True, 'latency':end-start})
+                    self.sendToDB('websiteData', {'url':object['url'], 'port':port, 'timestamp':time.ctime(), 'up':True, 'latency':end-start})
                 except:
-                    self.sendToDB('websiteData', {'website':object['website'], 'port':port, 'timestamp':time.ctime(), 'up':False, 'latency':9999})
+                    self.sendToDB('websiteData', {'url':object['url'], 'port':port, 'timestamp':time.ctime(), 'up':False, 'latency':9999})
     
     def _mainLoop(self):
         while True:
             self._pollWebsites()
             time.sleep(self.__pollingSpeed)
+            # addNewWebsites to DB
 
     def startServer(self):
-        self.__processes['app'] = mp.Process(name ='Flask', target=app.startFlask)
+        self.__processes['app'] = mp.Process(name ='Flask', target=app.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'].start()
         self._mainLoop()
 # end Server
