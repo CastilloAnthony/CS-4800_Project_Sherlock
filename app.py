@@ -54,7 +54,7 @@ def newPreset():
 
 
 
-def startFlask():
+def startFlask(q):#parameter: multiproccessor.Queue
     app.run(host="0.0.0.0", port=7777)#, debug=True)
 
 if __name__ == '__main__':
