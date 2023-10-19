@@ -10,16 +10,16 @@ class Server(): # The main server handler class
     # Communicates with DB using DBconnection and Clients with clientManager
     def __init__(self):
         self.__DBconneciton = False
-        self.__clientManager = False
+        # self.__clientManager = False
         self.__columns = ['masterList', 'websiteData', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
         self.__pollingSpeed = 3 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
-        self.__q = mp.Queue(maxsize=100)
-        self.__requests = []
-        print('Queue Size: '+str(self.__q.qsize()))
+        # self.__q = mp.Queue(maxsize=100)
+        # self.__requests = []
+        # print('Queue Size: '+str(self.__q.qsize()))
         self.__processes = {}
-        self.__pipes = {}
+        # self.__pipes = {}
         self._setupDBConnection()
 
     def __del__(self):
@@ -63,6 +63,12 @@ class Server(): # The main server handler class
         else:
             print("Unable to connect to DB at "+"mongodb://"+address+":"+port+"/")
 
+    def setPollingSpeed(self, speed:int):
+        self.__pollingSpeed = speed
+
+    def getPollingSpeed(self):
+        return self.__pollingSpeed
+    
     def sendToDB(self, column:str, content:dict):
         if column in self.__columns:
             self.__DBconneciton.addToDB(column, content)
@@ -81,15 +87,13 @@ class Server(): # The main server handler class
             return self.__DBconneciton.requestFromDB(column, query)
         else:
             return False
-        '''
-        if column in self.__columns:
-            newUUID = str(uuid.uuid4())
-            self.__requests.append(newUUID)
-            self.__processes[newUUID] = mp.Process(name ='Request'+newUUID, target=self.__DBconneciton.requestFromDBwithQ, args=[self.__q, column, query])
-            self.__processes[newUUID].start()
-        else:
-            return False
-        '''
+        # if column in self.__columns:
+        #     newUUID = str(uuid.uuid4())
+        #     self.__requests.append(newUUID)
+        #     self.__processes[newUUID] = mp.Process(name ='Request'+newUUID, target=self.__DBconneciton.requestFromDBwithQ, args=[self.__q, column, query])
+        #     self.__processes[newUUID].start()
+        # else:
+        #     return False
         #self.__DBconneciton.addToDB(column, query)
     
     def requestManyFromDB(self, column:str, queries:dict):
@@ -97,14 +101,12 @@ class Server(): # The main server handler class
             return self.__DBconneciton.requestManyFromDB(column, queries)
         else:
                 return False
-        '''
-        if column in self.__columns:
-            newUUID = str(uuid.uuid4())
-            #self.__processes[newUUID] = mp.Process(name ='Request'+newUUID, target=self.__DBconneciton.requestManyFromDBwithQ, args=[self.__q, column, queries])
-            #self.__processes[newUUID].start()
-        else:
-            return False
-        '''
+        # if column in self.__columns:
+        #     newUUID = str(uuid.uuid4())
+        #     #self.__processes[newUUID] = mp.Process(name ='Request'+newUUID, target=self.__DBconneciton.requestManyFromDBwithQ, args=[self.__q, column, queries])
+        #     #self.__processes[newUUID].start()
+        # else:
+        #     return False
         #self.__DBconneciton.addToDB(column, queries
 
     def _pollWebsites(self):
@@ -123,7 +125,7 @@ class Server(): # The main server handler class
                 except:
                     self.sendToDB('websiteData', {'website':object['website'], 'port':port, 'timestamp':time.ctime(), 'up':False, 'latency':9999})
     
-    def mainLoop(self):
+    def _mainLoop(self):
         while True:
             self._pollWebsites()
             time.sleep(self.__pollingSpeed)
@@ -131,9 +133,11 @@ class Server(): # The main server handler class
     def startServer(self):
         self.__processes['app'] = mp.Process(name ='Flask', target=app.startFlask)
         self.__processes['app'].start()
-        self.mainLoop()
-        
-    def startDB(self):
+        self._mainLoop()
+# end Server
+
+'''
+def startDB(self):
         # NOT USED
         """Creates the database and/or sets up a conneciton agent to the database (Might not need)
         """
@@ -153,7 +157,8 @@ class Server(): # The main server handler class
         #self.__clientManager = ClientListener(self.__q)
         self.__processes["ClientListener"] = mp.Process(name="ClientListenerProcess", target=self.__clientManager._listen)
         self.__processes["ClientListener"].start()
-# end Server
+'''
+
 
 def testServer():
     newServer = Server()
