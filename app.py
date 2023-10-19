@@ -46,6 +46,9 @@ def newPreset():
 
 
 
+def startFlask():
+    app.run(host="0.0.0.0", port=7777)#, debug=True)
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    startFlask()
     

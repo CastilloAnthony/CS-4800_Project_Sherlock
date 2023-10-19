@@ -1,5 +1,7 @@
 import pymongo
-
+import time
+import multiprocessing as mp
+import uuid
 class DBConnectionAgent():
     # Communicates directly with DB and Server
     def __init__(self):
@@ -30,8 +32,11 @@ class DBConnectionAgent():
             return False
         
     def disconnect(self):
-        pass
+        self.__client.close()
 
+    def createNewDB(self, name:str):
+        self.__client[name]['Initial'].insert_one({'name':name, 'notes':'Created a new database named '+name, 'timestamp':time.ctime()})
+    
     def getDBs(self):
         """Returns a List of databases for the connected system
 
@@ -75,21 +80,34 @@ class DBConnectionAgent():
         else:
             return False
 
-    def removeFromDB(self, column, query:dict):
+    def removeFromDB(self, column:str, query:dict):
         self.__db[column].delete_one(query)
 
-    def removeManyFromDB(self, column, query:dict):
+    def removeManyFromDB(self, column:str, query:dict):
         self.__db[column].delete_many(query)
 
-    def requestFromDB(self, column, query:dict):
+    def requestFromDB(self, column:str, query:dict):
         if self.__db != False:
             return self.__db[column].find_one(query)
     
-    def requestManyFromDB(self, column, query:dict):
+    def requestManyFromDB(self, column:str, query:dict):
         if self.__db != False:
             return self.__db[column].find(query)
 
-    def clearDB(self, column):
+    def requestFromDBwithQ(self, queue:mp.Queue, ID:uuid.uuid4, column:str, query:dict): # Using multiprocessing Queue
+        #self._requestFromDBwithQ(self.__db, queue, ID, column, query)
+        if self.__db != False:
+            queue.put({ID:self.__db[column].find_one(query)})
+    
+    def _requestFromDBwithQ(db, queue:mp.Queue, ID:uuid.uuid4, column:str, query:dict): # Using multiprocessing Queue
+        if db != False:
+            queue.put({ID:db[column].find_one(query)})
+
+    def requestManyFromDBwithQ(self, queue:mp.Queue, ID:uuid.uuid4, column:str, query:dict): # Using mulitprocessing Queue
+        if self.__db != False:
+            queue.put({'ID':ID, 'data':self.__db[column].find(query)}) 
+    
+    def clearDB(self, column:str):
         self.__db[column].delete_many({})
 
     '''
