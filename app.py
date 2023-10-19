@@ -27,7 +27,7 @@ def deleteWebsite():
 def editPreset():
     return render_template('EditPreset.html')
 
-@app.route('/trackWebsite')
+@app.route('/trackWebsite') 
 def trackWebsite():
     return render_template('TrackWebsite.html')
     
@@ -43,7 +43,13 @@ def newPreset():
     trackWebsite = TrackWebsite()
     print(type(trackWebsite))
     
+    #request 1: INSERT URL
     info = trackWebsite.enterWebsite(str(url))
+    
+    #request 2: RETRIEVAL OF MASTER LIST
+    
+    # request 3 INSERT OF PRESET 
+    
     
     # call a function that
     # will give me some cool graphs and info on that website
