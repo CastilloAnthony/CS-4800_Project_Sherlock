@@ -2,8 +2,10 @@
 # pip install flask
 # python app.py
 # this simply adds routes for the sites that will allow different sites to be hit. 
-# import pymongo
+from controllers.trackWebsite import TrackWebsite
 from flask import Flask, render_template, request
+
+
 app = Flask(__name__)
 @app.route('/')
 def index():
@@ -38,6 +40,10 @@ def trackWebsite():
 def newPreset():
     url = request.form['url']
     print('url: ', url)
+    trackWebsite = TrackWebsite()
+    print(type(trackWebsite))
+    
+    trackWebsite.enterWebsite(str(url))
     # call a function that
     # will give me some cool graphs and info on that website
     # Possibly a thing that sends
