@@ -34,8 +34,8 @@ class DBConnectionAgent():
     def disconnect(self):
         self.__client.close()
 
-    def createNewDB(self, name):
-        self.__client[name]['Initial'].insert_one({'Created on':time.ctime()})
+    def createNewDB(self, name:str):
+        self.__client[name]['Initial'].insert_one({'name':name, 'notes':'Created a new database named '+name, 'timestamp':time.ctime()})
     
     def getDBs(self):
         """Returns a List of databases for the connected system
