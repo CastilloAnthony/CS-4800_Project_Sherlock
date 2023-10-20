@@ -9,22 +9,18 @@ import app
 class Server(): # The main server handler class
     # Communicates with DB using DBconnection and Clients with clientManager
     def __init__(self):
-        self.__DBconneciton = False
-        # self.__clientManager = False
+        self.__DBconneciton = False # The connection agent
         self.__columns = ['masterList', 'websiteData', 'presets', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
-        self.__requestTypes = ['insert', 'remove', 'request'] # 
+        self.__requestTypes = ['insert', 'remove', 'request'] # Types of requests the server can handle
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
         self.__pollingSpeed = 3 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
-        #self.__newSitesQ = mp.Queue(maxsize=100)
-        self.__requestsQ = mp.Queue(maxsize=1000)
-        self.__dataQ = mp.Queue(maxsize=1000)
-        # print('Queue Size: '+str(self.__q.qsize()))
+        self.__requestsQ = mp.Queue(maxsize=1000) # The request queue, only a clinet will put to this queue
+        self.__dataQ = mp.Queue(maxsize=1000) # The request queue, only the server will put to this queue
         self.__processes = {}
-        # self.__pipes = {}
         self._setupDBConnection()
 
-    def __del__(self):
+    def __del__(self): # WIP
         del self.__DBconneciton
         del self.__clientManager
         time.sleep(10)
@@ -113,8 +109,8 @@ class Server(): # The main server handler class
 
     def _checkForRequests(self):
         #{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}
-        while self.__requestsQ.empty() != False:
-            newRequest = self.__newSitesQ.get()
+        while self.__requestsQ.empty() != True:
+            newRequest = self.__requestsQ.get()
             if newRequest['request_type'] == 'request':
                 if newRequest['column'] in self.__columns:
                     self.__dataQ.put({'id':newRequest['id'], 'data':self.__DBconneciton.requestFromDB(newRequest['column'], newRequest['query'])})

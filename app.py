@@ -4,12 +4,19 @@
 # pip install flask
 # python app.py
 # this simply adds routes for the sites that will allow different sites to be hit. 
+<<<<<<< HEAD
 # from controllers.trackWebsite import TrackWebsite
 from flask import Flask, render_template, request
+=======
+from controllers.trackWebsite import TrackWebsite
+from flask import Flask, render_template, request#, session
+>>>>>>> 3e8a39301508e2bb1be7ebcb1c327a28fc8c0d2a
 import uuid
 from multiprocessing import Queue as Q
 
 app = Flask(__name__)
+#requestQ = False
+#dataQ = False
 @app.route('/')
 def index():
     return render_template('homepage.html')
@@ -187,8 +194,12 @@ def addWebsite():
 
 #   EVERY REQUESTQ.PUT YOU DO , DO A DATAQ.GET
 
-def startFlask(requestQ:Q, dataQ:Q):#parameter: multiproccessor.Queue
+def startFlask(requestsQ:Q, datasQ:Q):#parameter: multiproccessor.Queue
+    requestQ = requestsQ
+    dataQ = datasQ
     app.run(host="0.0.0.0", port=7777)#, debug=True)
+    requestQ = requestsQ
+    dataQ = datasQ
 
 # if __name__ == '__main__':
 #     startFlask(Q,Q)
