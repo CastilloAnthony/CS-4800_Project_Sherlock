@@ -7,7 +7,6 @@
 # from controllers.trackWebsite import TrackWebsite
 from flask import Flask, render_template, request
 from controllers.trackWebsite import TrackWebsite
-from flask import Flask, render_template, request#, session
 import uuid
 from multiprocessing import Queue as Q
 
