@@ -24,9 +24,9 @@ def addPreset():
                         'query': {}                
                   }
     
-    requestQ.put(masterListRequest)
+    app.requestQ.put(masterListRequest)
     list_of_masterlist_urls = []
-    newData = dataQ.get() # {'id':uuid.uuid4(), 'data':data}
+    newData = app.dataQ.get() # {'id':uuid.uuid4(), 'data':data}
     #RETURNS DICTIONARY: Object and URL
     if newData['id'] == masterListRequest['id']:
         if newData['data'] != False:
@@ -76,9 +76,9 @@ def newAddedPreset():
                   }
     
     #request 1: RETRIEVAL OF MASTER LIST
-    requestQ.put(masterListRequest)
+    app.requestQ.put(masterListRequest)
     #   GOTTA CHECK THE DATA QUEUE FOR THE DATA
-    newData = dataQ.get() 
+    newData = app.dataQ.get() 
     #RETURNS DICTIONARY: Object and URL
     if newData['id'] == masterListRequest['id']:
         if newData['data'] != False:
@@ -108,7 +108,7 @@ def newAddedPreset():
                   }
     
     # request 2 INSERT OF PRESET 
-    requestQ.put(newPreset)
+    app.requestQ.put(newPreset)
     
     # return 
     return 0
@@ -145,7 +145,7 @@ def addWebsite():
     print(type(trackWebsite))
     
     #request 1: INSERT URL
-    requestQ.put({
+    app.requestQ.put({
         
     })
     
@@ -175,12 +175,10 @@ def addWebsite():
 
 #   EVERY REQUESTQ.PUT YOU DO , DO A DATAQ.GET
 
-def startFlask(requestsQ:Q, datasQ:Q):#parameter: multiproccessor.Queue
-    requestQ = requestsQ
-    dataQ = datasQ
+def startFlask(requestQ:Q, dataQ:Q):#parameter: multiproccessor.Queue
+    app.requestQ = requestQ
+    app.dataQ = dataQ
     app.run(host="0.0.0.0", port=7777)#, debug=True)
-    requestQ = requestsQ
-    dataQ = datasQ
 
 # if __name__ == '__main__':
 #     startFlask()
