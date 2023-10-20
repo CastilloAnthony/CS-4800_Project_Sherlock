@@ -1,3 +1,5 @@
+https://jinja.palletsprojects.com/en/latest/templates/#template-inheritance
+
 when you want to enter in the variable passed from render_template(<>.html,jobs=JOBS) 
 //let's say JOBS is a dictionary 
 //like JOBS = [{'title':Adsfa,adsfad:adfa},{'title':Adsfa,adsfad:adfa}]
