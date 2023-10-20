@@ -1,0 +1,51 @@
+when you want to enter in the variable passed from render_template(<>.html,jobs=JOBS) 
+//let's say JOBS is a dictionary 
+//like JOBS = [{'title':Adsfa,adsfad:adfa},{'title':Adsfa,adsfad:adfa}]
+
+//print all specified data sent
+{{jobs}} 
+
+//shows
+-------
+[{'title':Adsfa,adsfad:adfa},{'title':Adsfa,adsfad:adfa}]
+-------
+
+//FOR LOOP
+{%for job in jobs%}
+    <h1>{{job['title']}}<h1> 
+{%endfor%}
+//shows
+---------
+Adsfa
+Adsfa
+---------
+
+//CAN STYLE
+<style>
+    .yessir{
+        color:'black';
+        background:'white';
+    }
+</style>
+<h1 class="yessir">{{x}}</h1>
+//shows w/font color black, and background white
+-------
+[{'title':Adsfa,adsfad:adfa},{'title':Adsfa,adsfad:adfa}] 
+-------
+
+//WHILE LOOP
+{% for _ in range(1, large_number) %}
+
+   {% if loop.index > stop_at %}{% break %}{% endif %} 
+
+{% endfor %}
+-------
+
+-------
+
+//BLOCK
+<div id="content">{% block content %}{% endblock %}</div>
+//SHOWS
+-------
+//
+-------
