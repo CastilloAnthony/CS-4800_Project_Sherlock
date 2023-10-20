@@ -16,9 +16,9 @@ class Server(): # The main server handler class
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
         self.__pollingSpeed = 3 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
-        self.__newSitesQ = mp.Queue(maxsize=100)
-        self.__requestsQ = mp.Queue(maxsize=100)
-        self.__dataQ = mp.Queue(maxsize=100)
+        #self.__newSitesQ = mp.Queue(maxsize=100)
+        self.__requestsQ = mp.Queue(maxsize=1000)
+        self.__dataQ = mp.Queue(maxsize=1000)
         # print('Queue Size: '+str(self.__q.qsize()))
         self.__processes = {}
         # self.__pipes = {}
@@ -113,15 +113,27 @@ class Server(): # The main server handler class
 
     def _checkForRequests(self):
         #{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}
-        #while self.__newSitesQ.empty() != False:
-            #newRequest = 
+        while self.__requestsQ.empty() != False:
+            newRequest = self.__newSitesQ.get()
+            if newRequest['request_type'] == 'request':
+                if newRequest['column'] in self.__columns:
+                    self.__dataQ.put({'id':newRequest['id'], 'data':self.__DBconneciton.requestFromDB(newRequest['column'], newRequest['query'])})
+            elif newRequest['request_type'] == 'insert':
+                if newRequest['column'] in self.__columns:
+                    self.__DBconneciton.sendToDB(newRequest['column'], newRequest['query'])
+                    #self.__dataQ.put({'uuid':newRequest['id'], 'data':self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])})
+            elif newRequest['request_type'] == 'remove':
+                if newRequest['column'] in self.__columns:
+                    self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])
+                    #self.__dataQ.put({'uuid':newRequest['id'], 'data':self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])})
+            else:
+                self.__dataQ.put({'id':newRequest['id'], 'data':False})
             #self.sendToDB('masterList', {'url':self.__newSitesQ.get()})
-        pass
 
     def _pollWebsites(self):
         #tempList = self.__DBconneciton.addToDB('masterList', {})
         #masterList = ['www.google.com', 'www.instagram.com', 'csustan.edu']
-        self._checkForNewSites()
+        self._checkForRequests()
         masterList = self.requestManyFromDB('masterList', {})
         #print(masterList)
         for object in masterList:
@@ -137,8 +149,13 @@ class Server(): # The main server handler class
     
     def _mainLoop(self):
         while True:
+            start = time.time()
             self._pollWebsites()
-            time.sleep(self.__pollingSpeed)
+            end = time.time()
+            if (end-start) >= self.__pollingSpeed:
+                continue
+            else:
+                time.sleep((self.__pollingSpeed)-(end-start))
             # addNewWebsites to DB
 
     def startServer(self):
