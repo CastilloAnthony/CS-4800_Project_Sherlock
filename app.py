@@ -1,8 +1,10 @@
+#VIEWS
+
 #to get flask on your computers
 # pip install flask
 # python app.py
 # this simply adds routes for the sites that will allow different sites to be hit. 
-from controllers.trackWebsite import TrackWebsite
+# from controllers.trackWebsite import TrackWebsite
 from flask import Flask, render_template, request
 import uuid
 from multiprocessing import Queue as Q
@@ -15,7 +17,7 @@ def index():
 @app.route('/addPreset')
 def addPreset():
     x = []
-    
+    #WE NEED A LIST OF ALL THE THINGS IN THE MASTER LIST
     masterListRequest = {'id':uuid.uuid4(),
                         'request_type':'request',
                         'column':'masterList',
@@ -23,26 +25,23 @@ def addPreset():
                   }
     
     requestQ.put(masterListRequest)
-    list_of_masterlist_urls = []
+    masterList = []
     newData = dataQ.get() # {'id':uuid.uuid4(), 'data':data}
     #RETURNS DICTIONARY: Object and URL
     if newData['id'] == masterListRequest['id']:
         if newData['data'] != False:
             #   USE NEWDATA
             for key in newData['data']:
-                list_of_masterlist_urls.append(key)
+                masterList.append(key)
         if newData['data'] == False:
             #Sorry
             pass
     else:
         x.append(newData)
-        
-        
-    list_of_masterlist_urls
 
     
     
-    #return render_template('AddPreset.html')
+    return render_template('AddPreset.html', masterList = masterList)
 
 @app.route('/addPreset/newAddedPreset',methods=['POST'])
 def newAddedPreset():
@@ -137,28 +136,43 @@ def trackWebsite():
 
 @app.route('/trackWebsite/newTrackedWebsite',methods=['POST'])
 def addWebsite():
+    x = []
     url = request.form['url']
     print('url: ', url)
-    trackWebsite = TrackWebsite()
-    print(type(trackWebsite))
+    # trackWebsite = TrackWebsite()
+    # print(type(trackWebsite))
     
     #request 1: INSERT URL
-    requestQ.put({
-        
-    })
+    # request = {
+    #     'id':uuid.uuid4(),
+    #     'request_type':'insert',
+    #     'column':'presets',
+    #     'query': url
+    # }
     
-    #request 2: RETRIEVAL OF MASTER LIST
+    # requestQ.put(request)
+    # newData = dataQ.get() 
+    # info = ""
+    # #RETURNS DICTIONARY: Object and URL
+    # if newData['id'] == request['id']:
+    #     if newData['data'] != False:
+    #         #   USE NEWDATA
+    #         pass
+                
+    #     if newData['data'] == False:
+    #         #Sorry
+    #         pass
+    # else:
+    #     x.append(newData)
     
-    # request 3 INSERT OF PRESET 
-    
-    
+    x = [{"number":1},{"number":2}]
     # call a function that
     # will give me some cool graphs and info on that website
     # Possibly a thing that sends
     # the url to the client right here
     # return 'Hello %s %s have fun learning python <br/> <a href="/">Back Home</a>' % (first_name, last_name)
-    return 'URL INFO<br/> %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (info), url 
-
+    # return 'URL INFO<br/> %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (info), url 
+    return render_template('som.html', url=url, x=x)
 
 
 #REQUESTQ:Q IS FOR 
@@ -177,5 +191,5 @@ def startFlask(requestQ:Q, dataQ:Q):#parameter: multiproccessor.Queue
     app.run(host="0.0.0.0", port=7777)#, debug=True)
 
 # if __name__ == '__main__':
-#     startFlask()
+#     startFlask(Q,Q)
     
