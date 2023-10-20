@@ -14,27 +14,105 @@ def index():
 
 @app.route('/addPreset')
 def addPreset():
-    return render_template('AddPreset.html')
+    x = []
+    
+    masterListRequest = {'id':uuid.uuid4(),
+                        'request_type':'request',
+                        'column':'masterList',
+                        'query': {}                
+                  }
+    
+    requestQ.put(masterListRequest)
+    list_of_masterlist_urls = []
+    newData = dataQ.get() # {'id':uuid.uuid4(), 'data':data}
+    #RETURNS DICTIONARY: Object and URL
+    if newData['id'] == masterListRequest['id']:
+        if newData['data'] != False:
+            #   USE NEWDATA
+            for key in newData['data']:
+                list_of_masterlist_urls.append(key)
+        if newData['data'] == False:
+            #Sorry
+            pass
+    else:
+        x.append(newData)
+        
+        
+    list_of_masterlist_urls
+
+    
+    
+    #return render_template('AddPreset.html')
 
 @app.route('/addPreset/newAddedPreset',methods=['POST'])
 def newAddedPreset():
-    url = request.form['url']
+    #for incorrect data comming in
+    x = [] 
+    presetLists = request.form['presetsList']
+    name = request.form['name']
+    
     print('url: ', url)
     trackWebsite = TrackWebsite()
     print(type(trackWebsite))
     
-    #request 1: INSERT URL: needs (UUID, request_type=[insert,remove,or request], column=[masterlist, websiteData, presets, users], 'query'=actual data)
+    #request 1: INSERT URL: 
+    # needs (UUID, request_type=[insert,remove,or request], column=[masterList, websiteData, presets, users], 'query'=actual data)
     # {'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}    
-    info = q.put({'id':uuid.uuid4(),
+    
+    
+    # requestQ.put({'id':uuid.uuid4(),
+    #               'request_type':'insert',
+    #               'column':'presets',
+    #               'query':name
+    #               })
+    
+    
+    masterListRequest = {'id':uuid.uuid4(),
+                        'request_type':'request',
+                        'column':'masterList',
+                        'query': {}                
+                  }
+    
+    #request 1: RETRIEVAL OF MASTER LIST
+    requestQ.put(masterListRequest)
+    #   GOTTA CHECK THE DATA QUEUE FOR THE DATA
+    newData = dataQ.get() 
+    #RETURNS DICTIONARY: Object and URL
+    if newData['id'] == masterListRequest['id']:
+        if newData['data'] != False:
+            #   USE NEWDATA
+            pass
+                
+        if newData['data'] == False:
+            #Sorry
+            pass
+    else:
+        x.append(newData)
+    
+            
+            
+        
+    #FOR EVERY ITEM ON THE MASTERLIST HAVE A CHECKBOX THAT
+    #
+    userDictionary = {
+        'name':name, #STRING
+        'presetLists':presetLists #LIST
+    }
+    
+    newPreset = {'id':uuid.uuid4(),
                   'request_type':'insert',
                   'column':'presets',
-                  'query':str(url)
-                  })
+                  'query': userDictionary          #nameOfPreset and list of websites
+                  }
     
-    #request 2: RETRIEVAL OF MASTER LIST
+    # request 2 INSERT OF PRESET 
+    requestQ.put(newPreset)
     
-    # request 3 INSERT OF PRESET 
-    return 'URL INFO<br/> %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (info), url 
+    # return 
+    return 0
+
+#WILL BE USED FOR VIEWING PRESETS INFORMATION
+@app.route('/viewPresets')
 
 @app.route('/deletePreset')
 def deletePreset():
@@ -65,7 +143,9 @@ def addWebsite():
     print(type(trackWebsite))
     
     #request 1: INSERT URL
-    info = q(str(url))
+    requestQ.put({
+        
+    })
     
     #request 2: RETRIEVAL OF MASTER LIST
     
@@ -81,8 +161,19 @@ def addWebsite():
 
 
 
+#REQUESTQ:Q IS FOR 
+#INSERTS, REMOVES, REQUESTS
+#{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}   
+#RETURNS NOTHING 
 
-def startFlask(q):#parameter: multiproccessor.Queue
+#DATA_Q:Q IS FOR
+# NONE
+#RECEIVES
+#RETURNS {'uuid':uuid.uuid4(), 'data':data}
+
+#   EVERY REQUESTQ.PUT YOU DO , DO A DATAQ.GET
+
+def startFlask(requestQ:Q, dataQ:Q):#parameter: multiproccessor.Queue
     app.run(host="0.0.0.0", port=7777)#, debug=True)
 
 # if __name__ == '__main__':
