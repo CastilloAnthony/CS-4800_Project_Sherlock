@@ -6,7 +6,7 @@
 # this simply adds routes for the sites that will allow different sites to be hit. 
 # from controllers.trackWebsite import TrackWebsite
 from flask import Flask, render_template, request
-from controllers.trackWebsite import TrackWebsite
+# from controllers.trackWebsite import TrackWebsite
 import uuid
 from multiprocessing import Queue as Q
 
@@ -34,17 +34,18 @@ def addPreset():
     if newData['id'] == masterListRequest['id']:
         if newData['data'] != False:
             #   USE NEWDATA
-            for key in newData['data']:
-                masterList.append(key)
+            # for url in newData['data']['url']:
+            list_of_masterlist_urls.append(newData['data']['url'])
         if newData['data'] == False:
             #Sorry
             pass
     else:
         x.append(newData)
 
+    #print('list_of_masterlist_urls')
+    #[{'id': UUID('8a452346-3a5e-49f1-8190-c954a70d4a74'), 'data': {'_id': ObjectId('6531c3b37a653892efba49ec'), 'url': 'www.google.com'}}]
     
-    
-    return render_template('AddPreset.html', masterList = masterList)
+    return render_template('AddPreset.html', masterList = list_of_masterlist_urls)
 
 @app.route('/addPreset/newAddedPreset',methods=['POST'])
 def newAddedPreset():
@@ -53,7 +54,7 @@ def newAddedPreset():
     presetLists = request.form['presetsList']
     name = request.form['name']
     
-    print('url: ', url)
+    print('name: ', name)
     trackWebsite = TrackWebsite()
     print(type(trackWebsite))
     
@@ -146,35 +147,27 @@ def addWebsite():
     # print(type(trackWebsite))
     
     #request 1: INSERT URL
-    app.requestQ.put({
-        
-    })
+    one = {'id':uuid.uuid4(),
+                  'request_type':'insert',
+                  'column':'websiteData',
+                  'query': url          #nameOfPreset and list of websites
+                  }
+    app.requestQ.put(one)
     
-    #request 2: RETRIEVAL OF MASTER LIST
     
-    # request 3 INSERT OF PRESET 
-    
-    # request = {
-    #     'id':uuid.uuid4(),
-    #     'request_type':'insert',
-    #     'column':'presets',
-    #     'query': url
-    # }
-    
-    # requestQ.put(request)
-    # newData = dataQ.get() 
-    # info = ""
-    # #RETURNS DICTIONARY: Object and URL
-    # if newData['id'] == request['id']:
-    #     if newData['data'] != False:
-    #         #   USE NEWDATA
-    #         pass
+    newData = app.dataQ.get() 
+    info = []
+    #RETURNS DICTIONARY: Object and URL
+    if newData['id'] == request['id']:
+        if newData['data'] != False:
+            #   USE NEWDATA
+            info.append(newData)
                 
-    #     if newData['data'] == False:
-    #         #Sorry
-    #         pass
-    # else:
-    #     x.append(newData)
+        if newData['data'] == False:
+            #Sorry
+            pass
+    else:
+        x.append(newData)
     
     x = [{"number":1},{"number":2}]
     # call a function that
@@ -183,7 +176,7 @@ def addWebsite():
     # the url to the client right here
     # return 'Hello %s %s have fun learning python <br/> <a href="/">Back Home</a>' % (first_name, last_name)
     # return 'URL INFO<br/> %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (info), url 
-    return render_template('som.html', url=url, x=x)
+    return render_template('som.html', url=url, x=x, info=info)
 
 
 #REQUESTQ:Q IS FOR 
