@@ -1,1 +1,3 @@
 not allow duplicates
+auth.py for authorization at login page 
+graphs (data vis for single website to start)
