@@ -14,5 +14,9 @@
             <li><a href="editPreset">Edit Preset</a></li>
             <li><a href="deletePreset">Delete Preset</a></li>
         </ul>
+        {% for job in masterList%}
+            <div>{{job}}</div>
+        {%end for%}
+
     </body>
 </html>
