@@ -141,9 +141,10 @@ class Server(): # The main server handler class
             #self.sendToDB('masterList', {'url':self.__newSitesQ.get()})
 
     def _pollWebsites(self):
+        print(str(time.ctime())+' - Polling sites...')
         #tempList = self.__DBconneciton.addToDB('masterList', {})
         #masterList = ['www.google.com', 'www.instagram.com', 'csustan.edu']
-        self._checkForRequests()
+        #self._checkForRequests()
         masterList = self.requestManyFromDB('masterList', {})
         #print(masterList)
         for object in masterList:
@@ -159,14 +160,15 @@ class Server(): # The main server handler class
                     self.sendToDB('websiteData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':9999})
     
     def _mainLoop(self):
+        start = time.time() / 2 # We want to always poll site when the system first comes online
         while True:
-            start = time.time()
-            self._pollWebsites()
+            self._checkForRequests()
             end = time.time()
             if (end-start) >= self.__pollingSpeed:
-                continue
-            else:
-                time.sleep((self.__pollingSpeed)-(end-start))
+                self._pollWebsites()
+                start = time.time()
+            #else:
+                #time.sleep((self.__pollingSpeed)-(end-start))
             # addNewWebsites to DB
 
     def startServer(self):
