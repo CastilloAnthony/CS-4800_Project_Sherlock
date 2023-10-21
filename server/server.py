@@ -13,7 +13,7 @@ class Server(): # The main server handler class
         self.__columns = ['masterList', 'websiteData', 'presets', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
         self.__requestTypes = ['insert', 'remove', 'request'] # Types of requests the server can handle
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
-        self.__pollingSpeed = 300 # The seconds between each master list poll
+        self.__pollingSpeed = 60*3 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
         self.__requestsQ = mp.Queue(maxsize=1000) # The request queue, only a clinet will put to this queue
         self.__dataQ = mp.Queue(maxsize=1000) # The request queue, only the server will put to this queue
@@ -121,6 +121,10 @@ class Server(): # The main server handler class
         #     return False
         #self.__DBconneciton.addToDB(column, queries
 
+    def _changeSettings(self, setting, changeTo):
+        if setting == 'pollingSpeed':
+            self.__pollingSpeed = changeTo
+
     def _checkForRequests(self):
         #{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}
         while self.__requestsQ.empty() != True:
@@ -136,6 +140,10 @@ class Server(): # The main server handler class
                 if newRequest['column'] in self.__columns:
                     self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])
                     #self.__dataQ.put({'uuid':newRequest['id'], 'data':self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])})
+            elif newRequest['request_type'] == 'setting': #WIP
+                if newRequest['something'] == 'pollingSpeed':
+                    #self._changeSettings(newRequest['something'], newRequest['somethingElse'])
+                    pass
             else:
                 self.__dataQ.put({'id':newRequest['id'], 'data':False})
             #self.sendToDB('masterList', {'url':self.__newSitesQ.get()})
@@ -150,23 +158,23 @@ class Server(): # The main server handler class
         for object in masterList:
             for port in self.__httpPorts:
                 try:
-                    start = time.time()
+                    latencyTimerStart = time.time()
                     temp = socket.create_connection((object['url'], port))
                     temp.close()
-                    end = time.time()
+                    latencyTimerEnd = time.time()
                     #print('Latency to ', website+':'+str(i), str(end-start)+'ms')
-                    self.sendToDB('websiteData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':True, 'latency':end-start})
+                    self.sendToDB('websiteData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':True, 'latency':latencyTimerEnd-latencyTimerStart})
                 except:
                     self.sendToDB('websiteData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':9999})
     
     def _mainLoop(self):
-        start = time.time() / 2 # We want to always poll site when the system first comes online
+        mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
         while True:
             self._checkForRequests()
-            end = time.time()
-            if (end-start) >= self.__pollingSpeed:
+            mainLoopTimerEnd = time.time()
+            if (mainLoopTimerEnd-mainLoopTimerStart) >= self.__pollingSpeed:
+                mainLoopTimerStart = time.time()
                 self._pollWebsites()
-                start = time.time()
             #else:
                 #time.sleep((self.__pollingSpeed)-(end-start))
             # addNewWebsites to DB
