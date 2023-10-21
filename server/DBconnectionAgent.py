@@ -94,8 +94,8 @@ class DBConnectionAgent():
         if self.__db != False:
             return self.__db[column].find(query)
 
+    '''
     def requestFromDBwithQ(self, queue:mp.Queue, ID:uuid.uuid4, column:str, query:dict): # Using multiprocessing Queue
-        #self._requestFromDBwithQ(self.__db, queue, ID, column, query)
         if self.__db != False:
             queue.put({ID:self.__db[column].find_one(query)})
     
@@ -106,17 +106,15 @@ class DBConnectionAgent():
     def requestManyFromDBwithQ(self, queue:mp.Queue, ID:uuid.uuid4, column:str, query:dict): # Using mulitprocessing Queue
         if self.__db != False:
             queue.put({'ID':ID, 'data':self.__db[column].find(query)}) 
+    '''
     
     def clearDB(self, column:str):
         self.__db[column].delete_many({})
 
-    '''
-    def insertPosts(self, post:dict):
-        posts = self.__db.posts
-        post_id = posts.insert_one(post).inserted_id
-        print(post_id)
-
-    def getPost(self, query:dict):
-        return self.posts.find_one(query)
-    '''
+    def verifyCollection(self, column:str):
+        try:
+            self.__db.validate_collection(column)
+            return True
+        except pymongo.errors.OperationFailure:
+            return False
 #end DBConnecitonAgent

@@ -1,6 +1,6 @@
 import time
 import multiprocessing as mp
-import uuid
+#import uuid
 import socket
 from server.DBconnectionAgent import DBConnectionAgent
 import app
@@ -13,7 +13,7 @@ class Server(): # The main server handler class
         self.__columns = ['masterList', 'websiteData', 'presets', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
         self.__requestTypes = ['insert', 'remove', 'request'] # Types of requests the server can handle
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
-        self.__pollingSpeed = 3 # The seconds between each master list poll
+        self.__pollingSpeed = 300 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
         self.__requestsQ = mp.Queue(maxsize=1000) # The request queue, only a clinet will put to this queue
         self.__dataQ = mp.Queue(maxsize=1000) # The request queue, only the server will put to this queue
@@ -21,23 +21,35 @@ class Server(): # The main server handler class
         self._setupDBConnection()
 
     def __del__(self): # WIP
-        del self.__DBconneciton
-        del self.__clientManager
-        time.sleep(10)
-        for i in self.__pipes:
-            print(self.__pipes[i].recv())
-            self.__pipes[i].close()
         for i in self.__processes:
-            print('Alive: '+str(self.__processes[i].is_alive()))
-            #print('Terminated: '+str(self.__processes[i].terminate()))
-            while not self.__q.empty():
-                print('Pulled '+str(self.__q.get())+' from queue.')
-                time.sleep(0.4)
             if self.__processes[i].is_alive():
+                print('Process Alive: '+str(self.__processes[i].is_alive()))
+                print('Joined: '+str(self.__processes[i].join(timeout=3)))
                 print('Terminated: '+str(self.__processes[i].terminate()))
-                self.__q.close()
-            print('Joined: '+str(self.__processes[i].join(timeout=3)))
+            else:
+                print('Process Alive: '+str(self.__processes[i].is_alive()))
+                print('Joined: '+str(self.__processes[i].join(timeout=3)))
             self.__processes[i].close()
+        self.__requestsQ.close()
+        while not self.__requestsQ.empty():
+            print('Pulled '+str(self.__requestsQ.get())+' from queue.')
+        self.__dataQ.close()
+        while not self.__dataQ.empty():
+            print('Pulled '+str(self.__dataQ.get())+' from queue.')
+        del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes
+
+    def _checkForMasterlist(self):
+        if self.__DBconneciton.verifyCollection('masterList'):
+            print('Masterlist collection verified.')
+        else:
+            print('Error in masterlist, rebuilding the default masterlist.')
+            self.__DBconneciton.clearDB('masterList')
+            for i in self.__sampleSites:
+                self.sendToDB('masterList', {'url':i})
+            if self.__DBconneciton.verifyCollection('masterList'):
+                print('Masterlist rebuilt successfully.')
+            else:
+                print('An unexpected error occured.')
 
     def _setupDBConnection(self, address="localhost", port="27017"):
         self.__DBconneciton = DBConnectionAgent() # Maybe setup as a Daemon
@@ -45,6 +57,7 @@ class Server(): # The main server handler class
             print("Successfully connected to DB at "+"mongodb://"+address+":"+port+"/")
             if self.__DBconneciton.useDB('SHERLOCK'):
                 print('Using the SHERLOCK database.')
+                self._checkForMasterlist()
             else:
                 print('Could not connect to the SHERLOCK database. Creating new one...')
                 self.__DBconneciton.createNewDB('SHERLOCK')
@@ -52,8 +65,9 @@ class Server(): # The main server handler class
                     print('Successfully created new database.')
                     if self.__DBconneciton.useDB('SHERLOCK'):
                         print('Using the SHERLOCK database.')
-                        for i in self.__sampleSites:
-                            self.sendToDB('masterList', {'url':i})
+                        self._checkForMasterlist()
+                        # for i in self.__sampleSites:
+                        #     self.sendToDB('masterList', {'url':i})
                     else:
                         print('Could not connect to the new SHERLOCK database.')
                 else:
@@ -136,12 +150,13 @@ class Server(): # The main server handler class
             for port in self.__httpPorts:
                 try:
                     start = time.time()
-                    socket.create_connection((object['url'], port))
+                    temp = socket.create_connection((object['url'], port))
+                    temp.close()
                     end = time.time()
                     #print('Latency to ', website+':'+str(i), str(end-start)+'ms')
-                    self.sendToDB('websiteData', {'url':object['url'], 'port':port, 'timestamp':time.ctime(), 'up':True, 'latency':end-start})
+                    self.sendToDB('websiteData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':True, 'latency':end-start})
                 except:
-                    self.sendToDB('websiteData', {'url':object['url'], 'port':port, 'timestamp':time.ctime(), 'up':False, 'latency':9999})
+                    self.sendToDB('websiteData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':9999})
     
     def _mainLoop(self):
         while True:
@@ -182,7 +197,6 @@ def startDB(self):
         self.__processes["ClientListener"] = mp.Process(name="ClientListenerProcess", target=self.__clientManager._listen)
         self.__processes["ClientListener"].start()
 '''
-
 
 def testServer():
     newServer = Server()
