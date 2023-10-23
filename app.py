@@ -221,22 +221,7 @@ def addWebsite():
                   'query': url          
                   }
     app.requestQ.put(one)
-    
-    
-    newData = app.dataQ.get() #takes way too long
-    info = []
-    #RETURNS DICTIONARY: Object and URL
-    if newData['id'] == request['id']:
-        if newData['data'] != False:
-            #   USE NEWDATA
-            info.append(newData)
-                
-        if newData['data'] == False:
-            #Sorry
-            print("I'm tired boss")
-            pass
-    else:
-        x.append(newData)
+
     
     x = [{"number":1},{"number":2}]
     # call a function that
@@ -245,7 +230,7 @@ def addWebsite():
     # the url to the client right here
     # return 'Hello %s %s have fun learning python <br/> <a href="/">Back Home</a>' % (first_name, last_name)
     # return 'URL INFO<br/> %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (info), url 
-    return render_template('AddWebsite.html', url=url, x=x, info=info)
+    return render_template('AddWebsite_new.html', url=url, x=x)
 
 
 #REQUESTQ:Q IS FOR 
@@ -254,7 +239,7 @@ def addWebsite():
 #{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}   
 #RETURNS NOTHING 
 
-#DATA_Q:Q IS FOR
+#DATA_Q:Q IS 
 # NONE
 
 #RECEIVES
