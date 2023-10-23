@@ -123,7 +123,13 @@ class Server(): # The main server handler class
 
     def _changeSettings(self, setting, changeTo):
         if setting == 'pollingSpeed':
-            self.__pollingSpeed = changeTo
+            if isinstance(changeTo, int):
+                self.__pollingSpeed = changeTo
+                return True
+            else:
+                return False
+        else:
+            return False
 
     def _checkForRequests(self):
         #{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}
@@ -134,16 +140,14 @@ class Server(): # The main server handler class
                     self.__dataQ.put({'id':newRequest['id'], 'data':self.__DBconneciton.requestFromDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'insert':
                 if newRequest['column'] in self.__columns:
-                    self.__DBconneciton.sendToDB(newRequest['column'], newRequest['query'])
+                    self.__dataQ.put({'id':newRequest['id'], 'data':self.__DBconneciton.sendToDB(newRequest['column'], newRequest['query'])})
                     #self.__dataQ.put({'uuid':newRequest['id'], 'data':self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'remove':
                 if newRequest['column'] in self.__columns:
-                    self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])
+                    self.__dataQ.put({'id':newRequest['id'], 'data':self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])})
                     #self.__dataQ.put({'uuid':newRequest['id'], 'data':self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'setting': #WIP
-                if newRequest['something'] == 'pollingSpeed':
-                    #self._changeSettings(newRequest['something'], newRequest['somethingElse'])
-                    pass
+                self.__dataQ.put({'id':newRequest['id'], 'data':self._changeSettings(newRequest['setting'], newRequest['changeTo'])})
             else:
                 self.__dataQ.put({'id':newRequest['id'], 'data':False})
             #self.sendToDB('masterList', {'url':self.__newSitesQ.get()})
@@ -178,7 +182,7 @@ class Server(): # The main server handler class
             #else:
                 #time.sleep((self.__pollingSpeed)-(end-start))
             # addNewWebsites to DB
-
+            
     def startServer(self):
         self.__processes['app'] = mp.Process(name ='Flask', target=app.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'].start()
