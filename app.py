@@ -20,6 +20,7 @@ def index():
 @app.route('/addPreset')
 def addPreset():
     x = []
+    #TODO: grab all the items in the masterlist send it to the template: AddPreset.html then make a form that has all the presets with checkboxxes next to all of them 
     #WE NEED A LIST OF ALL THE THINGS IN THE MASTER LIST
     masterListRequest = {'id':uuid.uuid4(),
                         'request_type':'request',
@@ -40,7 +41,7 @@ def addPreset():
             #Sorry
             pass
     else:
-        x.append(newData)
+        x.append(newData['id'])
 
     #print('list_of_masterlist_urls')
     #[{'id': UUID('8a452346-3a5e-49f1-8190-c954a70d4a74'), 'data': {'_id': ObjectId('6531c3b37a653892efba49ec'), 'url': 'www.google.com'}}]
@@ -51,12 +52,13 @@ def addPreset():
 def newAddedPreset():
     #for incorrect data comming in
     x = [] 
+    # TODO: read in the items that were checkboxxed before the submit button was pressed. 
+    # TODO: those that were pressed should then request the information on those respective urls via database
+    # TODO: grab that information and present the data in this file. 
     presetLists = request.form['presetsList']
     name = request.form['name']
     
     print('name: ', name)
-    trackWebsite = TrackWebsite()
-    print(type(trackWebsite))
     
     #request 1: INSERT URL: 
     # needs (UUID, request_type=[insert,remove,or request], column=[masterList, websiteData, presets, users], 'query'=actual data)
@@ -116,33 +118,99 @@ def newAddedPreset():
 
 #WILL BE USED FOR VIEWING PRESETS INFORMATION
 @app.route('/viewPresets')
-
+def viewPresets():
+    
+    #WE WANT TO GRAB ALL THE REQUESTS AND HAVE THEM DISPLAYED ON THE PAGE... 
+    #MAYBE WITH A LIMIT OF 5 PRESETS PER PAGE AS WELL AS HAVE  A BUTTON THAT
+    #CAN LET'S YOU SEE THE NEXT 5 PRESETS
+    
+    #GRABBING ALL OF THE PRESETS
+    
+    presetRequest = {'id':uuid.uuid4(),
+                  'request_type':'insert',
+                  'column':'websiteData',
+                  'query': {}          
+                  }
+    app.requestQ.put(presetRequest)
+    
+    #ALL PRESETS ARE IN allPresets
+    
+    allPresets = app.dataQ.get() 
+    
+    #SENDING PRESETS FROM allPresets INTO THE viewPresets.html
+    
+    render_template('viewPreset.html', allPresets = allPresets)
+    
+    
+#########################################################################################################################################################
+#########################################################################################################################################################        
 @app.route('/deletePreset')
 def deletePreset():
-    return render_template('DeletePreset.html')
+    #SEE WHAT PRESETS WANT TO BE DELETED
+    presetsRequest = {'id':uuid.uuid4(),
+                  'request_type':'request',
+                  'column':'masterList',
+                  'query': {}          
+                  }
+    app.requestQ.put(presetsRequest)
+    
+    #ALL PRESETS ARE IN allPresets
+    
+    presets = app.dataQ.get() 
+    
+    return render_template('DeletePreset.html', presets = presets)
+
+@app.route('/deletePreset/deletedPresets', methods=['POST'])
+def deletedPresets():
+    deletedPresets = request.form['url']
+    #WE NEED TO FIND OUT WHAT HAPPENS WHEN USER SELECTS MULTIPLE, DOES DELETEPRESETS RETURN A LIST OR JUST ONE THING?
+    
+    #IF LIST
+    for preset in deletedPresets:
+        deletePresetRequest = {'id':uuid.uuid4(),
+                  'request_type':'remove',
+                  'column':'masterList',
+                  'query': preset          #preset might need to be in a dictionary
+                  }
+    
+    #IF SINGLE 
+    deletePresetRequest = {'id':uuid.uuid4(),
+                  'request_type':'remove',
+                  'column':'masterList',
+                  'query': deletedPresets          #preset might need to be in a dictionary
+                  }
+    
+    #IF ALL IS WELL, WE SHOULD SEND A "DELETION WAS SUCCESSFULL MESSAGE AND RETURN THE DELETED PRESETS TO CONFIRM WITH USER"
+    # return 'URL INFO<br/> %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (info), url 
+    
+    return 'Deleted Presets<br/> %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (deletedPresets) 
+#########################################################################################################################################################
+#########################################################################################################################################################    
+
+
 
 @app.route('/deleteWebsite')
 def deleteWebsite():
-    return render_template('deleteWebsite.html')
+    return render_template('DeleteWebsite.html')
 
 @app.route('/editPreset')
 def editPreset():
     return render_template('EditPreset.html')
 
-@app.route('/trackWebsite') #add website // trackWebsite
+@app.route('/addWebsite') #add website // trackWebsite
 def trackWebsite():
-    return render_template('TrackWebsite.html') #add website // trackWebsite
+    return render_template('AddWebsite.html') #add website // trackWebsite
     
 # We are going to request some data in
 # trackWebsite specifically the url
 # and then we will return the url so that we
 # can send it to the client
 
-@app.route('/trackWebsite/newTrackedWebsite',methods=['POST'])
+@app.route('/addWebsite/addedWebsite',methods=['POST'])
 def addWebsite():
     x = []
     url = request.form['url']
-    print('url: ', url)
+    # print('url: ', url)
     # trackWebsite = TrackWebsite()
     # print(type(trackWebsite))
     
@@ -150,12 +218,12 @@ def addWebsite():
     one = {'id':uuid.uuid4(),
                   'request_type':'insert',
                   'column':'websiteData',
-                  'query': url          #nameOfPreset and list of websites
+                  'query': url          
                   }
     app.requestQ.put(one)
     
     
-    newData = app.dataQ.get() 
+    newData = app.dataQ.get() #takes way too long
     info = []
     #RETURNS DICTIONARY: Object and URL
     if newData['id'] == request['id']:
@@ -165,6 +233,7 @@ def addWebsite():
                 
         if newData['data'] == False:
             #Sorry
+            print("I'm tired boss")
             pass
     else:
         x.append(newData)
@@ -176,16 +245,18 @@ def addWebsite():
     # the url to the client right here
     # return 'Hello %s %s have fun learning python <br/> <a href="/">Back Home</a>' % (first_name, last_name)
     # return 'URL INFO<br/> %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (info), url 
-    return render_template('som.html', url=url, x=x, info=info)
+    return render_template('AddWebsite.html', url=url, x=x, info=info)
 
 
 #REQUESTQ:Q IS FOR 
 #INSERTS, REMOVES, REQUESTS
+
 #{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}   
 #RETURNS NOTHING 
 
 #DATA_Q:Q IS FOR
 # NONE
+
 #RECEIVES
 #RETURNS {'uuid':uuid.uuid4(), 'data':data}
 
