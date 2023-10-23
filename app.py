@@ -20,6 +20,7 @@ def index():
 @app.route('/addPreset')
 def addPreset():
     x = []
+    #TODO: grab all the items in the masterlist send it to the template: AddPreset.html then make a form that has all the presets with checkboxxes next to all of them 
     #WE NEED A LIST OF ALL THE THINGS IN THE MASTER LIST
     masterListRequest = {'id':uuid.uuid4(),
                         'request_type':'request',
@@ -51,12 +52,13 @@ def addPreset():
 def newAddedPreset():
     #for incorrect data comming in
     x = [] 
+    # TODO: read in the items that were checkboxxed before the submit button was pressed. 
+    # TODO: those that were pressed should then request the information on those respective urls via database
+    # TODO: grab that information and present the data in this file. 
     presetLists = request.form['presetsList']
     name = request.form['name']
     
     print('name: ', name)
-    trackWebsite = TrackWebsite()
-    print(type(trackWebsite))
     
     #request 1: INSERT URL: 
     # needs (UUID, request_type=[insert,remove,or request], column=[masterList, websiteData, presets, users], 'query'=actual data)
@@ -116,7 +118,31 @@ def newAddedPreset():
 
 #WILL BE USED FOR VIEWING PRESETS INFORMATION
 @app.route('/viewPresets')
-
+def viewPresets():
+    
+    #WE WANT TO GRAB ALL THE REQUESTS AND HAVE THEM DISPLAYED ON THE PAGE... 
+    #MAYBE WITH A LIMIT OF 5 PRESETS PER PAGE AS WELL AS HAVE  A BUTTON THAT
+    #CAN LET'S YOU SEE THE NEXT 5 PRESETS
+    
+    #GRABBING ALL OF THE PRESETS
+    
+    presetRequest = {'id':uuid.uuid4(),
+                  'request_type':'insert',
+                  'column':'websiteData',
+                  'query': {}          
+                  }
+    app.requestQ.put(presetRequest)
+    
+    #ALL PRESETS ARE IN allPresets
+    
+    allPresets = app.dataQ.get() 
+    
+    #SENDING PRESETS FROM allPresets INTO THE viewPresets.html
+    
+    render_template('viewPreset.html', allPresets = allPresets)
+    
+    
+    
 @app.route('/deletePreset')
 def deletePreset():
     return render_template('DeletePreset.html')
