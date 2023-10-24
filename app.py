@@ -234,7 +234,7 @@ def addWebsite():
 
 
 #REQUESTQ:Q IS FOR 
-#INSERTS, REMOVES, REQUESTS
+#INSERT: No get() needed, REMOVE: no get() needed, REQUEST: get() needed 
 # needs (UUID, request_type=[insert,remove,or request], column=[masterList, websiteData, presets, users], 'query'=actual data)
 
 #COLLECTIONS
