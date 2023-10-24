@@ -128,7 +128,7 @@ def viewPresets():
     
     presetRequest = {'id':uuid.uuid4(),
                   'request_type':'insert',
-                  'column':'websiteData',
+                  'column':'masterList',
                   'query': {}          
                   }
     app.requestQ.put(presetRequest)
@@ -234,9 +234,17 @@ def addWebsite():
 
 
 #REQUESTQ:Q IS FOR 
-#INSERTS, REMOVES, REQUESTS
+#INSERT: No get() needed, REMOVE: no get() needed, REQUEST: get() needed 
+# needs (UUID, request_type=[insert,remove,or request], column=[masterList, websiteData, presets, users], 'query'=actual data)
 
-#{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}   
+#COLLECTIONS
+# users = information on users such as password, username, email
+# websiteData = polled data for websites. This has hundreds of thousands, do not poll from this unless you are graphing or do analytics
+# presets = holds set of websites ["google.com", "bing.com", "burgerking.com"] 
+# masterList = list of urls that need to be polled
+
+#{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'} 
+
 #RETURNS NOTHING 
 
 #DATA_Q:Q IS 
