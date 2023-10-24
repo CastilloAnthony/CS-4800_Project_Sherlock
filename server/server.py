@@ -13,7 +13,7 @@ class Server(): # The main server handler class
         self.__columns = ['masterList', 'websiteData', 'presets', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
         self.__requestTypes = ['insert', 'remove', 'request'] # Types of requests the server can handle
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
-        self.__pollingSpeed = 60*3 # The seconds between each master list poll
+        self.__pollingSpeed = 60*1 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
         self.__requestsQ = mp.Queue(maxsize=1000) # The request queue, only a clinet will put to this queue
         self.__dataQ = mp.Queue(maxsize=1000) # The request queue, only the server will put to this queue
@@ -140,7 +140,7 @@ class Server(): # The main server handler class
                     self.__dataQ.put({'id':newRequest['id'], 'data':self.__DBconneciton.requestFromDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'insert':
                 if newRequest['column'] in self.__columns:
-                    self.__dataQ.put({'id':newRequest['id'], 'data':self.__DBconneciton.sendToDB(newRequest['column'], newRequest['query'])})
+                    self.__dataQ.put({'id':newRequest['id'], 'data':self.__DBconneciton.addToDB(newRequest['column'], newRequest['query'])})
                     #self.__dataQ.put({'uuid':newRequest['id'], 'data':self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'remove':
                 if newRequest['column'] in self.__columns:
@@ -182,35 +182,12 @@ class Server(): # The main server handler class
             #else:
                 #time.sleep((self.__pollingSpeed)-(end-start))
             # addNewWebsites to DB
-            
+
     def startServer(self):
         self.__processes['app'] = mp.Process(name ='Flask', target=app.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'].start()
         self._mainLoop()
 # end Server
-
-'''
-def startDB(self):
-        # NOT USED
-        """Creates the database and/or sets up a conneciton agent to the database (Might not need)
-        """
-        #myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-
-    def _returnData(self):
-        # Not USED
-        data = self.__q.get()
-        if data['ID'] in self.__requests:
-            pass
-
-    def _startClientListener(self):
-        # DEPRECIATED
-        #parent_ClientListenerPipe, child_ClientListenerPipe = mp.Pipe()
-        self.__q = mp.Queue(3)
-        #self.__pipes["ClientListener"] = parent_ClientListenerPipe
-        #self.__clientManager = ClientListener(self.__q)
-        self.__processes["ClientListener"] = mp.Process(name="ClientListenerProcess", target=self.__clientManager._listen)
-        self.__processes["ClientListener"].start()
-'''
 
 def testServer():
     newServer = Server()
