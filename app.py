@@ -41,7 +41,7 @@ def addPreset():
             #Sorry
             pass
     else:
-        x.append(newData)
+        x.append(newData['id'])
 
     #print('list_of_masterlist_urls')
     #[{'id': UUID('8a452346-3a5e-49f1-8190-c954a70d4a74'), 'data': {'_id': ObjectId('6531c3b37a653892efba49ec'), 'url': 'www.google.com'}}]
@@ -128,7 +128,7 @@ def viewPresets():
     
     presetRequest = {'id':uuid.uuid4(),
                   'request_type':'insert',
-                  'column':'websiteData',
+                  'column':'masterList',
                   'query': {}          
                   }
     app.requestQ.put(presetRequest)
@@ -142,33 +142,75 @@ def viewPresets():
     render_template('viewPreset.html', allPresets = allPresets)
     
     
-    
+#########################################################################################################################################################
+#########################################################################################################################################################        
 @app.route('/deletePreset')
 def deletePreset():
-    return render_template('DeletePreset.html')
+    #SEE WHAT PRESETS WANT TO BE DELETED
+    presetsRequest = {'id':uuid.uuid4(),
+                  'request_type':'request',
+                  'column':'masterList',
+                  'query': {}          
+                  }
+    app.requestQ.put(presetsRequest)
+    
+    #ALL PRESETS ARE IN allPresets
+    
+    presets = app.dataQ.get() 
+    
+    return render_template('DeletePreset.html', presets = presets)
+
+@app.route('/deletePreset/deletedPresets', methods=['POST'])
+def deletedPresets():
+    deletedPresets = request.form['url']
+    #WE NEED TO FIND OUT WHAT HAPPENS WHEN USER SELECTS MULTIPLE, DOES DELETEPRESETS RETURN A LIST OR JUST ONE THING?
+    
+    #IF LIST
+    for preset in deletedPresets:
+        deletePresetRequest = {'id':uuid.uuid4(),
+                  'request_type':'remove',
+                  'column':'masterList',
+                  'query': preset          #preset might need to be in a dictionary
+                  }
+    
+    #IF SINGLE 
+    deletePresetRequest = {'id':uuid.uuid4(),
+                  'request_type':'remove',
+                  'column':'masterList',
+                  'query': deletedPresets          #preset might need to be in a dictionary
+                  }
+    
+    #IF ALL IS WELL, WE SHOULD SEND A "DELETION WAS SUCCESSFULL MESSAGE AND RETURN THE DELETED PRESETS TO CONFIRM WITH USER"
+    # return 'URL INFO<br/> %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (info), url 
+    
+    return 'Deleted Presets<br/> %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (deletedPresets) 
+#########################################################################################################################################################
+#########################################################################################################################################################    
+
+
 
 @app.route('/deleteWebsite')
 def deleteWebsite():
-    return render_template('deleteWebsite.html')
+    return render_template('DeleteWebsite.html')
 
 @app.route('/editPreset')
 def editPreset():
     return render_template('EditPreset.html')
 
-@app.route('/trackWebsite') #add website // trackWebsite
+@app.route('/addWebsite') #add website // trackWebsite
 def trackWebsite():
-    return render_template('TrackWebsite.html') #add website // trackWebsite
+    return render_template('AddWebsite.html') #add website // trackWebsite
     
 # We are going to request some data in
 # trackWebsite specifically the url
 # and then we will return the url so that we
 # can send it to the client
 
-@app.route('/trackWebsite/newTrackedWebsite',methods=['POST'])
+@app.route('/addWebsite/addedWebsite',methods=['POST'])
 def addWebsite():
     x = []
     url = request.form['url']
-    print('url: ', url)
+    # print('url: ', url)
     # trackWebsite = TrackWebsite()
     # print(type(trackWebsite))
     
@@ -176,24 +218,10 @@ def addWebsite():
     one = {'id':uuid.uuid4(),
                   'request_type':'insert',
                   'column':'websiteData',
-                  'query': url          #nameOfPreset and list of websites
+                  'query': url          
                   }
     app.requestQ.put(one)
-    
-    
-    newData = app.dataQ.get() 
-    info = []
-    #RETURNS DICTIONARY: Object and URL
-    if newData['id'] == request['id']:
-        if newData['data'] != False:
-            #   USE NEWDATA
-            info.append(newData)
-                
-        if newData['data'] == False:
-            #Sorry
-            pass
-    else:
-        x.append(newData)
+
     
     x = [{"number":1},{"number":2}]
     # call a function that
@@ -202,16 +230,26 @@ def addWebsite():
     # the url to the client right here
     # return 'Hello %s %s have fun learning python <br/> <a href="/">Back Home</a>' % (first_name, last_name)
     # return 'URL INFO<br/> %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (info), url 
-    return render_template('som.html', url=url, x=x, info=info)
+    return render_template('AddWebsite_new.html', url=url, x=x)
 
 
 #REQUESTQ:Q IS FOR 
-#INSERTS, REMOVES, REQUESTS
-#{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}   
+#INSERT: No get() needed, REMOVE: no get() needed, REQUEST: get() needed 
+# needs (UUID, request_type=[insert,remove,or request], column=[masterList, websiteData, presets, users], 'query'=actual data)
+
+#COLLECTIONS
+# users = information on users such as password, username, email
+# websiteData = polled data for websites. This has hundreds of thousands, do not poll from this unless you are graphing or do analytics
+# presets = holds set of websites ["google.com", "bing.com", "burgerking.com"] 
+# masterList = list of urls that need to be polled
+
+#{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'} 
+
 #RETURNS NOTHING 
 
-#DATA_Q:Q IS FOR
+#DATA_Q:Q IS 
 # NONE
+
 #RECEIVES
 #RETURNS {'uuid':uuid.uuid4(), 'data':data}
 

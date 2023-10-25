@@ -13,7 +13,7 @@ class Server(): # The main server handler class
         self.__columns = ['masterList', 'websiteData', 'presets', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
         self.__requestTypes = ['insert', 'remove', 'request'] # Types of requests the server can handle
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
-        self.__pollingSpeed = 60*3 # The seconds between each master list poll
+        self.__pollingSpeed = 60*1 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
         self.__requestsQ = mp.Queue(maxsize=1000) # The request queue, only a clinet will put to this queue
         self.__dataQ = mp.Queue(maxsize=1000) # The request queue, only the server will put to this queue
@@ -123,7 +123,13 @@ class Server(): # The main server handler class
 
     def _changeSettings(self, setting, changeTo):
         if setting == 'pollingSpeed':
-            self.__pollingSpeed = changeTo
+            if isinstance(changeTo, int):
+                self.__pollingSpeed = changeTo
+                return True
+            else:
+                return False
+        else:
+            return False
 
     def _checkForRequests(self):
         #{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}
@@ -134,16 +140,14 @@ class Server(): # The main server handler class
                     self.__dataQ.put({'id':newRequest['id'], 'data':self.__DBconneciton.requestFromDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'insert':
                 if newRequest['column'] in self.__columns:
-                    self.__DBconneciton.sendToDB(newRequest['column'], newRequest['query'])
+                    self.__dataQ.put({'id':newRequest['id'], 'data':self.__DBconneciton.addToDB(newRequest['column'], newRequest['query'])})
                     #self.__dataQ.put({'uuid':newRequest['id'], 'data':self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'remove':
                 if newRequest['column'] in self.__columns:
-                    self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])
+                    self.__dataQ.put({'id':newRequest['id'], 'data':self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])})
                     #self.__dataQ.put({'uuid':newRequest['id'], 'data':self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'setting': #WIP
-                if newRequest['something'] == 'pollingSpeed':
-                    #self._changeSettings(newRequest['something'], newRequest['somethingElse'])
-                    pass
+                self.__dataQ.put({'id':newRequest['id'], 'data':self._changeSettings(newRequest['setting'], newRequest['changeTo'])})
             else:
                 self.__dataQ.put({'id':newRequest['id'], 'data':False})
             #self.sendToDB('masterList', {'url':self.__newSitesQ.get()})
@@ -184,29 +188,6 @@ class Server(): # The main server handler class
         self.__processes['app'].start()
         self._mainLoop()
 # end Server
-
-'''
-def startDB(self):
-        # NOT USED
-        """Creates the database and/or sets up a conneciton agent to the database (Might not need)
-        """
-        #myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-
-    def _returnData(self):
-        # Not USED
-        data = self.__q.get()
-        if data['ID'] in self.__requests:
-            pass
-
-    def _startClientListener(self):
-        # DEPRECIATED
-        #parent_ClientListenerPipe, child_ClientListenerPipe = mp.Pipe()
-        self.__q = mp.Queue(3)
-        #self.__pipes["ClientListener"] = parent_ClientListenerPipe
-        #self.__clientManager = ClientListener(self.__q)
-        self.__processes["ClientListener"] = mp.Process(name="ClientListenerProcess", target=self.__clientManager._listen)
-        self.__processes["ClientListener"].start()
-'''
 
 def testServer():
     newServer = Server()
