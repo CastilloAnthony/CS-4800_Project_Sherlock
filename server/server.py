@@ -10,8 +10,8 @@ class Server(): # The main server handler class
     # Communicates with DB using DBconnection and Clients with clientManager
     def __init__(self):
         self.__DBconneciton = False # The connection agent
-        self.__columns = ['masterList', 'websiteData', 'presets', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
-        self.__requestTypes = ['insert', 'remove', 'request'] # Types of requests the server can handle
+        self.__columns = ['masterList', 'pollingData', 'presets', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
+        self.__requestTypes = ['insert', 'remove', 'request', 'setting'] # Types of requests the server can handle
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
         self.__pollingSpeed = 60*1 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
@@ -121,6 +121,18 @@ class Server(): # The main server handler class
         #     return False
         #self.__DBconneciton.addToDB(column, queries
 
+    def removeFromDB(self, column:str, query:str):
+        if column in self.__columns:
+            return self.__DBconneciton.removeFromDB(column, query)
+        else:
+            return False
+
+    def removeManyFromDB(self, column:str, queries:str):
+        if column in self.__columns:
+            return self.__DBconneciton.removeManyFromDB(column, queries)
+        else:
+            return False
+
     def _changeSettings(self, setting, changeTo):
         if setting == 'pollingSpeed':
             if isinstance(changeTo, int):
@@ -137,14 +149,16 @@ class Server(): # The main server handler class
             newRequest = self.__requestsQ.get()
             if newRequest['request_type'] == 'request':
                 if newRequest['column'] in self.__columns:
-                    self.__dataQ.put({'id':newRequest['id'], 'data':self.__DBconneciton.requestFromDB(newRequest['column'], newRequest['query'])})
+                    self.__dataQ.put({'id':newRequest['id'], 'data':self.requestManyFromDBmDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'insert':
-                if newRequest['column'] in self.__columns:
-                    self.__dataQ.put({'id':newRequest['id'], 'data':self.__DBconneciton.addToDB(newRequest['column'], newRequest['query'])})
+                if newRequest['column'] == 'masterList':
+                    self.__dataQ.put({'id':newRequest['id'], 'data':self.sendToDB(newRequest['column'], {'url':newRequest['query']})})
+                elif newRequest['column'] in self.__columns:
+                    self.__dataQ.put({'id':newRequest['id'], 'data':self.sendToDB(newRequest['column'], newRequest['query'])})
                     #self.__dataQ.put({'uuid':newRequest['id'], 'data':self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'remove':
                 if newRequest['column'] in self.__columns:
-                    self.__dataQ.put({'id':newRequest['id'], 'data':self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])})
+                    self.__dataQ.put({'id':newRequest['id'], 'data':self.removeFromDB(newRequest['column'], newRequest['query'])})
                     #self.__dataQ.put({'uuid':newRequest['id'], 'data':self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'setting': #WIP
                 self.__dataQ.put({'id':newRequest['id'], 'data':self._changeSettings(newRequest['setting'], newRequest['changeTo'])})
@@ -167,9 +181,9 @@ class Server(): # The main server handler class
                     temp.close()
                     latencyTimerEnd = time.time()
                     #print('Latency to ', website+':'+str(i), str(end-start)+'ms')
-                    self.sendToDB('websiteData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':True, 'latency':latencyTimerEnd-latencyTimerStart})
+                    self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':True, 'latency':latencyTimerEnd-latencyTimerStart})
                 except:
-                    self.sendToDB('websiteData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':9999})
+                    self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':9999})
     
     def _mainLoop(self):
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
@@ -192,7 +206,7 @@ class Server(): # The main server handler class
 def testServer():
     newServer = Server()
     #newServer._pollWebsites()
-    #newServer.sendToDB('websiteData', {'website':'www.google.com', 'timestamp':time.ctime(), 'data':1035100})
+    #newServer.sendToDB('pollingData', {'website':'www.google.com', 'timestamp':time.ctime(), 'data':1035100})
 
 if __name__ == '__main__':
     testServer()

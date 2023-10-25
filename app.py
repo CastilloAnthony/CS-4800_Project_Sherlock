@@ -61,7 +61,7 @@ def newAddedPreset():
     print('name: ', name)
     
     #request 1: INSERT URL: 
-    # needs (UUID, request_type=[insert,remove,or request], column=[masterList, websiteData, presets, users], 'query'=actual data)
+    # needs (UUID, request_type=[insert,remove,or request], column=[masterList, pollingData, presets, users], 'query'=actual data)
     # {'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}    
     
     
@@ -217,7 +217,7 @@ def addWebsite():
     #request 1: INSERT URL
     one = {'id':uuid.uuid4(),
                   'request_type':'insert',
-                  'column':'websiteData',
+                  'column':'masterList',
                   'query': url          
                   }
     app.requestQ.put(one)
@@ -235,11 +235,11 @@ def addWebsite():
 
 #REQUESTQ:Q IS FOR 
 #INSERT: No get() needed, REMOVE: no get() needed, REQUEST: get() needed 
-# needs (UUID, request_type=[insert,remove,or request], column=[masterList, websiteData, presets, users], 'query'=actual data)
+# needs (UUID, request_type=[insert,remove,or request], column=[masterList, pollingData, presets, users], 'query'=actual data)
 
 #COLLECTIONS
 # users = information on users such as password, username, email
-# websiteData = polled data for websites. This has hundreds of thousands, do not poll from this unless you are graphing or do analytics
+# pollingData = polled data for websites. This has hundreds of thousands, do not poll from this unless you are graphing or do analytics
 # presets = holds set of websites ["google.com", "bing.com", "burgerking.com"] 
 # masterList = list of urls that need to be polled
 
