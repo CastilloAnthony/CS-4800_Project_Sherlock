@@ -36,7 +36,6 @@ class AddPreset(): # Controller
             'query': {}
         }
         temp = self.requestData(masterListRequest)
-        print(temp)
         return temp
         #requestQ.put(masterListRequest)
         #time.sleep(1) 
