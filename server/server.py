@@ -4,7 +4,8 @@ import multiprocessing as mp
 import socket
 import numpy as np
 from server.DBconnectionAgent import DBConnectionAgent
-import app
+#import app
+import newApp
 #from clientListener import ClientListener
 
 class Server(): # The main server handler class
@@ -187,7 +188,9 @@ class Server(): # The main server handler class
                 self._pollWebsites()
 
     def startServer(self):
-        self.__processes['app'] = mp.Process(name ='Flask', target=app.startFlask, args=(self.__requestsQ, self.__dataQ))
+
+        #self.__processes['app'] = mp.Process(name ='Flask', target=app.startFlask, args=(self.__requestsQ, self.__dataQ))
+        self.__processes['app'] = mp.Process(name ='Flask', target=newApp.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'].start()
         self._mainLoop()
 # end Server

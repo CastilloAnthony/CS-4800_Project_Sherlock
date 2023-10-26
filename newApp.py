@@ -12,7 +12,7 @@ from controllers.trackWebsite import TrackWebsite
 
 
 class MyFlaskApp:
-    def __init__(self, requestQ, dataQ):
+    def __init__(self, requestQ:Queue, dataQ:Queue):
         self.app = Flask(__name__)
         self.app.requestQ = requestQ
         self.app.dataQ = dataQ
@@ -28,13 +28,13 @@ class MyFlaskApp:
         self.app.add_url_rule('/addWebsite', 'trackWebsite', self.trackWebsite)
         self.app.add_url_rule('/addWebsite/addedWebsite', 'addWebsite', self.addWebsite, methods=['POST'])
         
-        self.addPresetClass = AddPreset()
+        self.addPresetClass = AddPreset(self.app.requestQ, self.app.dataQ)
 
     def index(self):
         return render_template('homepage.html')
 
     def addPreset(self):
-        return render_template('AddPreset.html', masterList=self.addPresetClass.query(self.app.requestQ))
+        return render_template('AddPreset.html', masterList=self.addPresetClass.query())
 
     def newAddedPreset(self):
         x = []
@@ -111,23 +111,30 @@ class MyFlaskApp:
 
     def run(self):
         self.app.run(host="0.0.0.0", port=7777)
-        
+
+    def newRequest(self, queryRequest):
+        pass
+
     def checkForData(self, queryRequest):
         #ANTHONY
         initialDataID = False
         while self.app.dataQ.empty() != True:
-                    newData = self.app.dataQ.get()
-                    if newData['id'] == initialDataID:
-                        self.app.requestQ.put(queryRequest)
-                        time.sleep(1) #import time
-                        initialDataID = False
-                    elif initialDataID == False:
-                        initialDataID = newData['id']
-                    if newData['id'] == queryRequest['id']:
-                        if newData['data'] is not False:
-                            return newData
-                    else:
-                        self.app.dataQ.put(newData)
+            newData = self.app.dataQ.get()
+            if newData['id'] == initialDataID:
+                self.app.requestQ.put(queryRequest)
+                time.sleep(1) #import time
+                initialDataID = False
+            elif initialDataID == False:
+                initialDataID = newData['id']
+            if newData['id'] == queryRequest['id']:
+                if newData['data'] is not False:
+                    return newData
+            else:
+                self.app.dataQ.put(newData)
+
+def startFlask(requestQ, dataQ):
+    newFlask = MyFlaskApp(requestQ, dataQ)
+    newFlask.run()
 
 # Usage
 if __name__ == '__main__':
