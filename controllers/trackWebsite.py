@@ -53,25 +53,25 @@ class TrackWebsite: # Controller
     def print(self):
         print('hello')
 
-website_url = [
-        "https://www.google.co.in", 
-        "https://www.yahoo.com", 
-        "https://www.amazon.co.in", 
-        "https://www.pipsnacks.com/404",
-        "http://the-internet.herokuapp.com/status_codes/301",
-        "http://the-internet.herokuapp.com/status_codes/500"
-    ]
-website_single_url = "https://www.google.co.in"
+# website_url = [
+#         "https://www.google.co.in", 
+#         "https://www.yahoo.com", 
+#         "https://www.amazon.co.in", 
+#         "https://www.pipsnacks.com/404",
+#         "http://the-internet.herokuapp.com/status_codes/301",
+#         "http://the-internet.herokuapp.com/status_codes/500"
+#     ]
+# website_single_url = "https://www.google.co.in"
 
-x = TrackWebsite()
-def use_all(website_url):
-    for url in website_url:
-        # x.enterWebsite(i)
-        print(x.enterWebsite(url))
+# x = TrackWebsite()
+# def use_all(website_url):
+#     for url in website_url:
+#         # x.enterWebsite(i)
+#         print(x.enterWebsite(url))
 
-def get_one(website_single_url):
-    print(x.enterWebsite(website_single_url))
+# def get_one(website_single_url):
+#     print(x.enterWebsite(website_single_url))
     
-# Use one of these
-# get_one(website_single_url="https://www.google.co.in")
-use_all(website_url=website_url)
+# # Use one of these
+# # get_one(website_single_url="https://www.google.co.in")
+# use_all(website_url=website_url)

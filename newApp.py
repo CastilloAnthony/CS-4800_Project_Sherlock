@@ -1,6 +1,15 @@
 from flask import Flask, render_template, request
 import uuid
+import time
 from multiprocessing import Queue
+from controllers.addPreset import AddPreset
+from controllers.deletePreset import DeletePreset 
+from controllers.editPreset import EditPreset 
+import controllers.graphTableGenerator
+from controllers.trackWebsite import TrackWebsite 
+#CALL THE CLASES
+
+
 
 class MyFlaskApp:
     def __init__(self, requestQ, dataQ):
@@ -18,25 +27,14 @@ class MyFlaskApp:
         self.app.add_url_rule('/editPreset', 'editPreset', self.editPreset)
         self.app.add_url_rule('/addWebsite', 'trackWebsite', self.trackWebsite)
         self.app.add_url_rule('/addWebsite/addedWebsite', 'addWebsite', self.addWebsite, methods=['POST'])
+        
+        self.addPresetClass = AddPreset()
 
     def index(self):
         return render_template('homepage.html')
 
     def addPreset(self):
-        x = []
-        masterListRequest = {
-            'id': uuid.uuid4(),
-            'request_type': 'request',
-            'column': 'masterList',
-            'query': {}
-        }
-        self.app.requestQ.put(masterListRequest)
-        list_of_masterlist_urls = []
-        newData = self.app.dataQ.get()
-        if newData['id'] == masterListRequest['id']:
-            if newData['data'] is not False:
-                list_of_masterlist_urls.append(newData['data']['url'])
-        return render_template('AddPreset.html', masterList=list_of_masterlist_urls)
+        return render_template('AddPreset.html', masterList=self.addPresetClass.query(self.app.requestQ))
 
     def newAddedPreset(self):
         x = []
@@ -113,6 +111,23 @@ class MyFlaskApp:
 
     def run(self):
         self.app.run(host="0.0.0.0", port=7777)
+        
+    def checkForData(self, queryRequest):
+        #ANTHONY
+        initialDataID = False
+        while self.app.dataQ.empty() != True:
+                    newData = self.app.dataQ.get()
+                    if newData['id'] == initialDataID:
+                        self.app.requestQ.put(queryRequest)
+                        time.sleep(1) #import time
+                        initialDataID = False
+                    elif initialDataID == False:
+                        initialDataID = newData['id']
+                    if newData['id'] == queryRequest['id']:
+                        if newData['data'] is not False:
+                            return newData
+                    else:
+                        self.app.dataQ.put(newData)
 
 # Usage
 if __name__ == '__main__':
