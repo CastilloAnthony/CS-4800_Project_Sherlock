@@ -2,6 +2,7 @@ import time
 import multiprocessing as mp
 #import uuid
 import socket
+import numpy as np
 from server.DBconnectionAgent import DBConnectionAgent
 import app
 #from clientListener import ClientListener
@@ -17,7 +18,7 @@ class Server(): # The main server handler class
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
         self.__requestsQ = mp.Queue(maxsize=1000) # The request queue, only a clinet will put to this queue
         self.__dataQ = mp.Queue(maxsize=1000) # The request queue, only the server will put to this queue
-        self.__processes = {}
+        self.__processes = {} # Process handles identifiers and handles for all processes created by the server
         self._setupDBConnection()
 
     def __del__(self): # WIP
@@ -49,7 +50,7 @@ class Server(): # The main server handler class
             if self.__DBconneciton.verifyCollection('masterList'):
                 print('Masterlist rebuilt successfully.')
             else:
-                print('An unexpected error occured.')
+                print('An unexpected error occured in the verification of the masterList.')
 
     def _setupDBConnection(self, address="localhost", port="27017"):
         self.__DBconneciton = DBConnectionAgent() # Maybe setup as a Daemon
@@ -66,8 +67,6 @@ class Server(): # The main server handler class
                     if self.__DBconneciton.useDB('SHERLOCK'):
                         print('Using the SHERLOCK database.')
                         self._checkForMasterlist()
-                        # for i in self.__sampleSites:
-                        #     self.sendToDB('masterList', {'url':i})
                     else:
                         print('Could not connect to the new SHERLOCK database.')
                 else:
@@ -76,7 +75,11 @@ class Server(): # The main server handler class
             print("Unable to connect to DB at "+"mongodb://"+address+":"+port+"/")
 
     def setPollingSpeed(self, speed:int):
-        self.__pollingSpeed = speed
+        if isinstance(speed, int):
+            self.__pollingSpeed = speed
+            return True
+        else:
+            return False
 
     def getPollingSpeed(self):
         return self.__pollingSpeed
@@ -86,10 +89,6 @@ class Server(): # The main server handler class
             self.__DBconneciton.addToDB(column, content)
         else:
             return False
-            #newUUID = str(uuid.uuid4())
-            #self.__processes[newUUID] = mp.Process(name ='SHERLOCK_Insert'+newUUID, target=self.__DBconneciton.addToDB, args=[column, content])
-            #self.__processes[newUUID].start()
-            #self.__DBconneciton.addToDB(column, content)
 
     def sendManyToDB(self, column:str, contents:dict): # What would the format of 'contents' be for multiple inserts?
         pass
@@ -99,80 +98,73 @@ class Server(): # The main server handler class
             return self.__DBconneciton.requestFromDB(column, query)
         else:
             return False
-        # if column in self.__columns:
-        #     newUUID = str(uuid.uuid4())
-        #     self.__requests.append(newUUID)
-        #     self.__processes[newUUID] = mp.Process(name ='Request'+newUUID, target=self.__DBconneciton.requestFromDBwithQ, args=[self.__q, column, query])
-        #     self.__processes[newUUID].start()
-        # else:
-        #     return False
-        #self.__DBconneciton.addToDB(column, query)
     
     def requestManyFromDB(self, column:str, queries:dict):
         if column in self.__columns:
             return self.__DBconneciton.requestManyFromDB(column, queries)
         else:
                 return False
-        # if column in self.__columns:
-        #     newUUID = str(uuid.uuid4())
-        #     #self.__processes[newUUID] = mp.Process(name ='Request'+newUUID, target=self.__DBconneciton.requestManyFromDBwithQ, args=[self.__q, column, queries])
-        #     #self.__processes[newUUID].start()
-        # else:
-        #     return False
-        #self.__DBconneciton.addToDB(column, queries
 
-    def removeFromDB(self, column:str, query:str):
+    def removeFromDB(self, column:str, query:dict):
         if column in self.__columns:
             return self.__DBconneciton.removeFromDB(column, query)
         else:
             return False
 
-    def removeManyFromDB(self, column:str, queries:str):
+    def removeManyFromDB(self, column:str, queries:dict):
         if column in self.__columns:
             return self.__DBconneciton.removeManyFromDB(column, queries)
         else:
             return False
 
-    def _changeSettings(self, setting, changeTo):
+    def _changeSettings(self, setting:str, changeTo):
         if setting == 'pollingSpeed':
-            if isinstance(changeTo, int):
-                self.__pollingSpeed = changeTo
-                return True
-            else:
-                return False
+                return self.setPollingSpeed(changeTo)
         else:
             return False
 
     def _checkForRequests(self):
-        #{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}
+        # Expected Request Formats # WIP
+        #{'id':uuid.uuid4(), 'request_type':'request', 'column':'masterList', 'query':{}}                                                               ### Gets all urls from the master list
+        #{'id':uuid.uuid4(), 'request_type':'request', 'column':'pollingData', 'query':'wwww.google.com'}                                               ### Requests the polling data for a specific url
+        #{'id':uuid.uuid4(), 'request_type':'request', 'column':'pollingData', 'query':['wwww.google.com', 'www.instgram.com', 'www.csustan.edu']}      ### Requests the polling data for a list of urls
+        #{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}                                                 ### Inserts a url into the masterList
+        #{'id':uuid.uuid4(), 'request_type':'remove', 'column':'masterList', 'query':{url:'wwww.google.com'}}                                           ### Removes a url from the master list, be careful with this
+        #{'id':uuid.uuid4(), 'request_type':'setting', 'column':'pollingSpeed', 'query':60}                                                             ### Changes the polling speed of the server. Query must be an integer
         while self.__requestsQ.empty() != True:
             newRequest = self.__requestsQ.get()
-            if newRequest['request_type'] == 'request':
-                if newRequest['column'] in self.__columns:
+            if newRequest['request_type'] == 'request': # For requesting any data from the system
+                if newRequest['column'] in 'masterList':
                     self.__dataQ.put({'id':newRequest['id'], 'data':self.requestManyFromDBmDB(newRequest['column'], newRequest['query'])})
+                elif newRequest['column'] in 'pollingData':
+                    if isinstance(newRequest['query'], list): # For a list of urls
+                        tempData = []
+                        for i in newRequest['query']:
+                            tempData.append(self.requestManyFromDB(newRequest['column'], newRequest['query']))
+                        self.__dataQ.put({'id':newRequest['id'], 'data':tempData})
+                        del tempData
+                    elif isinstance(newRequest['query'], str): # For a single url
+                        self.__dataQ.put({'id':newRequest['id'], 'data':self.requestManyFromDBmDB(newRequest['column'], newRequest['query'])})
+                    else:
+                        self.__dataQ.put({'id':newRequest['id'], 'data':False})
+                elif newRequest['column'] in self.__columns: # For all other requests
+                    self.__dataQ.put({'id':newRequest['id'], 'data':'Not Yet Implemented'})
             elif newRequest['request_type'] == 'insert':
-                if newRequest['column'] == 'masterList':
+                if newRequest['column'] == 'masterList': # For url insertions into the master list
                     self.__dataQ.put({'id':newRequest['id'], 'data':self.sendToDB(newRequest['column'], {'url':newRequest['query']})})
-                elif newRequest['column'] in self.__columns:
+                elif newRequest['column'] in self.__columns: # For all other insertions, might not be necessary (infact might not be good either)
                     self.__dataQ.put({'id':newRequest['id'], 'data':self.sendToDB(newRequest['column'], newRequest['query'])})
-                    #self.__dataQ.put({'uuid':newRequest['id'], 'data':self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'remove':
-                if newRequest['column'] in self.__columns:
+                if newRequest['column'] in self.__columns: # For all removals of data, might not be good, but works
                     self.__dataQ.put({'id':newRequest['id'], 'data':self.removeFromDB(newRequest['column'], newRequest['query'])})
-                    #self.__dataQ.put({'uuid':newRequest['id'], 'data':self.__DBconneciton.removeFromDB(newRequest['column'], newRequest['query'])})
-            elif newRequest['request_type'] == 'setting': #WIP
-                self.__dataQ.put({'id':newRequest['id'], 'data':self._changeSettings(newRequest['setting'], newRequest['changeTo'])})
+            elif newRequest['request_type'] == 'setting': # For changing settings such as the polling speed of the server
+                self.__dataQ.put({'id':newRequest['id'], 'data':self._changeSettings(newRequest['column'], newRequest['changeTo'])})
             else:
                 self.__dataQ.put({'id':newRequest['id'], 'data':False})
-            #self.sendToDB('masterList', {'url':self.__newSitesQ.get()})
 
     def _pollWebsites(self):
         print(str(time.ctime())+' - Polling sites...')
-        #tempList = self.__DBconneciton.addToDB('masterList', {})
-        #masterList = ['www.google.com', 'www.instagram.com', 'csustan.edu']
-        #self._checkForRequests()
         masterList = self.requestManyFromDB('masterList', {})
-        #print(masterList)
         for object in masterList:
             for port in self.__httpPorts:
                 try:
@@ -180,10 +172,10 @@ class Server(): # The main server handler class
                     temp = socket.create_connection((object['url'], port))
                     temp.close()
                     latencyTimerEnd = time.time()
-                    #print('Latency to ', website+':'+str(i), str(end-start)+'ms')
                     self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':True, 'latency':latencyTimerEnd-latencyTimerStart})
+                    break
                 except:
-                    self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':9999})
+                    self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':np.nan})
     
     def _mainLoop(self):
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
@@ -193,9 +185,6 @@ class Server(): # The main server handler class
             if (mainLoopTimerEnd-mainLoopTimerStart) >= self.__pollingSpeed:
                 mainLoopTimerStart = time.time()
                 self._pollWebsites()
-            #else:
-                #time.sleep((self.__pollingSpeed)-(end-start))
-            # addNewWebsites to DB
 
     def startServer(self):
         self.__processes['app'] = mp.Process(name ='Flask', target=app.startFlask, args=(self.__requestsQ, self.__dataQ))
