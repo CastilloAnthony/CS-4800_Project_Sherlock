@@ -170,13 +170,13 @@ class Server(): # The main server handler class
             for port in self.__httpPorts:
                 try:
                     latencyTimerStart = time.time()
-                    temp = socket.create_connection((object['url'], port))
+                    temp = socket.create_connection((object, port))
                     temp.close()
                     latencyTimerEnd = time.time()
-                    self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':True, 'latency':latencyTimerEnd-latencyTimerStart})
+                    self.sendToDB('pollingData', {'url':object, 'port':port, 'timestamp':time.time(), 'up':True, 'latency':latencyTimerEnd-latencyTimerStart})
                     break
                 except:
-                    self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':np.nan})
+                    self.sendToDB('pollingData', {'url':object, 'port':port, 'timestamp':time.time(), 'up':False, 'latency':np.nan})
     
     def _mainLoop(self):
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
