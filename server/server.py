@@ -136,7 +136,7 @@ class Server(): # The main server handler class
             newRequest = self.__requestsQ.get()
             if newRequest['request_type'] == 'request': # For requesting any data from the system
                 if newRequest['column'] in 'masterList':
-                    self.__dataQ.put({'id':newRequest['id'], 'data':self.requestManyFromDBmDB(newRequest['column'], newRequest['query'])})
+                    self.__dataQ.put({'id':newRequest['id'], 'data':self.requestManyFromDB(newRequest['column'], newRequest['query'])})
                 elif newRequest['column'] in 'pollingData':
                     if isinstance(newRequest['query'], list): # For a list of urls
                         tempData = []
@@ -145,7 +145,7 @@ class Server(): # The main server handler class
                         self.__dataQ.put({'id':newRequest['id'], 'data':tempData})
                         del tempData
                     elif isinstance(newRequest['query'], str): # For a single url
-                        self.__dataQ.put({'id':newRequest['id'], 'data':self.requestManyFromDBmDB(newRequest['column'], newRequest['query'])})
+                        self.__dataQ.put({'id':newRequest['id'], 'data':self.requestManyFromDB(newRequest['column'], newRequest['query'])})
                     else:
                         self.__dataQ.put({'id':newRequest['id'], 'data':False})
                 elif newRequest['column'] in self.__columns: # For all other requests
