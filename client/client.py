@@ -13,7 +13,7 @@ from controllers.trackWebsite import TrackWebsite
 
 class MyFlaskApp:
     def __init__(self, requestQ:Queue, dataQ:Queue):
-        self.app = Flask(__name__)
+        self.app = Flask(__name__, template_folder='../templates', static_folder='../static')
         self.app.requestQ = requestQ
         self.app.dataQ = dataQ
 
