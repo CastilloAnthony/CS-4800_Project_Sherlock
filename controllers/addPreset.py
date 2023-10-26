@@ -13,9 +13,10 @@ class AddPreset(): # Controller
         time.sleep(0.1)
         initialDataID = False
         while self.__dataQ.empty() != True:
-            newData = self.app.dataQ.get()
+            newData = self.__dataQ.get()
+            print(newData)
             if newData['id'] == initialDataID:
-                self.app.requestQ.put(request)
+                self.__requestQ.put(request)
                 time.sleep(0.1) #import time
                 initialDataID = False
             elif initialDataID == False:
@@ -24,16 +25,7 @@ class AddPreset(): # Controller
                 if newData['data'] is not False:
                     return newData
             else:
-                self.app.dataQ.put(newData)
-
-    def getMasterList(self):
-        masterListRequest = {
-            'id': uuid.uuid4(),
-            'request_type': 'request',
-            'column': 'masterList',
-            'query': {}
-        }
-        return self.checkForData(masterListRequest)
+                self.__dataQ.put(newData)
 
     def query(self):
         #ASKING
@@ -43,7 +35,9 @@ class AddPreset(): # Controller
             'column': 'masterList',
             'query': {}
         }
-        return self.requestData(masterListRequest)
+        temp = self.requestData(masterListRequest)
+        print(temp)
+        return temp
         #requestQ.put(masterListRequest)
         #time.sleep(1) 
         #GRABBING

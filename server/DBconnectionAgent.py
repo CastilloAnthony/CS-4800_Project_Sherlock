@@ -99,7 +99,11 @@ class DBConnectionAgent():
     
     def requestManyFromDB(self, column:str, query:dict):
         if self.__db != False:
-            return self.__db[column].find(query)
+            tempData = []
+            cur = self.__db[column].find(query)
+            for doc in cur:
+                tempData.append(doc['url'])
+            return tempData
         else:
             return False
 
