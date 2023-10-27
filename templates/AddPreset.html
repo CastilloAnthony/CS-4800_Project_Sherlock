@@ -19,7 +19,8 @@
         <h1 style="color:white">Preset Creation List</h1>
         <br><br>
         <!--
-            I am giving the value in the form of: {'id': UUID('36d8c82d-4a56-4860-8f71-aff5f350f45e'), 
+            I am giving the value in the form of: 
+        {'id': UUID('36d8c82d-4a56-4860-8f71-aff5f350f45e'), 
         'timestamp': 1698420651.296685, 'data': ['www.google.com', 'www.instagram.com', 
         'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 
         'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com']}
@@ -38,13 +39,21 @@
             <input type="text" name="name">
             <br><br>
             {% for url in masterList['data'] %}
-                <label class="background">
-                    <!--
+                <!--<label class="background">
+                    
                         We want to look at the inputs name when returning these back to 
-                    -->
-                    <input type="checkbox" name="presetsList" value="{{ url }}">
-                    {{ url }}
-                </label><br>
+                    
+                    <input type="checkbox" name="presetsList" value="{{ url }}">{{ url }}<br>
+                </label><br>-->
+
+                <!--
+                    Working on getting this to send more than one stupid value. 
+                    I want it to send a list back to addPreset so I can send it to
+                    the database as a list
+                -->
+                
+                <input type="checkbox" name="selected_options[]" value="{{ url }}"> {{ url }}
+                
             {% endfor %}
             <input type="submit" value="Submit">
         </form>

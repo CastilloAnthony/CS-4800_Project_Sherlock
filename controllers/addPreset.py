@@ -45,8 +45,9 @@ class AddPreset(): # Controller
         #return super().checkForData(masterListRequest)
         
     def addPreset(self):
-        presetLists = request.form['presetsList'] #WE HAVE THIS
+        presetLists = request.form.getlist('selected_options[]') #WE HAVE THIS
         print(presetLists)
+        print(type(presetLists))
         name = request.form['name'] #WE HAVE THIS
         userDictionary = {
             'name': name,

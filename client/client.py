@@ -38,7 +38,7 @@ class MyFlaskApp:
 
     def newAddedPreset(self):
         self.addPresetClass.addPreset()
-        return "YOU HAVE SUCCESSFULLY ADDED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='homepage.html'>Visit Homepage</a>"
+        return "YOU HAVE SUCCESSFULLY ADDED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
 
     def viewPresets(self):
         presetRequest = {
