@@ -102,7 +102,7 @@ class DBConnectionAgent():
             tempData = []
             cur = self.__db[column].find(query)
             for doc in cur:
-                tempData.append(doc['url'])
+                tempData.append(doc)
             return tempData
         else:
             return False

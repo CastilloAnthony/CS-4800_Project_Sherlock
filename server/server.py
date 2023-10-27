@@ -1,6 +1,6 @@
 import time
 import multiprocessing as mp
-#import uuid
+import uuid
 import socket
 import numpy as np
 from server.DBconnectionAgent import DBConnectionAgent
@@ -47,7 +47,7 @@ class Server(): # The main server handler class
             print('Error in masterlist, rebuilding the default masterlist.')
             self.__DBconneciton.clearDB('masterList')
             for i in self.__sampleSites:
-                self.sendToDB('masterList', {'url':i})
+                self.sendToDB('masterList', {'url':i, 'timestamp':time.time()})
             if self.__DBconneciton.verifyCollection('masterList'):
                 print('Masterlist rebuilt successfully.')
             else:
@@ -126,42 +126,54 @@ class Server(): # The main server handler class
 
     def _checkForRequests(self):
         # Expected Request Formats # WIP
-        #{'id':uuid.uuid4(), 'request_type':'request', 'column':'masterList', 'query':{}}                                                               ### Gets all urls from the master list
-        #{'id':uuid.uuid4(), 'request_type':'request', 'column':'pollingData', 'query':'wwww.google.com'}                                               ### Requests the polling data for a specific url
-        #{'id':uuid.uuid4(), 'request_type':'request', 'column':'pollingData', 'query':['wwww.google.com', 'www.instgram.com', 'www.csustan.edu']}      ### Requests the polling data for a list of urls
-        #{'id':uuid.uuid4(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}                                                 ### Inserts a url into the masterList
-        #{'id':uuid.uuid4(), 'request_type':'remove', 'column':'masterList', 'query':{url:'wwww.google.com'}}                                           ### Removes a url from the master list, be careful with this
-        #{'id':uuid.uuid4(), 'request_type':'setting', 'column':'pollingSpeed', 'query':60}                                                             ### Changes the polling speed of the server. Query must be an integer
+        #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'masterList', 'query':{}}                                                               ### Gets all urls from the master list
+        #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'pollingData', 'query':'wwww.google.com'}                                               ### Requests the polling data for a specific url
+        #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'pollingData', 'query':['wwww.google.com', 'www.instgram.com', 'www.csustan.edu']}      ### Requests the polling data for a list of urls
+        #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}                                                 ### Inserts a url into the masterList
+        #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'remove', 'column':'masterList', 'query':{url:'wwww.google.com'}}                                           ### Removes a url from the master list, be careful with this
+        #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'setting', 'column':'pollingSpeed', 'query':60}                                                             ### Changes the polling speed of the server. Query must be an integer
         while self.__requestsQ.empty() != True:
             newRequest = self.__requestsQ.get()
             if newRequest['request_type'] == 'request': # For requesting any data from the system
                 if newRequest['column'] in 'masterList':
-                    self.__dataQ.put({'id':newRequest['id'], 'data':self.requestManyFromDB(newRequest['column'], newRequest['query'])})
+                    if newRequest['query'] == {}:
+                        masterList = []
+                        data = self.requestManyFromDB(newRequest['column'], newRequest['query'])
+                        for doc in data:
+                            masterList.append(doc['url'])
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':masterList})
+                    else:
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':False})
                 elif newRequest['column'] in 'pollingData':
                     if isinstance(newRequest['query'], list): # For a list of urls
                         tempData = []
                         for i in newRequest['query']:
                             tempData.append(self.requestManyFromDB(newRequest['column'], newRequest['query']))
-                        self.__dataQ.put({'id':newRequest['id'], 'data':tempData})
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':tempData})
                         del tempData
                     elif isinstance(newRequest['query'], str): # For a single url
-                        self.__dataQ.put({'id':newRequest['id'], 'data':self.requestManyFromDB(newRequest['column'], newRequest['query'])})
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestManyFromDB(newRequest['column'], newRequest['query'])})
                     else:
-                        self.__dataQ.put({'id':newRequest['id'], 'data':False})
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':False})
                 elif newRequest['column'] in self.__columns: # For all other requests
-                    self.__dataQ.put({'id':newRequest['id'], 'data':'Not Yet Implemented'})
+                    self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':'Not Yet Implemented'})
             elif newRequest['request_type'] == 'insert':
                 if newRequest['column'] == 'masterList': # For url insertions into the master list
-                    self.__dataQ.put({'id':newRequest['id'], 'data':self.sendToDB(newRequest['column'], {'url':newRequest['query']})})
+                    temp = self.requestFromDB('masterList', {'url':newRequest['query']})
+                    print('test!!!'+str(temp))
+                    if self.requestFromDB('masterList', {'url':newRequest['query']}) == None:
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.sendToDB(newRequest['column'], {'url':newRequest['query'], 'timestamp':time.time()})})
+                    else:
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':False})
                 elif newRequest['column'] in self.__columns: # For all other insertions, might not be necessary (infact might not be good either)
-                    self.__dataQ.put({'id':newRequest['id'], 'data':self.sendToDB(newRequest['column'], newRequest['query'])})
+                    self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.sendToDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'remove':
                 if newRequest['column'] in self.__columns: # For all removals of data, might not be good, but works
-                    self.__dataQ.put({'id':newRequest['id'], 'data':self.removeFromDB(newRequest['column'], newRequest['query'])})
+                    self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.removeFromDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'setting': # For changing settings such as the polling speed of the server
-                self.__dataQ.put({'id':newRequest['id'], 'data':self._changeSettings(newRequest['column'], newRequest['changeTo'])})
+                self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self._changeSettings(newRequest['column'], newRequest['changeTo'])})
             else:
-                self.__dataQ.put({'id':newRequest['id'], 'data':False})
+                self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':False})
 
     def _pollWebsites(self):
         print(str(time.ctime())+' - Polling sites...')
@@ -170,13 +182,13 @@ class Server(): # The main server handler class
             for port in self.__httpPorts:
                 try:
                     latencyTimerStart = time.time()
-                    temp = socket.create_connection((object, port))
+                    temp = socket.create_connection((object['url'], port))
                     temp.close()
                     latencyTimerEnd = time.time()
-                    self.sendToDB('pollingData', {'url':object, 'port':port, 'timestamp':time.time(), 'up':True, 'latency':latencyTimerEnd-latencyTimerStart})
+                    self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':True, 'latency':latencyTimerEnd-latencyTimerStart})
                     break
                 except:
-                    self.sendToDB('pollingData', {'url':object, 'port':port, 'timestamp':time.time(), 'up':False, 'latency':np.nan})
+                    self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':np.nan})
     
     def _mainLoop(self):
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
