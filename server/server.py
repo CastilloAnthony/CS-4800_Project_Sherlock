@@ -159,8 +159,6 @@ class Server(): # The main server handler class
                     self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':'Not Yet Implemented'})
             elif newRequest['request_type'] == 'insert':
                 if newRequest['column'] == 'masterList': # For url insertions into the master list
-                    temp = self.requestFromDB('masterList', {'url':newRequest['query']})
-                    print('test!!!'+str(temp))
                     if self.requestFromDB('masterList', {'url':newRequest['query']}) == None:
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.sendToDB(newRequest['column'], {'url':newRequest['query'], 'timestamp':time.time()})})
                     else:
