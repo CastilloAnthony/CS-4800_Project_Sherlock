@@ -53,7 +53,7 @@ class AddWebsite(): # Controller
             'column': 'masterList',
             'query': url
         }
-        return self.requestData(oneWebsite)
+        self.__requestQ.put(oneWebsite)
 
     
 #end AddPreset
