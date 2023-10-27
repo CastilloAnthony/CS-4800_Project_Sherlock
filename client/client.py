@@ -25,10 +25,12 @@ class MyFlaskApp:
         self.app.add_url_rule('/deletePreset/deletedPresets', 'deletedPresets', self.deletedPresets, methods=['POST'])
         self.app.add_url_rule('/deleteWebsite', 'deleteWebsite', self.deleteWebsite)
         self.app.add_url_rule('/editPreset', 'editPreset', self.editPreset)
-        self.app.add_url_rule('/addWebsite', 'trackWebsite', self.trackWebsite)
-        self.app.add_url_rule('/addWebsite/addedWebsite', 'addWebsite', self.addWebsite, methods=['POST'])
+        self.app.add_url_rule('/addWebsite', 'addWebsite', self.addWebsite)
+        self.app.add_url_rule('/addWebsite/newAddedWebsite', 'newAddedWebsite', self.newAddedWebsite, methods=['POST'])
         
         self.addPresetClass = AddPreset(self.app.requestQ, self.app.dataQ)
+        self.addWebsiteClass = AddWebsite(self.app.requestQ, self.app.dataQ)
+        
 
     def index(self):
         return render_template('homepage.html')
@@ -81,14 +83,13 @@ class MyFlaskApp:
         return render_template('EditPreset.html')
     
     #grabbing Data
-    def trackWebsite(self):
+    def addWebsite(self):
         return render_template('AddWebsite.html')
     
     #show Data is put in 
-    def addWebsite(self):
-        message = self.AddWebsite.addWebsite()
-        
-        return render_template('AddWebsite_new.html', message)
+    def newAddedWebsite(self):
+        self.addWebsiteClass.addWebsite()
+        return "YOU HAVE SUCCESSFULLY ADDED A WEBSITE, PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
 
     def run(self):
         self.app.run(host="0.0.0.0", port=7777)
