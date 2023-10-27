@@ -51,7 +51,8 @@ class AddPreset(): # Controller
         name = request.form['name'] #WE HAVE THIS
         userDictionary = {
             'name': name,
-            'presetLists': presetLists
+            'presetLists': presetLists,
+            'timestamp':time.time()
         }
         newPreset = {
             'id': uuid.uuid4(),
