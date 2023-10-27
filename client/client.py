@@ -6,7 +6,7 @@ from controllers.addPreset import AddPreset
 from controllers.deletePreset import DeletePreset 
 from controllers.editPreset import EditPreset 
 import controllers.graphTableGenerator
-from controllers.trackWebsite import TrackWebsite 
+from controllers.addWebsite import AddWebsite 
 #CALL THE CLASES
 
 
@@ -79,22 +79,16 @@ class MyFlaskApp:
 
     def editPreset(self):
         return render_template('EditPreset.html')
-
+    
+    #grabbing Data
     def trackWebsite(self):
         return render_template('AddWebsite.html')
-
+    
+    #show Data is put in 
     def addWebsite(self):
-        x = []
-        url = request.form['url']
-        one = {
-            'id': uuid.uuid4(),
-            'request_type': 'insert',
-            'column': 'masterList',
-            'query': url
-        }
-        self.app.requestQ.put(one)
-        x = [{"number": 1}, {"number": 2}]
-        return render_template('AddWebsite_new.html', url=url, x=x)
+        message = self.AddWebsite.addWebsite()
+        
+        return render_template('AddWebsite_new.html', message)
 
     def run(self):
         self.app.run(host="0.0.0.0", port=7777)
