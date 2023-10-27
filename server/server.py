@@ -123,7 +123,17 @@ class Server(): # The main server handler class
                 return self.setPollingSpeed(changeTo)
         else:
             return False
-
+        
+    def _cleanDataQ(self):
+        tempData = []
+        while self.__dataQ.empty() != True:
+            newData = self.__dataQ.get()
+            if (time.time()-newData['timestamp']) < 600:
+                tempData.append(newData)
+            else:
+                print('Deleting ', newData)
+                del newData
+        
     def _checkForRequests(self):
         # Expected Request Formats # WIP
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'masterList', 'query':{}}                                                               ### Gets all urls from the master list
@@ -189,13 +199,16 @@ class Server(): # The main server handler class
                     self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':np.nan})
     
     def _mainLoop(self):
-        mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
+        pollingTimerStart, cleanupTimerStart = 0, 0 # We want to always poll site when the system first comes online
         while True:
             self._checkForRequests()
-            mainLoopTimerEnd = time.time()
-            if (mainLoopTimerEnd-mainLoopTimerStart) >= self.__pollingSpeed:
-                mainLoopTimerStart = time.time()
+            pollingTimerEnd, cleanupTimerEnd = time.time(), time.time()
+            if (pollingTimerEnd-pollingTimerStart) >= self.__pollingSpeed:
+                pollingTimerStart = time.time()
                 self._pollWebsites()
+            if (cleanupTimerEnd - cleanupTimerStart) >= 600:
+                cleanupTimerStart = time.time()
+                self._cleanDataQ()
 
     def startServer(self):
 
