@@ -5,18 +5,48 @@
         <title>Add Preset</title>
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style1.css') }}">
     </head>
+
     <body>
         <ul>
             <li><a class="current" href="/">Home</a></li>
-            <li><a href="addWebsite">add Website</a></li>
+            <li><a href="addWebsite">Add Website</a></li>
             <li><a href="deleteWebsite">Delete Website</a></li>
             <li><a href="addPreset">Add Preset</a></li>
             <li><a href="editPreset">Edit Preset</a></li>
             <li><a href="deletePreset">Delete Preset</a></li>
         </ul>
         <br>
-        <div style="color:white">
-            {{masterList}}
-        </div>
+        <h1 style="color:white">Preset Creation List</h1>
+        <br><br>
+        <!--
+            I am giving the value in the form of: {'id': UUID('36d8c82d-4a56-4860-8f71-aff5f350f45e'), 
+        'timestamp': 1698420651.296685, 'data': ['www.google.com', 'www.instagram.com', 
+        'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 
+        'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com']}
+
+        id
+        timestamp
+        data
+        -->
+        
+        <form action="addPreset/newAddedPreset" style="background-color:white; display:inline-block" method="POST">
+            <!--
+                Need a name for the respective preset so the user knows what to ask for later
+                Make it easier to recall for them. 
+            -->
+            <label for="fname">Preset List Name (Please Pick Something You Will Remember):</label>
+            <input type="text" name="name">
+            <br><br>
+            {% for url in masterList['data'] %}
+                <label class="background">
+                    <!--
+                        We want to look at the inputs name when returning these back to 
+                    -->
+                    <input type="checkbox" name="presetsList" value="{{ url }}">
+                    {{ url }}
+                </label><br>
+            {% endfor %}
+            <input type="submit" value="Submit">
+        </form>
     </body>
 </html>

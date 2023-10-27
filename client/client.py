@@ -37,21 +37,8 @@ class MyFlaskApp:
         return render_template('AddPreset.html', masterList=self.addPresetClass.query())
 
     def newAddedPreset(self):
-        x = []
-        presetLists = request.form['presetsList']
-        name = request.form['name']
-        userDictionary = {
-            'name': name,
-            'presetLists': presetLists
-        }
-        newPreset = {
-            'id': uuid.uuid4(),
-            'request_type': 'insert',
-            'column': 'presets',
-            'query': userDictionary
-        }
-        self.app.requestQ.put(newPreset)
-        return '0'
+        self.addPresetClass.addPreset()
+        return "YOU HAVE SUCCESSFULLY ADDED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='homepage.html'>Visit Homepage</a>"
 
     def viewPresets(self):
         presetRequest = {

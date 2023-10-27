@@ -1,5 +1,7 @@
 import uuid
 import time
+import requests
+from flask import Flask, render_template, request
 
 class AddPreset(): # Controller
     def __init__(self, requestQ, dataQ):
@@ -41,6 +43,23 @@ class AddPreset(): # Controller
         #time.sleep(1) 
         #GRABBING
         #return super().checkForData(masterListRequest)
+        
+    def addPreset(self):
+        presetLists = request.form['presetsList'] #WE HAVE THIS
+        name = request.form['name'] #WE HAVE THIS
+        userDictionary = {
+            'name': name,
+            'presetLists': presetLists
+        }
+        newPreset = {
+            'id': uuid.uuid4(),
+            'request_type': 'insert',
+            'column': 'presets',
+            'query': userDictionary
+        }
+        #WE ARE SENDING IN AN INSERT REQUEST AFTER THIS WE WILL BE DONE
+        #SIMPLY GIVE THEM A "YOUR THING HAS INSERTED CORRECTLY AND BE ON WITH YOUR WAY"
+        self.requestData(newPreset)
 
     
 #end AddPreset
