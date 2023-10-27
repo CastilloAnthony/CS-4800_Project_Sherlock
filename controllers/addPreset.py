@@ -46,6 +46,7 @@ class AddPreset(): # Controller
         
     def addPreset(self):
         presetLists = request.form['presetsList'] #WE HAVE THIS
+        print(presetLists)
         name = request.form['name'] #WE HAVE THIS
         userDictionary = {
             'name': name,
