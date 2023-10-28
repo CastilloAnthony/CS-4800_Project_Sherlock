@@ -38,6 +38,8 @@ class MyFlaskApp:
         self.app.add_url_rule('/viewPresets', 'viewPresets', self.viewPresets)
         #EDITPRESET
         self.app.add_url_rule('/editPreset', 'editPreset', self.editPreset)
+        self.app.add_url_rule('/editPreset/newEditedPreset', 'newEditPreset', self.newEditPreset, methods=['POST'])
+        self.app.add_url_rule('/editPreset/newEditedPreset/edit', 'edit', self.edit, methods=['POST'])
         
         #FORWEBSITES
         #ADDWEBSITE
@@ -94,14 +96,19 @@ class MyFlaskApp:
         self.deleteWebsiteClass.deleteWebsite()
         return "YOU HAVE SUCCESSFULLY DELETED A WEBSITE PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
 
+    #TODO
     def editPreset(self):
+        return render_template('EditPreset.html', presets= self.editPreset.query())
+    #TODO
+    def newEditedPreset(self):
+        return render_template('EditPreset.html')
+    #TODO   
+    def edit(self):
         return render_template('EditPreset.html')
     
-    #grabbing Data
     def addWebsite(self):
         return render_template('AddWebsite.html')
     
-    #show Data is put in 
     def newAddedWebsite(self):
         self.addWebsiteClass.addWebsite()
         return "YOU HAVE SUCCESSFULLY ADDED A WEBSITE, PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
