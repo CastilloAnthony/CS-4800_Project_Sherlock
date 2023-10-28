@@ -35,8 +35,8 @@
                 Need a name for the respective preset so the user knows what to ask for later
                 Make it easier to recall for them. 
             -->
-            <label for="fname">Preset List Name (Please Pick Something You Will Remember):</label>
-            <input type="text" name="name">
+            <label for="fname">Preset List Name (Please Pick Something You Will Remember):</label><br>
+            Preset Name: <input type="text" name="name">
             <br><br>
             {% for url in masterList['data'] %}
                 <!--<label class="background">
@@ -52,7 +52,7 @@
                     the database as a list
                 -->
                 
-                <input type="checkbox" name="selected_options[]" value="{{ url }}"> {{ url }}
+                <input type="checkbox" name="selected_options[]" value="{{ url }}"> {{ url }}<br>
                 
             {% endfor %}
             <input type="submit" value="Submit">

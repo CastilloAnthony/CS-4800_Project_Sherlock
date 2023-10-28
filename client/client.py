@@ -2,11 +2,15 @@ from flask import Flask, render_template, request
 import uuid
 import time
 from multiprocessing import Queue
+
 from controllers.addPreset import AddPreset
 from controllers.deletePreset import DeletePreset 
 from controllers.editPreset import EditPreset 
-import controllers.graphTableGenerator
 from controllers.addWebsite import AddWebsite 
+from controllers.deleteWebsite import DeleteWebsite 
+
+import controllers.graphTableGenerator
+
 #CALL THE CLASES
 
 
@@ -16,20 +20,43 @@ class MyFlaskApp:
         self.app = Flask(__name__, template_folder='../templates', static_folder='../static')
         self.app.requestQ = requestQ
         self.app.dataQ = dataQ
-
+        
+        #ROUTECREATING
+        #Example: self.app.add_url_rule(route='<route>', name='<name>', function=<function>, OPTIONAL methods=[<typeOfRequest>])
+        
+        #HOMEPAGE
         self.app.add_url_rule('/', 'index', self.index)
+        
+        #FORPRESETS
+        #ADDPRESET
         self.app.add_url_rule('/addPreset', 'addPreset', self.addPreset)
         self.app.add_url_rule('/addPreset/newAddedPreset', 'newAddedPreset', self.newAddedPreset, methods=['POST'])
-        self.app.add_url_rule('/viewPresets', 'viewPresets', self.viewPresets)
+        #DELETEPRESET
         self.app.add_url_rule('/deletePreset', 'deletePreset', self.deletePreset)
-        self.app.add_url_rule('/deletePreset/deletedPresets', 'deletedPresets', self.deletedPresets, methods=['POST'])
-        self.app.add_url_rule('/deleteWebsite', 'deleteWebsite', self.deleteWebsite)
+        self.app.add_url_rule('/deletePreset/newDeletedPreset', 'newDeletedPreset', self.newDeletedPreset, methods=['POST'])
+        #VIEWPRESET
+        self.app.add_url_rule('/viewPresets', 'viewPresets', self.viewPresets)
+        #EDITPRESET
         self.app.add_url_rule('/editPreset', 'editPreset', self.editPreset)
+        
+        #FORWEBSITES
+        #ADDWEBSITE
         self.app.add_url_rule('/addWebsite', 'addWebsite', self.addWebsite)
         self.app.add_url_rule('/addWebsite/newAddedWebsite', 'newAddedWebsite', self.newAddedWebsite, methods=['POST'])
+        #DELETEWEBSITE
+        self.app.add_url_rule('/deleteWebsite', 'deleteWebsite', self.deleteWebsite)
+        self.app.add_url_rule('/deleteWebsite/newDeletedWebsite', 'newDeletedWebsite', self.newDeletedWebsite, methods=['POST'])
         
+        
+        #CLASS_INITIALIZATION
         self.addPresetClass = AddPreset(self.app.requestQ, self.app.dataQ)
+        self.deletePresetClass = DeletePreset(self.app.requestQ, self.app.dataQ)
+        self.editPresetClass = EditPreset(self.app.requestQ, self.app.dataQ)    
+        
         self.addWebsiteClass = AddWebsite(self.app.requestQ, self.app.dataQ)
+        self.deleteWebsiteClass = DeleteWebsite(self.app.requestQ, self.app.dataQ)        
+            
+        
         
 
     def index(self):
@@ -54,30 +81,18 @@ class MyFlaskApp:
         return render_template('viewPreset.html', allPresets=allPresets)
 
     def deletePreset(self):
-        presetsRequest = {
-            'id': uuid.uuid4(),
-            'request_type': 'request',
-            'column': 'masterList',
-            'query': {}
-        }
-        self.app.requestQ.put(presetsRequest)
-        presets = self.app.dataQ.get()
-        return render_template('DeletePreset.html', presets=presets)
+        return render_template('DeletePreset.html', presets=self.deletePresetClass.query())
 
-    def deletedPresets(self):
-        deletedPresets = request.form.getlist('url')
-        for preset in deletedPresets:
-            deletePresetRequest = {
-                'id': uuid.uuid4(),
-                'request_type': 'remove',
-                'column': 'masterList',
-                'query': preset
-            }
-            self.app.requestQ.put(deletePresetRequest)
-        return 'Deleted Presets<br/> %s <br/> <a href="/trackWebsite">TrackWebsite</a>' % (deletedPresets)
+    def newDeletedPreset(self):
+        self.deletePresetClass.deletePreset()
+        return "YOU HAVE SUCCESSFULLY ADDED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
 
     def deleteWebsite(self):
-        return render_template('DeleteWebsite.html')
+        return render_template('DeleteWebsite.html', masterList = self.deleteWebsiteClass.query())
+    
+    def newDeletedWebsite(self):
+        self.deleteWebsiteClass.deleteWebsite()
+        return "YOU HAVE SUCCESSFULLY DELETED A WEBSITE PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
 
     def editPreset(self):
         return render_template('EditPreset.html')
