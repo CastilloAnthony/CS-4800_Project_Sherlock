@@ -4,9 +4,7 @@ import uuid
 import socket
 import numpy as np
 from server.DBconnectionAgent import DBConnectionAgent
-#import app
 import client.client 
-#from clientListener import ClientListener
 
 class Server(): # The main server handler class
     # Communicates with DB using DBconnection and Clients with clientManager
@@ -227,7 +225,6 @@ class Server(): # The main server handler class
                 self._pollWebsites()
 
     def startServer(self):
-        #self.__processes['app'] = mp.Process(name ='Flask', target=app.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'] = mp.Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'].start()
         self._mainLoop()
