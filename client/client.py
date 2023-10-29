@@ -11,10 +11,6 @@ from controllers.deleteWebsite import DeleteWebsite
 
 import controllers.graphTableGenerator
 
-#CALL THE CLASES
-
-
-
 class MyFlaskApp:
     def __init__(self, requestQ:Queue, dataQ:Queue):
         self.app = Flask(__name__, template_folder='../templates', static_folder='../static')
@@ -38,7 +34,7 @@ class MyFlaskApp:
         self.app.add_url_rule('/viewPresets', 'viewPresets', self.viewPresets)
         #EDITPRESET
         self.app.add_url_rule('/editPreset', 'editPreset', self.editPreset)
-        self.app.add_url_rule('/editPreset/newEditedPreset', 'newEditPreset', self.newEditPreset, methods=['POST'])
+        self.app.add_url_rule('/editPreset/newEditedPreset', 'newEditedPreset', self.newEditedPreset, methods=['POST'])
         self.app.add_url_rule('/editPreset/newEditedPreset/edit', 'edit', self.edit, methods=['POST'])
         
         #FORWEBSITES
@@ -98,10 +94,10 @@ class MyFlaskApp:
 
     #TODO
     def editPreset(self):
-        return render_template('EditPreset.html', presets= self.editPreset.query())
+        return render_template('EditPreset.html', presets=self.editPresetClass.query())
     #TODO
     def newEditedPreset(self):
-        return render_template('EditPreset.html')
+        return render_template('EditPreset.html', chosenPreset=self.editPresetClass.editPreset())
     #TODO   
     def edit(self):
         return render_template('EditPreset.html')

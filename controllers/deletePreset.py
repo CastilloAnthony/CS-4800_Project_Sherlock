@@ -54,7 +54,6 @@ class DeletePreset(): # Controller
                 'column': 'presets',
                 'query': preset
             }
-            self.app.requestQ.put(deletePresetRequest)
             self.requestData(deletePresetRequest)
 
     
