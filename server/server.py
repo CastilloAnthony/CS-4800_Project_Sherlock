@@ -157,11 +157,7 @@ class Server(): # The main server handler class
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':False})
                 elif newRequest['column'] in 'presets':
                     if newRequest['query'] == {}:
-                        tempData = []
-                        data = self.removeManyFromDB(newRequest['column'], newRequest['query'])
-                        for doc in data:
-                            tempData.append(doc)
-                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':tempData})
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.removeManyFromDB(newRequest['column'], newRequest['query'])})
                         del tempData
                     elif isinstance(newRequest['query'], str):
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestFromDB(newRequest['column'], newRequest['query'])})
@@ -216,7 +212,6 @@ class Server(): # The main server handler class
                 self._pollWebsites()
 
     def startServer(self):
-
         #self.__processes['app'] = mp.Process(name ='Flask', target=app.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'] = mp.Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'].start()
