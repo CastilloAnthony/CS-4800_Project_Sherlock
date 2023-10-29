@@ -41,7 +41,12 @@ class Server(): # The main server handler class
         del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes
 
     def createSamplePresets(self):
-        pass
+        if self.__DBconneciton.verifyCollection('presets'):
+            print('Presets collection verified.')
+        else:
+            print('')
+            samplePrest = {'name':'Sample Preset', 'user':'admin', 'timestamp':time.time(), 'data':[self.__sampleSites[0], self.__sampleSites[1], self.__sampleSites[2]]}
+        
 
     def _checkForMasterlist(self):
         if self.__DBconneciton.verifyCollection('masterList'):
@@ -160,7 +165,7 @@ class Server(): # The main server handler class
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':False})
                 elif newRequest['column'] in 'presets':
                     if newRequest['query'] == {}:
-                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.removeManyFromDB(newRequest['column'], newRequest['query'])})
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestManyFromDB(newRequest['column'], newRequest['query'])})
                     elif isinstance(newRequest['query'], str):
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestFromDB(newRequest['column'], newRequest['query'])})
                     elif isinstance(newRequest['query'], list):
@@ -179,6 +184,8 @@ class Server(): # The main server handler class
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.sendToDB(newRequest['column'], {'url':newRequest['query'], 'timestamp':time.time()})})
                     else:
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':False})
+                elif newRequest['column'] == 'presets':
+                    self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.sendToDB(newRequest['column'], newRequest['query'])})
                 elif newRequest['column'] in self.__columns: # For all other insertions, might not be necessary (infact might not be good either)
                     self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.sendToDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'remove':
