@@ -40,13 +40,17 @@ class Server(): # The main server handler class
             print('Pulled '+str(self.__dataQ.get())+' from queue.')
         del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes
 
-    def createSamplePresets(self):
+    def _checkForPresets(self):
         if self.__DBconneciton.verifyCollection('presets'):
             print('Presets collection verified.')
         else:
-            print('')
+            print('Error in preset collection, rebuilding sample preset')
             samplePrest = {'name':'Sample Preset', 'user':'admin', 'timestamp':time.time(), 'data':[self.__sampleSites[0], self.__sampleSites[1], self.__sampleSites[2]]}
-        
+            self.sendToDB('presets', samplePrest)
+            if self.__DBconneciton.verifyCollection('presets'):
+                print('Preset collection was rebuilt successfully.')
+            else:
+                print('An unexpected error occured in the verification of the Preset collection.')
 
     def _checkForMasterlist(self):
         if self.__DBconneciton.verifyCollection('masterList'):
@@ -68,6 +72,7 @@ class Server(): # The main server handler class
             if self.__DBconneciton.useDB('SHERLOCK'):
                 print('Using the SHERLOCK database.')
                 self._checkForMasterlist()
+                self._checkForPresets()
             else:
                 print('Could not connect to the SHERLOCK database. Creating new one...')
                 self.__DBconneciton.createNewDB('SHERLOCK')
@@ -76,6 +81,7 @@ class Server(): # The main server handler class
                     if self.__DBconneciton.useDB('SHERLOCK'):
                         print('Using the SHERLOCK database.')
                         self._checkForMasterlist()
+                        self._checkForPresets()
                     else:
                         print('Could not connect to the new SHERLOCK database.')
                 else:
