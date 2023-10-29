@@ -1,11 +1,12 @@
 import time
 import multiprocessing as mp
-from uuid import uuid4
+import uuid
 import socket
 import numpy as np
 from server.DBconnectionAgent import DBConnectionAgent
-from client.client import startFlask
-#import client.client 
+#import app
+import client.client 
+#from clientListener import ClientListener
 
 class Server(): # The main server handler class
     # Communicates with DB using DBconnection and Clients with clientManager
@@ -122,19 +123,7 @@ class Server(): # The main server handler class
                 return self.setPollingSpeed(changeTo)
         else:
             return False
-        
-    def _cleanDataQ(self):
-        tempData = []
-        while self.__dataQ.empty() != True:
-            newData = self.__dataQ.get()
-            if (time.time()-newData['timestamp']) < 600:
-                tempData.append(newData)
-            else:
-                print('Deleting ', newData)
-                del newData
-        for data in tempData:
-            self.__dataQ.put(data)
-        
+
     def _checkForRequests(self):
         # Expected Request Formats # WIP
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'masterList', 'query':{}}                                                               ### Gets all urls from the master list
@@ -166,6 +155,24 @@ class Server(): # The main server handler class
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestManyFromDB(newRequest['column'], newRequest['query'])})
                     else:
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':False})
+                elif newRequest['column'] in 'presets':
+                    if newRequest['query'] == {}:
+                        tempData = []
+                        data = self.removeManyFromDB(newRequest['column'], newRequest['query'])
+                        for doc in data:
+                            tempData.append(doc)
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':tempData})
+                        del tempData
+                    elif isinstance(newRequest['query'], str):
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestFromDB(newRequest['column'], newRequest['query'])})
+                    elif isinstance(newRequest['query'], list):
+                        tempData = []
+                        for i in newRequest['query']:
+                            tempData.append(self.requestManyFromDB(newRequest['column'], newRequest['query']))
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':tempData})
+                        del tempData
+                    elif isinstance(newRequest['query'], dict):
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':'Not Yet Implemented'})
                 elif newRequest['column'] in self.__columns: # For all other requests
                     self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':'Not Yet Implemented'})
             elif newRequest['request_type'] == 'insert':
@@ -200,21 +207,18 @@ class Server(): # The main server handler class
                     self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':np.nan})
     
     def _mainLoop(self):
-        pollingTimerStart, cleanupTimerStart = 0, 0 # We want to always poll site when the system first comes online
+        mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
         while True:
             self._checkForRequests()
-            pollingTimerEnd, cleanupTimerEnd = time.time(), time.time()
-            if (pollingTimerEnd-pollingTimerStart) >= self.__pollingSpeed:
-                pollingTimerStart = time.time()
+            mainLoopTimerEnd = time.time()
+            if (mainLoopTimerEnd-mainLoopTimerStart) >= self.__pollingSpeed:
+                mainLoopTimerStart = time.time()
                 self._pollWebsites()
-            if (cleanupTimerEnd - cleanupTimerStart) >= 600:
-                cleanupTimerStart = time.time()
-                self._cleanDataQ()
 
     def startServer(self):
 
         #self.__processes['app'] = mp.Process(name ='Flask', target=app.startFlask, args=(self.__requestsQ, self.__dataQ))
-        self.__processes['app'] = mp.Process(name ='Flask', target=startFlask, args=(self.__requestsQ, self.__dataQ))
+        self.__processes['app'] = mp.Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'].start()
         self._mainLoop()
 # end Server
