@@ -40,6 +40,9 @@ class Server(): # The main server handler class
             print('Pulled '+str(self.__dataQ.get())+' from queue.')
         del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes
 
+    def createSamplePresets(self):
+        pass
+
     def _checkForMasterlist(self):
         if self.__DBconneciton.verifyCollection('masterList'):
             print('Masterlist collection verified.')
@@ -158,7 +161,6 @@ class Server(): # The main server handler class
                 elif newRequest['column'] in 'presets':
                     if newRequest['query'] == {}:
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.removeManyFromDB(newRequest['column'], newRequest['query'])})
-                        del tempData
                     elif isinstance(newRequest['query'], str):
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestFromDB(newRequest['column'], newRequest['query'])})
                     elif isinstance(newRequest['query'], list):
