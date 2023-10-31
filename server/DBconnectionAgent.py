@@ -1,17 +1,16 @@
 import pymongo
-import time
-import multiprocessing as mp
+from time import ctime
 
 class DBConnectionAgent():
     # Communicates directly with DB and Server
     def __init__(self):
-        """_summary_
+        """Initialization function setting client and db to false.
         """
         self.__client = False
         self.__db = False
 
     def __del__(self):
-        """_summary_
+        """Deletion function that deletes the client and db variables.
         """
         self.disconnect()
         del self.__client
@@ -36,20 +35,31 @@ class DBConnectionAgent():
             return False
         
     def disconnect(self):
-        """_summary_
-        """
-        self.__client.close()
-
-    def createNewDB(self, name:str):
-        """_summary_
-
-        Args:
-            name (str): _description_
+        """Attempts to disconnect from the mongoDB.
 
         Returns:
-            _type_: _description_
+            bool: True/False on success/failure.
         """
-        return self.__client[name]['Initial'].insert_one({'name':name, 'notes':'Created a new database named '+name, 'timestamp':time.ctime()}).acknowledged
+        if self.__client != False:
+            self.__client.close()
+            self.__client = False
+            return True
+        else:
+            return False
+        
+    def createNewDB(self, name:str):
+        """Attempts to creates a brand new mongoDB database named the inputted string.
+
+        Args:
+            name (str): The name of the database to be created.
+
+        Returns:
+            bool: True/False on success/failure.
+        """
+        if name not in self.getDBs():
+            return self.__client[name]['Initial'].insert_one({'name':name, 'notes':'Created a new database named '+name, 'timestamp':ctime()}).acknowledged
+        else:
+            return False
     
     def getDBs(self):
         """Returns a List of databases for the connected system
@@ -94,14 +104,14 @@ class DBConnectionAgent():
             return False
 
     def removeFromDB(self, column:str, query:dict):
-        """_summary_
+        """Removes the first instance of an entry, within the column, that matches the inputted query.
 
         Args:
-            column (str): _description_
-            query (dict): _description_
+            column (str): The desired colleciton for which to remove data from.
+            query (dict): The query used to match with data in the database.
 
         Returns:
-            _type_: _description_
+            bool: True/False on success/failure.
         """
         if self.__db != False:
             return self.__db[column].delete_one(query).acknowledged
@@ -109,14 +119,13 @@ class DBConnectionAgent():
             return False
 
     def removeManyFromDB(self, column:str, query:dict):
-        """_summary_
+        """Removes all instances, from the column, that matches the inputted query.
 
         Args:
-            column (str): _description_
-            query (dict): _description_
-
+            column (str): The desired colleciton for which to remove data from.
+            query (dict): The query used to match with data in the database.
         Returns:
-            _type_: _description_
+            bool: True/False on success/failure.
         """
         if self.__db != False:
             return self.__db[column].delete_many(query).acknowledged
@@ -124,14 +133,14 @@ class DBConnectionAgent():
             return False
 
     def requestFromDB(self, column:str, query:dict):
-        """_summary_
+        """Returns the first entry, from the column, that matches the inputted query.
 
         Args:
-            column (str): _description_
-            query (dict): _description_
+            column (str): The desired colleciton for which to request data from.
+            query (dict): The query used to match with data in the database.
 
         Returns:
-            _type_: _description_
+            bool: True/False on success/failure.
         """
         if self.__db != False:
             return self.__db[column].find_one(query)
