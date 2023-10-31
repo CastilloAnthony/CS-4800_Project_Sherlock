@@ -15,7 +15,6 @@
             <li><a href="deletePreset">Delete Preset</a></li>
         </ul><br>
         <h1  style="text-align:center;color:white;">Delete Preset</h1><br>
-        {{presets}}
         <form action="deletePreset/newDeletedPreset" style="background-color:white; display:inline-block" method="POST">
             <!--
                 Need a name for the respective preset so the user knows what to ask for later
@@ -36,7 +35,7 @@
                     the database as a list
                 -->
                 
-                <input type="checkbox" name="selected_options[]" value="{{ preset['name'] }}"> {{ preset['name'] }} <br> {{preset['presetLists'] }}<br>
+                <input type="checkbox" name="selected_options[]" value="{{preset['name']}}"> {{ preset['name'] }} <br> {{preset['presetLists'] }}<br>
                 
             {% endfor %}
             <input type="submit" value="Submit">
