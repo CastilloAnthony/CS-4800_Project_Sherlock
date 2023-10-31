@@ -23,5 +23,5 @@ filename = 'gg'
 #format for timestamp function: ??
 
 #need functions for uptime, downtime, and latency calculations
-response = requests.get()
-print(response.status_code) #gives the status of whether or not a website is active/inactive
+#response = requests.get()
+#print(response.status_code) #gives the status of whether or not a website is active/inactive

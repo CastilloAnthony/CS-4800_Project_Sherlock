@@ -4,6 +4,7 @@ import socket
 import numpy as np
 from server.DBconnectionAgent import DBConnectionAgent
 import client.client 
+import webbrowser
 
 class Server(): # The main server handler class
     # Communicates with DB using DBconnection and Clients with clientManager
@@ -206,7 +207,7 @@ class Server(): # The main server handler class
             return self.__DBconneciton.removeManyFromDB(column, queries)
         else:
             return False
-
+    
     def _changeSettings(self, setting:str, changeTo):
         """_summary_
 
@@ -263,7 +264,7 @@ class Server(): # The main server handler class
                     elif isinstance(newRequest['query'], list):
                         tempData = []
                         for i in newRequest['query']:
-                            tempData.append(self.requestManyFromDB(newRequest['column'], newRequest['query']))
+                            tempData.append(self.requestManyFromDB(newRequest['column'], newRequest['query'][i]))
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':tempData})
                         del tempData
                     elif isinstance(newRequest['query'], dict):
@@ -281,6 +282,7 @@ class Server(): # The main server handler class
                 elif newRequest['column'] in self.__columns: # For all other insertions, might not be necessary (infact might not be good either)
                     self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.sendToDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'remove':
+                print('Server: ', newRequest)
                 if newRequest['column'] in self.__columns: # For all removals of data, might not be good, but works
                     self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.removeFromDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'setting': # For changing settings such as the polling speed of the server
@@ -309,6 +311,9 @@ class Server(): # The main server handler class
         """_summary_
         """
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
+        homepage = "http://127.0.0.1:7777"
+        time.sleep(3)
+        webbrowser.open(homepage)
         while True:
             self._checkForRequests()
             mainLoopTimerEnd = time.time()

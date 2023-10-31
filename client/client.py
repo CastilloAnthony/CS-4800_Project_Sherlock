@@ -79,7 +79,7 @@ class MyFlaskApp:
         return render_template('viewPreset.html', allPresets=allPresets)
 
     def deletePreset(self):
-        return render_template('DeletePreset.html', presets=self.deletePresetClass.query())
+        return render_template('DeletePreset.html', presets=self.deletePresetClass.query()['data'])
 
     def newDeletedPreset(self):
         self.deletePresetClass.deletePreset()
