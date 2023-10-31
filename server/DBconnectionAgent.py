@@ -1,4 +1,4 @@
-import pymongo
+from pymongo import errors, MongoClient
 from time import ctime
 
 class DBConnectionAgent():
@@ -27,7 +27,7 @@ class DBConnectionAgent():
             bool: Success/Failure to connect
         """
         try:
-            self.__client = pymongo.MongoClient("mongodb://"+address+":"+port+"/")
+            self.__client = MongoClient("mongodb://"+address+":"+port+"/")
             return True
         except:
             print("Could not connect to DB at: "+"mongodb://"+address+":"+port+"/")
@@ -193,6 +193,6 @@ class DBConnectionAgent():
         try:
             self.__db.validate_collection(column)
             return True
-        except pymongo.errors.OperationFailure:
+        except errors.OperationFailure:
             return False
 #end DBConnecitonAgent

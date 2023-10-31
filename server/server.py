@@ -1,26 +1,29 @@
 import time
-import multiprocessing as mp
-import uuid
-import socket
-import numpy as np
+from multiprocessing import Queue, Process
+from socket import create_connection
+from numpy import nan
 from server.DBconnectionAgent import DBConnectionAgent
 import client.client 
 
 class Server(): # The main server handler class
     # Communicates with DB using DBconnection and Clients with clientManager
     def __init__(self):
+        """_summary_
+        """
         self.__DBconneciton = False # The connection agent
         self.__columns = ['masterList', 'pollingData', 'presets', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
         self.__requestTypes = ['insert', 'remove', 'request', 'setting'] # Types of requests the server can handle
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
         self.__pollingSpeed = 60*1 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
-        self.__requestsQ = mp.Queue(maxsize=1000) # The request queue, only a clinet will put to this queue
-        self.__dataQ = mp.Queue(maxsize=1000) # The request queue, only the server will put to this queue
+        self.__requestsQ = Queue(maxsize=1000) # The request queue, only a clinet will put to this queue
+        self.__dataQ = Queue(maxsize=1000) # The request queue, only the server will put to this queue
         self.__processes = {} # Process handles identifiers and handles for all processes created by the server
         self._setupDBConnection()
 
     def __del__(self): # WIP
+        """_summary_
+        """
         for i in self.__processes:
             if self.__processes[i].is_alive():
                 print('Process Alive: '+str(self.__processes[i].is_alive()))
@@ -39,6 +42,8 @@ class Server(): # The main server handler class
         del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes
 
     def _checkForPresets(self):
+        """_summary_
+        """
         if self.__DBconneciton.verifyCollection('presets'):
             print('Presets collection verified.')
         else:
@@ -51,6 +56,8 @@ class Server(): # The main server handler class
                 print('An unexpected error occured in the verification of the Preset collection.')
 
     def _checkForMasterlist(self):
+        """_summary_
+        """
         if self.__DBconneciton.verifyCollection('masterList'):
             print('Masterlist collection verified.')
         else:
@@ -64,6 +71,12 @@ class Server(): # The main server handler class
                 print('An unexpected error occured in the verification of the masterList.')
 
     def _setupDBConnection(self, address="localhost", port="27017"):
+        """_summary_
+
+        Args:
+            address (str, optional): _description_. Defaults to "localhost".
+            port (str, optional): _description_. Defaults to "27017".
+        """
         self.__DBconneciton = DBConnectionAgent() # Maybe setup as a Daemon
         if self.__DBconneciton.connect(address, port):
             print("Successfully connected to DB at "+"mongodb://"+address+":"+port+"/")
@@ -88,6 +101,14 @@ class Server(): # The main server handler class
             print("Unable to connect to DB at "+"mongodb://"+address+":"+port+"/")
 
     def setPollingSpeed(self, speed:int):
+        """_summary_
+
+        Args:
+            speed (int): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if isinstance(speed, int):
             self.__pollingSpeed = speed
             return True
@@ -95,48 +116,115 @@ class Server(): # The main server handler class
             return False
 
     def getPollingSpeed(self):
+        """_summary_
+
+        Returns:
+            _type_: _description_
+        """
         return self.__pollingSpeed
     
     def sendToDB(self, column:str, content:dict):
+        """_summary_
+
+        Args:
+            column (str): _description_
+            content (dict): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if column in self.__columns:
             self.__DBconneciton.addToDB(column, content)
         else:
             return False
 
-    def sendManyToDB(self, column:str, contents:dict): # What would the format of 'contents' be for multiple inserts?
+    def sendManyToDB(self, column:str, contents:dict): # WIP, Not used
+        """_summary_
+
+        Args:
+            column (str): _description_
+            contents (dict): _description_
+        """
         pass
 
     def requestFromDB(self, column:str, query:dict):
+        """_summary_
+
+        Args:
+            column (str): _description_
+            query (dict): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if column in self.__columns:
             return self.__DBconneciton.requestFromDB(column, query)
         else:
             return False
     
     def requestManyFromDB(self, column:str, queries:dict):
+        """_summary_
+
+        Args:
+            column (str): _description_
+            queries (dict): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if column in self.__columns:
             return self.__DBconneciton.requestManyFromDB(column, queries)
         else:
                 return False
 
     def removeFromDB(self, column:str, query:dict):
+        """_summary_
+
+        Args:
+            column (str): _description_
+            query (dict): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if column in self.__columns:
             return self.__DBconneciton.removeFromDB(column, query)
         else:
             return False
 
     def removeManyFromDB(self, column:str, queries:dict):
+        """_summary_
+
+        Args:
+            column (str): _description_
+            queries (dict): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if column in self.__columns:
             return self.__DBconneciton.removeManyFromDB(column, queries)
         else:
             return False
 
     def _changeSettings(self, setting:str, changeTo):
+        """_summary_
+
+        Args:
+            setting (str): _description_
+            changeTo (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if setting == 'pollingSpeed':
                 return self.setPollingSpeed(changeTo)
         else:
             return False
 
     def _checkForRequests(self):
+        """_summary_
+        """
         # Expected Request Formats # WIP
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'masterList', 'query':{}}                                                               ### Gets all urls from the master list
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'pollingData', 'query':'wwww.google.com'}                                               ### Requests the polling data for a specific url
@@ -201,21 +289,25 @@ class Server(): # The main server handler class
                 self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':False})
 
     def _pollWebsites(self):
+        """_summary_
+        """
         print(str(time.ctime())+' - Polling sites...')
         masterList = self.requestManyFromDB('masterList', {})
         for object in masterList:
             for port in self.__httpPorts:
                 try:
                     latencyTimerStart = time.time()
-                    temp = socket.create_connection((object['url'], port))
+                    temp = create_connection((object['url'], port)) # socket.create_connection((url, port))
                     temp.close()
                     latencyTimerEnd = time.time()
                     self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':True, 'latency':latencyTimerEnd-latencyTimerStart})
                     break
                 except:
-                    self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':np.nan})
+                    self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':nan})
     
     def _mainLoop(self):
+        """_summary_
+        """
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
         while True:
             self._checkForRequests()
@@ -225,7 +317,9 @@ class Server(): # The main server handler class
                 self._pollWebsites()
 
     def startServer(self):
-        self.__processes['app'] = mp.Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
+        """_summary_
+        """
+        self.__processes['app'] = Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'].start()
         self._mainLoop()
 # end Server
