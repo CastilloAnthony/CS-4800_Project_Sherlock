@@ -5,10 +5,14 @@ import multiprocessing as mp
 class DBConnectionAgent():
     # Communicates directly with DB and Server
     def __init__(self):
+        """_summary_
+        """
         self.__client = False
         self.__db = False
 
     def __del__(self):
+        """_summary_
+        """
         self.disconnect()
         del self.__client
         del self.__db
@@ -32,9 +36,19 @@ class DBConnectionAgent():
             return False
         
     def disconnect(self):
+        """_summary_
+        """
         self.__client.close()
 
     def createNewDB(self, name:str):
+        """_summary_
+
+        Args:
+            name (str): _description_
+
+        Returns:
+            _type_: _description_
+        """
         return self.__client[name]['Initial'].insert_one({'name':name, 'notes':'Created a new database named '+name, 'timestamp':time.ctime()}).acknowledged
     
     def getDBs(self):
@@ -80,24 +94,61 @@ class DBConnectionAgent():
             return False
 
     def removeFromDB(self, column:str, query:dict):
+        """_summary_
+
+        Args:
+            column (str): _description_
+            query (dict): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if self.__db != False:
             return self.__db[column].delete_one(query).acknowledged
         else:
             return False
 
     def removeManyFromDB(self, column:str, query:dict):
+        """_summary_
+
+        Args:
+            column (str): _description_
+            query (dict): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if self.__db != False:
             return self.__db[column].delete_many(query).acknowledged
         else:
             return False
 
     def requestFromDB(self, column:str, query:dict):
+        """_summary_
+
+        Args:
+            column (str): _description_
+            query (dict): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if self.__db != False:
             return self.__db[column].find_one(query)
         else:
             return False
     
     def requestManyFromDB(self, column:str, query:dict):
+        """Takes in a request for a given collection and searches the database for content that matches the query.
+
+        Args:
+            column (str): The name of the collection that data is being requested from
+            query (dict): _description_
+
+        Returns:
+            bool: False if a connection to the database has not yet been established
+            list: A list of all the documents/dictionaries that 
+        """
         if self.__db != False:
             tempData = []
             cur = self.__db[column].find(query)
@@ -108,12 +159,28 @@ class DBConnectionAgent():
             return False
 
     def clearDB(self, column:str):
+        """Deletes everything from the database for the given collection/column
+
+        Args:
+            column (str): The name of the collection to be deleted
+
+        Returns:
+            bool: True/False for a successful/unsuccessful deletion of the contents of the collection
+        """
         if self.__db != False:
             return self.__db[column].delete_many({}).acknowledged
         else:
             return False
 
     def verifyCollection(self, column:str):
+        """Verifies that a collection/column exists within the database.
+
+        Args:
+            column (str): The name of the collection to be verified.
+
+        Returns:
+            bool: True/False for if the collection Exists or Does Not Exist
+        """
         try:
             self.__db.validate_collection(column)
             return True
