@@ -1,7 +1,7 @@
 import time
-from multiprocessing import Queue, Process
-from socket import create_connection
-from numpy import nan
+import multiprocessing as mp
+import socket
+import numpy as np
 from server.DBconnectionAgent import DBConnectionAgent
 import client.client 
 
@@ -16,8 +16,8 @@ class Server(): # The main server handler class
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
         self.__pollingSpeed = 60*1 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
-        self.__requestsQ = Queue(maxsize=1000) # The request queue, only a clinet will put to this queue
-        self.__dataQ = Queue(maxsize=1000) # The request queue, only the server will put to this queue
+        self.__requestsQ = mp.Queue(maxsize=1000) # The request queue, only a clinet will put to this queue
+        self.__dataQ = mp.Queue(maxsize=1000) # The request queue, only the server will put to this queue
         self.__processes = {} # Process handles identifiers and handles for all processes created by the server
         self._setupDBConnection()
 
@@ -297,13 +297,13 @@ class Server(): # The main server handler class
             for port in self.__httpPorts:
                 try:
                     latencyTimerStart = time.time()
-                    temp = create_connection((object['url'], port)) # socket.create_connection((url, port))
+                    temp = socket.create_connection((object['url'], port))
                     temp.close()
                     latencyTimerEnd = time.time()
                     self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':True, 'latency':latencyTimerEnd-latencyTimerStart})
                     break
                 except:
-                    self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':nan})
+                    self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':np.nan})
     
     def _mainLoop(self):
         """_summary_
@@ -319,7 +319,7 @@ class Server(): # The main server handler class
     def startServer(self):
         """_summary_
         """
-        self.__processes['app'] = Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
+        self.__processes['app'] = mp.Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'].start()
         self._mainLoop()
 # end Server
