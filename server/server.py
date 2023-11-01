@@ -13,7 +13,7 @@ class Server(): # The main server handler class
         """
         self.__DBconneciton = False # The connection agent
         self.__columns = ['masterList', 'pollingData', 'presets', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
-        self.__requestTypes = ['insert', 'remove', 'request', 'setting'] # Types of requests the server can handle
+        self.__requestTypes = ['insert', 'remove', 'request', 'update', 'setting'] # Types of requests the server can handle
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
         self.__pollingSpeed = 60*1 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
@@ -124,6 +124,21 @@ class Server(): # The main server handler class
         """
         return self.__pollingSpeed
     
+    def updateInDB(self, column:str, content:dict):
+        """Updates a pre-existing document with new information
+
+        Args:
+            column (str): The specific collection to have its contents be updated
+            content (dict): A dictionary containing the query to match with whats already in the database and content to replace the matched query with. FORMAT: {{query}, {modifications}}
+
+        Returns:
+            bool: True/False for success/failure to update data already existing in the database
+        """
+        if column in self.__columns:
+            self.__DBconneciton.updateInDB(column, content)
+        else:
+            return False
+
     def sendToDB(self, column:str, content:dict):
         """_summary_
 
@@ -282,13 +297,14 @@ class Server(): # The main server handler class
                 elif newRequest['column'] in self.__columns: # For all other insertions, might not be necessary (infact might not be good either)
                     self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.sendToDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'remove':
-                print('Server: ', newRequest)
                 if newRequest['column'] in self.__columns: # For all removals of data, might not be good, but works
                     self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.removeFromDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'setting': # For changing settings such as the polling speed of the server
                 self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self._changeSettings(newRequest['column'], newRequest['changeTo'])})
+            elif newRequest['request_type'] == 'update':
+                self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.updateInDB(newRequest['column'], newRequest['changeTo'])})
             else:
-                self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':False})
+                self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':'Not Implemented'})
 
     def _pollWebsites(self):
         """_summary_

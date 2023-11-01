@@ -195,4 +195,20 @@ class DBConnectionAgent():
             return True
         except pymongo.errors.OperationFailure:
             return False
+
+    def updateInDB(self, column:str, query:dict):
+        """Updates a single document in the database. 
+
+        Args:
+            column (str): The collection to modify
+            query (dict): QUERY FORMAT EXAMPLE: {{'id':matchWithThis}, {'id':ModifyToThis}}
+
+        Returns:
+            bool: True/False for a successful/unsuccessful update
+        """
+        if self.__db != False:
+            return self.__db[column].update_one(query).acknowledged
+        else:
+            return False
+
 #end DBConnecitonAgent
