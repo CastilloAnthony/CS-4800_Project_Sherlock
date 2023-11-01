@@ -1,14 +1,17 @@
 import pymongo
-import time
-import multiprocessing as mp
+from time import ctime
 
 class DBConnectionAgent():
     # Communicates directly with DB and Server
     def __init__(self):
+        """Initialization function setting client and db to false.
+        """
         self.__client = False
         self.__db = False
 
     def __del__(self):
+        """Deletion function that deletes the client and db variables.
+        """
         self.disconnect()
         del self.__client
         del self.__db
@@ -32,10 +35,31 @@ class DBConnectionAgent():
             return False
         
     def disconnect(self):
-        self.__client.close()
+        """Attempts to disconnect from the mongoDB.
 
+        Returns:
+            bool: True/False on success/failure.
+        """
+        if self.__client != False:
+            self.__client.close()
+            self.__client = False
+            return True
+        else:
+            return False
+        
     def createNewDB(self, name:str):
-        return self.__client[name]['Initial'].insert_one({'name':name, 'notes':'Created a new database named '+name, 'timestamp':time.ctime()}).acknowledged
+        """Attempts to creates a brand new mongoDB database named the inputted string.
+
+        Args:
+            name (str): The name of the database to be created.
+
+        Returns:
+            bool: True/False on success/failure.
+        """
+        if name not in self.getDBs():
+            return self.__client[name]['Initial'].insert_one({'name':name, 'notes':'Created a new database named '+name, 'timestamp':ctime()}).acknowledged
+        else:
+            return False
     
     def getDBs(self):
         """Returns a List of databases for the connected system
@@ -80,24 +104,60 @@ class DBConnectionAgent():
             return False
 
     def removeFromDB(self, column:str, query:dict):
+        """Removes the first instance of an entry, within the column, that matches the inputted query.
+
+        Args:
+            column (str): The desired colleciton for which to remove data from.
+            query (dict): The query used to match with data in the database.
+
+        Returns:
+            bool: True/False on success/failure.
+        """
         if self.__db != False:
             return self.__db[column].delete_one(query).acknowledged
         else:
             return False
 
     def removeManyFromDB(self, column:str, query:dict):
+        """Removes all instances, from the column, that matches the inputted query.
+
+        Args:
+            column (str): The desired colleciton for which to remove data from.
+            query (dict): The query used to match with data in the database.
+        Returns:
+            bool: True/False on success/failure.
+        """
         if self.__db != False:
             return self.__db[column].delete_many(query).acknowledged
         else:
             return False
 
     def requestFromDB(self, column:str, query:dict):
+        """Returns the first entry, from the column, that matches the inputted query.
+
+        Args:
+            column (str): The desired colleciton for which to request data from.
+            query (dict): The query used to match with data in the database.
+
+        Returns:
+            bool: True/False on success/failure.
+        """
         if self.__db != False:
             return self.__db[column].find_one(query)
         else:
             return False
     
     def requestManyFromDB(self, column:str, query:dict):
+        """Takes in a request for a given collection and searches the database for content that matches the query.
+
+        Args:
+            column (str): The name of the collection that data is being requested from
+            query (dict): _description_
+
+        Returns:
+            bool: False if a connection to the database has not yet been established
+            list: A list of all the documents/dictionaries that 
+        """
         if self.__db != False:
             tempData = []
             cur = self.__db[column].find(query)
@@ -108,12 +168,28 @@ class DBConnectionAgent():
             return False
 
     def clearDB(self, column:str):
+        """Deletes everything from the database for the given collection/column
+
+        Args:
+            column (str): The name of the collection to be deleted
+
+        Returns:
+            bool: True/False for a successful/unsuccessful deletion of the contents of the collection
+        """
         if self.__db != False:
             return self.__db[column].delete_many({}).acknowledged
         else:
             return False
 
     def verifyCollection(self, column:str):
+        """Verifies that a collection/column exists within the database.
+
+        Args:
+            column (str): The name of the collection to be verified.
+
+        Returns:
+            bool: True/False for if the collection Exists or Does Not Exist
+        """
         try:
             self.__db.validate_collection(column)
             return True

@@ -37,6 +37,7 @@ class DeletePreset(): # Controller
             'column': 'presets', #Cannot get presets yet {'id': UUID('575b1827-40da-4141-b2fe-af951dd7a518'), 'timestamp': 1698523276.91872, 'data': 'Not Yet Implemented'}
             'query': {}
         }
+        print('something who cares')
         temp = self.requestData(masterListRequest)
         return temp
         #requestQ.put(masterListRequest)
@@ -46,13 +47,14 @@ class DeletePreset(): # Controller
         
     def deletePreset(self):
         #should return a list of presets wanted to be deleted
-        deletedPresets = request.form.getlist('deletedPresets') 
+        deletedPresets = request.form.getlist('selected_options[]') 
         for preset in deletedPresets:
+            presetList = {'name':preset}
             deletePresetRequest = {
                 'id': uuid.uuid4(),
                 'request_type': 'remove',
                 'column': 'presets',
-                'query': preset
+                'query': presetList
             }
             self.requestData(deletePresetRequest)
 
