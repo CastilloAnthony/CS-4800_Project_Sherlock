@@ -29,6 +29,11 @@ class graphTableGenerator:
                     return newData
             else:
                 self.__dataQ.put(newData)
+                print(len(newData))
+
+            # have the requested data print out in a list
+
+
 
 
 #load files
