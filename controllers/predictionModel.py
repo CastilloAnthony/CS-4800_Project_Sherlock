@@ -2,11 +2,16 @@ import time
 import tensorflow as tf
 
 class PredictionModel():
+    """_summary_
+    """
     def __init__(self):
         self.__data = False
         self.__model = False
+        self.__modelFilename = 'predictionModel.keras'
 
     def __del__(self):
+        """_summary_
+        """
         del self.__data, self.__model
 
     def requestData(self, request): # Not Used
@@ -29,6 +34,8 @@ class PredictionModel():
                 self.__dataQ.put(newData)
 
     def createModel(self):
+        """WIP
+        """
         OUT_STEPS, num_features = 1
         self.__model = tf.keras.Sequential([
             tf.keras.layers.Lambda(lambda x: x[:, -11:, :]),
@@ -59,14 +66,70 @@ class PredictionModel():
         ])
         '''
 
-    def setData(self, data):
+    def saveModel(self):
+        """Saves the model to a file using the name provided in self.__modelFilename
+        """
+        self.__modle.save(self.__modelFilename)
+
+    def readModel(self):
+        """Reads a model from file using the name provided in self.__modelFilename
+        """
+        self.__model = tf.keras.models.load_model(self.__modelFilename)
+
+    def setFilename(self, name:str):
+        """Changes the file name that the model gets saved as. Additionally creates a new model and then saves it to the new file.
+
+        Args:
+            name (str): The name to change the model's file
+        """
+        self.__modelFilename = name
+        self.createModel()
+        self.saveModel()
+
+    def getFilename(self):
+        """Returns the name of the file that the model is saved in
+
+        Returns:
+            str: The name of the file the model is saved to
+        """
+        return self.__modelFilename
+    
+    def setData(self, data:list):
+        """Clears out the old data and then sets the new data in the class.
+
+        Args:
+            data (list): A list of dictionaries to work with (i.e., [{data0}, {data1}, {data2}])
+        """
+        self.clearData()
         self.__data = data
 
     def clearData(self):
+        """Empties the data that is currently stored by the model
+        """
         self.__data = False
 
+    def clearModel(self):
+        """Resets the model back to a skeleton model (i.e., no training.)
+        """
+        self.__model = False
+        self.createModel()
+    
     def predict(self):
-        pass
+        predicitons = [{'data0'}, {'data1'}, {'data2'}, {'etc.'}]
+        return predicitons
 
-    def trainModel(self):
-        pass
+    def trainModel(self, iterations:int = 3):
+        """Trians the model on the data given using the 
+
+        Args:
+            iterations (int, optional): The number of time the model will be fitted to the data. Defaults to 3.
+        """
+        for i in range(iterations):
+            self.__model.fit()
+        self.saveModel()
+
+    def predictOnData(self, data:list, iterations:int=3):
+        self.readModel()
+        self.setData(data)
+        self.trainModel(iterations)
+        return self.predict()
