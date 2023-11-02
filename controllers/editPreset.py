@@ -1,7 +1,7 @@
 import uuid
 import time
 from flask import Flask, render_template, request
-
+from bson import ObjectId
 import re
 
 class EditPreset(): # Controller
@@ -81,7 +81,8 @@ class EditPreset(): # Controller
             'id': uuid.uuid4(),
             'request_type': 'update',
             'column': 'presets', 
-            'query': {'_id':preset_to_be_changed['_id']},
+            #filter_criteria = {"_id": ObjectId("your-document-id")}
+            'query': {'_id': ObjectId(str(preset_to_be_changed['_id']))},
             'changeTo': new_dictionary
         }
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT
