@@ -302,7 +302,7 @@ class Server(): # The main server handler class
             elif newRequest['request_type'] == 'setting': # For changing settings such as the polling speed of the server
                 self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self._changeSettings(newRequest['column'], newRequest['changeTo'])})
             elif newRequest['request_type'] == 'update':
-                self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.updateInDB(newRequest['column'], newRequest['changeTo'])})
+                self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.updateInDB(newRequest['column'], newRequest['query'])})
             else:
                 self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':'Not Implemented'})
 

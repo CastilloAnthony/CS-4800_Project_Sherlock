@@ -9,7 +9,7 @@ from controllers.editPreset import EditPreset
 from controllers.addWebsite import AddWebsite 
 from controllers.deleteWebsite import DeleteWebsite 
 
-import controllers.graphTableGenerator
+# import controllers.graphTableGenerator
 
 class MyFlaskApp:
     def __init__(self, requestQ:Queue, dataQ:Queue):
@@ -97,7 +97,8 @@ class MyFlaskApp:
         return render_template('EditPreset.html', presets=self.editPresetClass.query())
     #TODO
     def newEditedPreset(self):
-        return render_template('EditPreset.html', chosenPreset=self.editPresetClass.editPreset())
+        self.editPresetClass.editPreset()
+        return "YOU HAVE SUCCESSFULLY EDITED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
     #TODO   
     def edit(self):
         return render_template('EditPreset.html')

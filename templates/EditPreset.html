@@ -16,6 +16,20 @@
         </ul><br>
         <h1  style="text-align:center;color:white;">Edit Preset</h1><br>
         {{presets}}
-
+        <form action="editPreset/newEditedPreset" style="background-color:white; display:inline-block" method="POST">
+            <!--
+                Need a name for the respective preset so the user knows what to ask for later
+                Make it easier to recall for them. 
+            -->
+            
+            <div style="background:black;color:white;">FROM THIS LIST PICK WHICH ONES YOU WOULD LIKE TO EDIT</div>
+            <br><br>
+            {% for item in presets['data'] %}
+                
+                <input type="checkbox" name="selected_option" value="{{ item }}"> {{ item['name'] }}<br>{{item['presetLists']}}
+                
+            {% endfor %}
+            <input type="submit" value="Submit">
+        </form>
     </body>
 </html>
