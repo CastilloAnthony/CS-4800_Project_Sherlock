@@ -207,7 +207,19 @@ class DBConnectionAgent():
             bool: True/False for a successful/unsuccessful update
         """
         if self.__db != False:
-            return self.__db[column].update_one(query, changeTo).acknowledged
+            #update_one(<filter_criteria>, update_data)
+            #filter_criteria = {"name": "John"}
+            #update_data = {"$set": {"age": 30}}
+            
+            #ours
+            #filter_criteria = {"_id":0, "name":"asdf", "presetLists:[]", "timestamp":213123.12312}
+            #update_data = {"$set":{"name":"<newName>", presetLists:[<newItem1>,<newItem2>]}}
+            print('I AM')
+            
+            print(query, '\n',changeTo)
+            # {'_id': '6542ea752079dc2a9c74ca6c', 'name': 'adfa', 'presetLists': ["'www.csustan.edu'", "'www.microsoft.com'", "'www.nasa.gov'", "'chat.openai.com'"], 'timestamp': 1698884213.945767}
+            # {'name': 'AYOOO', 'presetLists': ['www.google.com', 'www.csustan.edu', 'www.wikipedia.org']}
+            return self.__db[column].update_one(query, {"$set":changeTo}).acknowledged
         else:
             return False
 

@@ -56,12 +56,12 @@ class EditPreset(): # Controller
             value = value_str if value_str else (list_str.split(', ') if list_str else (float(float_str) if float_str else obj_id))
             data[key] = value
 
-        print("Data:",type(data), data)
+        # print("Data:",type(data), data)
         
-        print("_id",type(data['_id']),data['_id'])
-        print("name",type(data['name']),data['name'])
-        print("presetLists",type(data['presetLists']),data['presetLists'])
-        print("timestamp",type(data['timestamp']),data['timestamp'])
+        # print("_id",type(data['_id']),data['_id'])
+        # print("name",type(data['name']),data['name'])
+        # print("presetLists",type(data['presetLists']),data['presetLists'])
+        # print("timestamp",type(data['timestamp']),data['timestamp'])
         
         return data
         
@@ -71,12 +71,8 @@ class EditPreset(): # Controller
         preset_to_be_changed = request.form['selected_option[]']#.replace("'", "\"")
         preset_to_be_changed = self.parseStringToDict(preset_to_be_changed)
         
-        # duh = "{'_id': ObjectId('653dae5111534f866611d128'), 'name': 'taco', 'presetLists': ['www.csustan.edu', 'www.microsoft.com'], 'timestamp': 1698541137.0775506}".replace("'", "\"")    
-        #{'_id': ObjectId('653dae5111534f866611d128'), 'name': 'taco', 'presetLists': ['www.csustan.edu', 'www.microsoft.com'], 'timestamp': 1698541137.0775506}
-        
         #HARD CODING
-        new_dictionary = {'_id':preset_to_be_changed['_id'],'name':'taco', 'presetLists':['www.google.com', 'chat.openai.com', 'www.bbc.co.uk'], 'timestamp':preset_to_be_changed['timestamp']}
-        
+        new_dictionary = {'name':'AYOOO', 'presetLists':['www.google.com', 'www.csustan.edu', 'www.wikipedia.org']}
         presetRequest = {
             'id': uuid.uuid4(),
             'request_type': 'update',
