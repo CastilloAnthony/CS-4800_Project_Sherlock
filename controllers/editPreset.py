@@ -4,6 +4,7 @@ import requests
 from flask import Flask, render_template, request
 import json
 import ast
+import re
 
 class EditPreset(): # Controller
     def __init__(self, requestQ, dataQ):
@@ -42,60 +43,46 @@ class EditPreset(): # Controller
         temp = self.requestData(presetRequest)
         return temp
         
-    def parseStringToDict(self, input:str):
-        newDict = {'_id':False, 'name':False, 'presetLists':False, 'timestamp':False}
-        newKey = ''
-        newValue = ''
-        for c in input:
-            if c == ':':
-                pass
-            elif c == ',':
-                pass
-            elif c == '{':
-                pass
-            elif c == '}':
-                pass
-            else:
-                newStr += c
+    def parseStringToDict(self, stringedDictionary:str):
+        # Define a regular expression pattern to match key-value pairs
+        pattern = r"'(\w+)': (?:'([^']*)'|(?:\[(.*?)\])|(\d+\.\d+)|ObjectId\('([^']*)'\))"
 
+        # Find all key-value pairs in the string
+        matches = re.findall(pattern, stringedDictionary)
+
+        # Create a dictionary from the matches
+        data = {}
+        for key, value_str, list_str, float_str, obj_id in matches:
+            value = value_str if value_str else (list_str.split(', ') if list_str else (float(float_str) if float_str else obj_id))
+            data[key] = value
+
+        print("Data:",type(data), data)
+        
+        print("_id",type(data['_id']),data['_id'])
+        print("name",type(data['name']),data['name'])
+        print("presetLists",type(data['presetLists']),data['presetLists'])
+        print("timestamp",type(data['timestamp']),data['timestamp'])
+        
+        return data
         
     def editPreset(self):
         #should return a list of presets wanted to be deleted
         print('I am here')
-        # duh = request.form['selected_option'].replace("'", "\"")
-        # preset_to_be_changed = request.form.to_dict("selected_option")
-        # preset_to_be_changed = request.form["selected_option"]
-        #input_string = "{'_id': ObjectId('6542ea752079dc2a9c74ca6c'), 'name': 'adfa', 'presetLists': ['www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com'], 'timestamp': 1698884213.945767}"
-        # print(type(preset_to_be_changed),'   ', preset_to_be_changed)
-        # input_string = preset_to_be_changed
-        #print(type(input_string),input_string) 
-        # Convert the string to a dictionary
-        #my_dict = ast.literal_eval(input_string)
-        #preset_to_be_changed = json.loads(request.form['selected_option'].replace("'", "\""))
-        # Now, 'my_dict' is a Python dictionary
         preset_to_be_changed = request.form['selected_option[]']#.replace("'", "\"")
-        print(type(preset_to_be_changed), preset_to_be_changed)
-        #preset_to_be_changed = json.loads(preset_to_be_changed)
         preset_to_be_changed = self.parseStringToDict(preset_to_be_changed)
-        print(preset_to_be_changed)
         
-        
-        #RECKAGE
-        # preset_to_be_changed = preset_to_be_changed['selected_option']
-        # duh = "{'_id': ObjectId('653dae5111534f866611d128'), 'name': 'taco', 'presetLists': ['www.csustan.edu', 'www.microsoft.com'], 'timestamp': 1698541137.0775506}".replace("'", "\"")
-        # preset_to_be_changed = json.loads(duh)# string by default has single quoutes and that is why no work :(
-    
-        
+        # duh = "{'_id': ObjectId('653dae5111534f866611d128'), 'name': 'taco', 'presetLists': ['www.csustan.edu', 'www.microsoft.com'], 'timestamp': 1698541137.0775506}".replace("'", "\"")    
         #{'_id': ObjectId('653dae5111534f866611d128'), 'name': 'taco', 'presetLists': ['www.csustan.edu', 'www.microsoft.com'], 'timestamp': 1698541137.0775506}
+        
         #HARD CODING
-        new_dictionary = {'_id':preset_to_be_changed[0],'name':'taco', 'presetLists':['www.google.com', 'chat.openai.com', 'www.bbc.co.uk'], 'timestamp':preset_to_be_changed[3]}
+        new_dictionary = {'_id':preset_to_be_changed['_id'],'name':'taco', 'presetLists':['www.google.com', 'chat.openai.com', 'www.bbc.co.uk'], 'timestamp':preset_to_be_changed['timestamp']}
         
         presetRequest = {
             'id': uuid.uuid4(),
             'request_type': 'update',
             'column': 'presets', 
             'query': preset_to_be_changed,
-            'changeTo':new_dictionary
+            'changeTo': new_dictionary
         }
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT
         temp = self.requestData(presetRequest)
