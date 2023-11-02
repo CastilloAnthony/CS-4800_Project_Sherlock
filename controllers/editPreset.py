@@ -42,6 +42,22 @@ class EditPreset(): # Controller
         temp = self.requestData(presetRequest)
         return temp
         
+    def parseStringToDict(self, input:str):
+        newDict = {'_id':False, 'name':False, 'presetLists':False, 'timestamp':False}
+        newKey = ''
+        newValue = ''
+        for c in input:
+            if c == ':':
+                pass
+            elif c == ',':
+                pass
+            elif c == '{':
+                pass
+            elif c == '}':
+                pass
+            else:
+                newStr += c
+
         
     def editPreset(self):
         #should return a list of presets wanted to be deleted
@@ -49,15 +65,19 @@ class EditPreset(): # Controller
         # duh = request.form['selected_option'].replace("'", "\"")
         # preset_to_be_changed = request.form.to_dict("selected_option")
         # preset_to_be_changed = request.form["selected_option"]
-        input_string = "{'_id': ObjectId('6542ea752079dc2a9c74ca6c'), 'name': 'adfa', 'presetLists': ['www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com'], 'timestamp': 1698884213.945767}"
+        #input_string = "{'_id': ObjectId('6542ea752079dc2a9c74ca6c'), 'name': 'adfa', 'presetLists': ['www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com'], 'timestamp': 1698884213.945767}"
         # print(type(preset_to_be_changed),'   ', preset_to_be_changed)
         # input_string = preset_to_be_changed
-        print(type(input_string),input_string) 
+        #print(type(input_string),input_string) 
         # Convert the string to a dictionary
-        my_dict = ast.literal_eval(input_string)
-
+        #my_dict = ast.literal_eval(input_string)
+        #preset_to_be_changed = json.loads(request.form['selected_option'].replace("'", "\""))
         # Now, 'my_dict' is a Python dictionary
-        print(my_dict)
+        preset_to_be_changed = request.form['selected_option[]']#.replace("'", "\"")
+        print(type(preset_to_be_changed), preset_to_be_changed)
+        #preset_to_be_changed = json.loads(preset_to_be_changed)
+        preset_to_be_changed = self.parseStringToDict(preset_to_be_changed)
+        print(preset_to_be_changed)
         
         
         #RECKAGE
@@ -68,7 +88,7 @@ class EditPreset(): # Controller
         
         #{'_id': ObjectId('653dae5111534f866611d128'), 'name': 'taco', 'presetLists': ['www.csustan.edu', 'www.microsoft.com'], 'timestamp': 1698541137.0775506}
         #HARD CODING
-        new_dictionary = {'_id':preset_to_be_changed['_id'],'name':'taco', 'presetLists':['www.google.com', 'chat.openai.com', 'www.bbc.co.uk'], 'timestamp':preset_to_be_changed['timestamp']}
+        new_dictionary = {'_id':preset_to_be_changed[0],'name':'taco', 'presetLists':['www.google.com', 'chat.openai.com', 'www.bbc.co.uk'], 'timestamp':preset_to_be_changed[3]}
         
         presetRequest = {
             'id': uuid.uuid4(),

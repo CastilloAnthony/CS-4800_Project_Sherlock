@@ -26,7 +26,7 @@
             <br><br>
             {% for item in presets['data'] %}
                 
-                <input type="checkbox" name="selected_option" value="{{ item }}"> {{ item['name'] }}<br>{{item['presetLists']}}
+                <input type="checkbox" name="selected_option" value="{{ item }}"> {{ item['name'] }}<br>{{item['presetLists']}}<br>
                 
             {% endfor %}
             <input type="submit" value="Submit">
