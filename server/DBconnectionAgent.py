@@ -217,8 +217,8 @@ class DBConnectionAgent():
             print('I AM')
             
             print(query, '\n',changeTo)
-            # {'_id': '6542ea752079dc2a9c74ca6c', 'name': 'adfa', 'presetLists': ["'www.csustan.edu'", "'www.microsoft.com'", "'www.nasa.gov'", "'chat.openai.com'"], 'timestamp': 1698884213.945767}
-            # {'name': 'AYOOO', 'presetLists': ['www.google.com', 'www.csustan.edu', 'www.wikipedia.org']}
+            # query: {'_id': '6542ea752079dc2a9c74ca6c', 'name': 'adfa', 'presetLists': ["'www.csustan.edu'", "'www.microsoft.com'", "'www.nasa.gov'", "'chat.openai.com'"], 'timestamp': 1698884213.945767}
+            # changeTo: {'name': 'AYOOO', 'presetLists': ['www.google.com', 'www.csustan.edu', 'www.wikipedia.org']}
             return self.__db[column].update_one(query, {"$set":changeTo}).acknowledged
         else:
             return False
