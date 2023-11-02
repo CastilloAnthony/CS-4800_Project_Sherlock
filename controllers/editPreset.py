@@ -2,6 +2,8 @@ import uuid
 import time
 import requests
 from flask import Flask, render_template, request
+import json
+import ast
 
 class EditPreset(): # Controller
     def __init__(self, requestQ, dataQ):
@@ -44,9 +46,30 @@ class EditPreset(): # Controller
     def editPreset(self):
         #should return a list of presets wanted to be deleted
         print('I am here')
-        preset_to_be_changed = request.form['selected_option']
+        # duh = request.form['selected_option'].replace("'", "\"")
+        # preset_to_be_changed = request.form.to_dict("selected_option")
+        # preset_to_be_changed = request.form["selected_option"]
+        input_string = "{'_id': ObjectId('6542ea752079dc2a9c74ca6c'), 'name': 'adfa', 'presetLists': ['www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com'], 'timestamp': 1698884213.945767}"
+        # print(type(preset_to_be_changed),'   ', preset_to_be_changed)
+        # input_string = preset_to_be_changed
+        print(type(input_string),input_string) 
+        # Convert the string to a dictionary
+        my_dict = ast.literal_eval(input_string)
+
+        # Now, 'my_dict' is a Python dictionary
+        print(my_dict)
         
-        new_dictionary = {'name':'taco', 'presetLists':['www.google.com', 'chat.openai.com', 'www.bbc.co.uk']}
+        
+        #RECKAGE
+        # preset_to_be_changed = preset_to_be_changed['selected_option']
+        # duh = "{'_id': ObjectId('653dae5111534f866611d128'), 'name': 'taco', 'presetLists': ['www.csustan.edu', 'www.microsoft.com'], 'timestamp': 1698541137.0775506}".replace("'", "\"")
+        # preset_to_be_changed = json.loads(duh)# string by default has single quoutes and that is why no work :(
+    
+        
+        #{'_id': ObjectId('653dae5111534f866611d128'), 'name': 'taco', 'presetLists': ['www.csustan.edu', 'www.microsoft.com'], 'timestamp': 1698541137.0775506}
+        #HARD CODING
+        new_dictionary = {'_id':preset_to_be_changed['_id'],'name':'taco', 'presetLists':['www.google.com', 'chat.openai.com', 'www.bbc.co.uk'], 'timestamp':preset_to_be_changed['timestamp']}
+        
         presetRequest = {
             'id': uuid.uuid4(),
             'request_type': 'update',
