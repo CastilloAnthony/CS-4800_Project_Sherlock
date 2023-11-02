@@ -1,9 +1,7 @@
 import uuid
 import time
-import requests
 from flask import Flask, render_template, request
-import json
-import ast
+
 import re
 
 class EditPreset(): # Controller
@@ -55,29 +53,35 @@ class EditPreset(): # Controller
         for key, value_str, list_str, float_str, obj_id in matches:
             value = value_str if value_str else (list_str.split(', ') if list_str else (float(float_str) if float_str else obj_id))
             data[key] = value
-
-        # print("Data:",type(data), data)
         
-        # print("_id",type(data['_id']),data['_id'])
-        # print("name",type(data['name']),data['name'])
-        # print("presetLists",type(data['presetLists']),data['presetLists'])
-        # print("timestamp",type(data['timestamp']),data['timestamp'])
-        
+        data = self.remove_double_quotes(data)
         return data
+    
+    def remove_double_quotes(self, item):
+        if isinstance(item, list):
+            return [self.remove_double_quotes(element) for element in item]
+        elif isinstance(item, dict):
+            return {key: self.remove_double_quotes(value) for key, value in item.items()}
+        elif isinstance(item, str):
+            return item.replace('"', '').replace("'", '')  # Remove both double and single quotes
+        else:
+            return item
         
     def editPreset(self):
         #should return a list of presets wanted to be deleted
-        print('I am here')
+        
         preset_to_be_changed = request.form['selected_option[]']#.replace("'", "\"")
+        
         preset_to_be_changed = self.parseStringToDict(preset_to_be_changed)
         
+        
         #HARD CODING
-        new_dictionary = {'name':'AYOOO', 'presetLists':['www.google.com', 'www.csustan.edu', 'www.wikipedia.org']}
+        new_dictionary = {'name':'taco', 'presetLists':['www.google.com', 'chat.openai.com', 'www.bbc.co.uk']}
         presetRequest = {
             'id': uuid.uuid4(),
             'request_type': 'update',
             'column': 'presets', 
-            'query': preset_to_be_changed,
+            'query': {'_id':preset_to_be_changed['_id']},
             'changeTo': new_dictionary
         }
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT

@@ -211,14 +211,11 @@ class DBConnectionAgent():
             #filter_criteria = {"name": "John"}
             #update_data = {"$set": {"age": 30}}
             
-            #ours
-            #filter_criteria = {"_id":0, "name":"asdf", "presetLists:[]", "timestamp":213123.12312}
-            #update_data = {"$set":{"name":"<newName>", presetLists:[<newItem1>,<newItem2>]}}
-            print('I AM')
+            
             
             print(query, '\n',changeTo)
-            # query: {'_id': '6542ea752079dc2a9c74ca6c', 'name': 'adfa', 'presetLists': ["'www.csustan.edu'", "'www.microsoft.com'", "'www.nasa.gov'", "'chat.openai.com'"], 'timestamp': 1698884213.945767}
-            # changeTo: {'name': 'AYOOO', 'presetLists': ['www.google.com', 'www.csustan.edu', 'www.wikipedia.org']}
+            # query: {'_id': '6542ea812079dc2a9c74ca6d', 'name': 'adfa', 'presetLists': ['www.csustan.edu', 'www.bbc.co.uk', 'www.reddit.com', 'https://discord.gg/keAWQanBp8'], 'timestamp': 1698884225.4272666}
+            # changeTo: {'_id':preset_to_be_changed['_id'],'name':'taco', 'presetLists':['www.google.com', 'chat.openai.com', 'www.bbc.co.uk'], 'timestamp':preset_to_be_changed['timestamp']}
             return self.__db[column].update_one(query, {"$set":changeTo}).acknowledged
         else:
             return False
