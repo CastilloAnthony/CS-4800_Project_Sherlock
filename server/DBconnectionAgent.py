@@ -196,7 +196,7 @@ class DBConnectionAgent():
         except pymongo.errors.OperationFailure:
             return False
 
-    def updateInDB(self, column:str, query:dict):
+    def updateInDB(self, column:str, query:dict, changeTo:dict):
         """Updates a single document in the database. 
 
         Args:
