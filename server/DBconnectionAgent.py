@@ -207,7 +207,7 @@ class DBConnectionAgent():
             bool: True/False for a successful/unsuccessful update
         """
         if self.__db != False:
-            return self.__db[column].update_one(query).acknowledged
+            return self.__db[column].update_one(query, changeTo).acknowledged
         else:
             return False
 
