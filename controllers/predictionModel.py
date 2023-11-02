@@ -114,8 +114,16 @@ class PredictionModel():
         self.__model = False
         self.createModel()
     
-    def predict(self):
-        predicitons = [{'data0'}, {'data1'}, {'data2'}, {'etc.'}]
+    def predict(self, quantity:int=60*3):
+        """Projects the future for the current data using the fitted model.
+
+        Args:
+            quantity (int, optional): The number of minutes to project over. Defaults to 60*3.
+
+        Returns:
+            list: A list of all the predictions
+        """
+        predicitons = [{'data0'}, {'data1'}, {'data2'}, {'etc.'}, {'data#quantity-1#'}]
         return predicitons
 
     def trainModel(self, iterations:int = 3):
@@ -128,8 +136,17 @@ class PredictionModel():
             self.__model.fit()
         self.saveModel()
 
-    def predictOnData(self, data:list, iterations:int=3):
+    def predictOnData(self, data:list, iterations:int=3, predictions=180):
+        """An all in one simplified function for giving the prediciton model data, training the model, and then makeing predictions.
+
+        Args:
+            data (list): The data to train and predict over.
+            iterations (int, optional): The number of times to fit the model to the data. Defaults to 3.
+            predictions (int, optional): The number of minutes to project over. Defaults to 180
+        Returns:
+            list: A list of all the predictions for the next few data points
+        """
         self.readModel()
         self.setData(data)
         self.trainModel(iterations)
-        return self.predict()
+        return self.predict(predictions)
