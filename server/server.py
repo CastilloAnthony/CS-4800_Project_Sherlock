@@ -124,7 +124,7 @@ class Server(): # The main server handler class
         """
         return self.__pollingSpeed
     
-    def updateInDB(self, column:str, content:dict):
+    def updateInDB(self, column:str, content:dict, changeTo:dict):
         """Updates a pre-existing document with new information
 
         Args:
@@ -135,7 +135,7 @@ class Server(): # The main server handler class
             bool: True/False for success/failure to update data already existing in the database
         """
         if column in self.__columns:
-            self.__DBconneciton.updateInDB(column, content)
+            self.__DBconneciton.updateInDB(column, content, changeTo)
         else:
             return False
 
@@ -302,7 +302,7 @@ class Server(): # The main server handler class
             elif newRequest['request_type'] == 'setting': # For changing settings such as the polling speed of the server
                 self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self._changeSettings(newRequest['column'], newRequest['changeTo'])})
             elif newRequest['request_type'] == 'update':
-                self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.updateInDB(newRequest['column'], newRequest['changeTo'])})
+                self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.updateInDB(newRequest['column'], newRequest['query'], newRequest['changeTo'])})
             else:
                 self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':'Not Implemented'})
 

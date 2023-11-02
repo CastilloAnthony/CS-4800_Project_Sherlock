@@ -5,7 +5,7 @@ import seaborn as sns
 from datetime import datetime, timedelta
 import pytz
 import requests
-import predictionModel
+import controllers.predictionModel
 
 class graphTableGenerator:
     def __init__(self, requestQ, dataQ):

@@ -2,6 +2,9 @@ import uuid
 import time
 import requests
 from flask import Flask, render_template, request
+import json
+import ast
+import re
 
 class EditPreset(): # Controller
     def __init__(self, requestQ, dataQ):
@@ -16,7 +19,6 @@ class EditPreset(): # Controller
         initialDataID = False
         while self.__dataQ.empty() != True:
             newData = self.__dataQ.get()
-            print(newData)
             if newData['id'] == initialDataID:
                 self.__requestQ.put(request)
                 time.sleep(0.1) #import time
@@ -31,22 +33,57 @@ class EditPreset(): # Controller
 
     def query(self):
         #ASKING
-        masterListRequest = {
+        presetRequest = {
             'id': uuid.uuid4(),
             'request_type': 'request',
             'column': 'presets', #Cannot get presets yet {'id': UUID('575b1827-40da-4141-b2fe-af951dd7a518'), 'timestamp': 1698523276.91872, 'data': 'Not Yet Implemented'}
             'query': {}
         }
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT
-        temp = self.requestData(masterListRequest)
+        temp = self.requestData(presetRequest)
         return temp
         
+    def parseStringToDict(self, stringedDictionary:str):
+        # Define a regular expression pattern to match key-value pairs
+        pattern = r"'(\w+)': (?:'([^']*)'|(?:\[(.*?)\])|(\d+\.\d+)|ObjectId\('([^']*)'\))"
+
+        # Find all key-value pairs in the string
+        matches = re.findall(pattern, stringedDictionary)
+
+        # Create a dictionary from the matches
+        data = {}
+        for key, value_str, list_str, float_str, obj_id in matches:
+            value = value_str if value_str else (list_str.split(', ') if list_str else (float(float_str) if float_str else obj_id))
+            data[key] = value
+
+        # print("Data:",type(data), data)
+        
+        # print("_id",type(data['_id']),data['_id'])
+        # print("name",type(data['name']),data['name'])
+        # print("presetLists",type(data['presetLists']),data['presetLists'])
+        # print("timestamp",type(data['timestamp']),data['timestamp'])
+        
+        return data
         
     def editPreset(self):
         #should return a list of presets wanted to be deleted
-        presetName = request.form('presetName') 
+        print('I am here')
+        preset_to_be_changed = request.form['selected_option[]']#.replace("'", "\"")
+        preset_to_be_changed = self.parseStringToDict(preset_to_be_changed)
         
-        pass
+        #HARD CODING
+        new_dictionary = {'name':'AYOOO', 'presetLists':['www.google.com', 'www.csustan.edu', 'www.wikipedia.org']}
+        presetRequest = {
+            'id': uuid.uuid4(),
+            'request_type': 'update',
+            'column': 'presets', 
+            'query': preset_to_be_changed,
+            'changeTo': new_dictionary
+        }
+        #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT
+        temp = self.requestData(presetRequest)
+        return temp
 
-    
+    def editPreset1(self):
+        self.query()
 #end AddPreset
