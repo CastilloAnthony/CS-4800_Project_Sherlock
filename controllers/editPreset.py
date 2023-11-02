@@ -51,7 +51,8 @@ class EditPreset(): # Controller
             'id': uuid.uuid4(),
             'request_type': 'update',
             'column': 'presets', 
-            'query': (preset_to_be_changed, new_dictionary)
+            'query': preset_to_be_changed,
+            'changeTo':new_dictionary
         }
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT
         temp = self.requestData(presetRequest)
