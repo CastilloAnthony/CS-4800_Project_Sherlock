@@ -103,6 +103,8 @@ class Server(): # The main server handler class
                 print("Unable to connect to DB at "+"mongodb://"+address+":"+port+"/")
         except:
             print('There was an error in connecting to MongoDB via ', address, ':', port)
+            print('Aborting...')
+            self.__del__()
 
     def setPollingSpeed(self, speed:int):
         """_summary_
