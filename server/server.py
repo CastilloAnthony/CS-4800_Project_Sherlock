@@ -20,7 +20,7 @@ class Server(): # The main server handler class
         self.__requestsQ = mp.Queue(maxsize=1000) # The request queue, only a clinet will put to this queue
         self.__dataQ = mp.Queue(maxsize=1000) # The request queue, only the server will put to this queue
         self.__processes = {} # Process handles identifiers and handles for all processes created by the server
-        
+        self._setupDBConnection()
 
     def __del__(self): # WIP
         """_summary_
