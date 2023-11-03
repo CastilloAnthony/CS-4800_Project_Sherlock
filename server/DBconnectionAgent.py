@@ -1,3 +1,4 @@
+# Created by Anthony Castillo
 import pymongo
 from time import ctime
 
@@ -201,7 +202,7 @@ class DBConnectionAgent():
 
         Args:
             column (str): The collection to modify
-            query (dict): QUERY FORMAT EXAMPLE: {{'id':matchWithThis}, {'id':ModifyToThis}}
+            query (dict): QUERY FORMAT EXAMPLE: query={'id':matchWithThis}, changeTo={'id':ModifyToThis}
 
         Returns:
             bool: True/False for a successful/unsuccessful update
@@ -213,7 +214,7 @@ class DBConnectionAgent():
             
             
             
-            print(query, '\n',changeTo)
+            # print(query, '\n',changeTo)
             # query: {'_id': '6542ea812079dc2a9c74ca6d', 'name': 'adfa', 'presetLists': ['www.csustan.edu', 'www.bbc.co.uk', 'www.reddit.com', 'https://discord.gg/keAWQanBp8'], 'timestamp': 1698884225.4272666}
             # changeTo: {'_id':preset_to_be_changed['_id'],'name':'taco', 'presetLists':['www.google.com', 'chat.openai.com', 'www.bbc.co.uk'], 'timestamp':preset_to_be_changed['timestamp']}
             return self.__db[column].update_one(query, {"$set":changeTo}).acknowledged

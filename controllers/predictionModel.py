@@ -1,3 +1,4 @@
+# Created by Anthony Castillo
 import time
 import tensorflow as tf
 
@@ -15,6 +16,14 @@ class PredictionModel():
         del self.__data, self.__model
 
     def requestData(self, request): # Not Used
+        """_summary_
+
+        Args:
+            request (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         self.__requestQ.put(request)
         time.sleep(0.1)
         initialDataID = False
