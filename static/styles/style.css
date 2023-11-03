@@ -18,7 +18,7 @@ li a{
 }
 li a:hover{
     background-color:black;
-    color:white;
+    color:lightgray;
 }
 li a.current{
     background-color:green;
@@ -26,5 +26,5 @@ li a.current{
 }
 li a:hover:not(.current){
     background-color:black;
-    color:white;
+    color:lightgray;
 }

@@ -31,7 +31,7 @@ class MyFlaskApp:
         self.app.add_url_rule('/deletePreset', 'deletePreset', self.deletePreset)
         self.app.add_url_rule('/deletePreset/newDeletedPreset', 'newDeletedPreset', self.newDeletedPreset, methods=['POST'])
         #VIEWPRESET
-        self.app.add_url_rule('/viewPresets', 'viewPresets', self.viewPresets)
+        self.app.add_url_rule('/viewPreset', 'viewPreset', self.viewPreset)
         #EDITPRESET
         self.app.add_url_rule('/editPreset', 'editPreset', self.editPreset)
         self.app.add_url_rule('/editPreset/newEditedPreset', 'newEditedPreset', self.newEditedPreset, methods=['POST'])
@@ -44,6 +44,8 @@ class MyFlaskApp:
         #DELETEWEBSITE
         self.app.add_url_rule('/deleteWebsite', 'deleteWebsite', self.deleteWebsite)
         self.app.add_url_rule('/deleteWebsite/newDeletedWebsite', 'newDeletedWebsite', self.newDeletedWebsite, methods=['POST'])
+        #VIEWEBSITE
+        self.app.add_url_rule('/viewWebsite', 'viewWebsite', self.viewWebsite)
         
         
         #CLASS_INITIALIZATION
@@ -56,10 +58,14 @@ class MyFlaskApp:
             
         
         
-
+    ################################
+    #         ROUTING              #
+    ################################
+    #TODO
     def index(self):
         return render_template('homepage.html')
-
+    
+    #FINISHED
     def addPreset(self):
         return render_template('AddPreset.html', masterList=self.addPresetClass.query())
 
@@ -67,7 +73,8 @@ class MyFlaskApp:
         self.addPresetClass.addPreset()
         return "YOU HAVE SUCCESSFULLY ADDED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
 
-    def viewPresets(self):
+    #TODO
+    def viewPreset(self):
         presetRequest = {
             'id': uuid.uuid4(),
             'request_type': 'insert',
@@ -77,7 +84,12 @@ class MyFlaskApp:
         self.app.requestQ.put(presetRequest)
         allPresets = self.app.dataQ.get()
         return render_template('viewPreset.html', allPresets=allPresets)
+    
+    #TODO
+    def viewWebsite(self):
+        return render_template('viewWebsite.html')
 
+    #FINISHED
     def deletePreset(self):
         return render_template('DeletePreset.html', presets=self.deletePresetClass.query()['data'])
 
@@ -85,6 +97,7 @@ class MyFlaskApp:
         self.deletePresetClass.deletePreset()
         return "YOU HAVE SUCCESSFULLY ADDED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
 
+    #FINISHED
     def deleteWebsite(self):
         return render_template('DeleteWebsite.html', masterList = self.deleteWebsiteClass.query())
     
@@ -92,6 +105,7 @@ class MyFlaskApp:
         self.deleteWebsiteClass.deleteWebsite()
         return "YOU HAVE SUCCESSFULLY DELETED A WEBSITE PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
 
+    #FINISHED
     def editPreset(self):
         return render_template('EditPreset.html', presets=self.editPresetClass.query())
     
@@ -112,7 +126,7 @@ class MyFlaskApp:
             </html>
             """.format(url_for('index'))
 
-    
+    #FINISHED
     def addWebsite(self):
         return render_template('AddWebsite.html')
     
@@ -120,6 +134,17 @@ class MyFlaskApp:
         self.addWebsiteClass.addWebsite()
         return "YOU HAVE SUCCESSFULLY ADDED A WEBSITE, PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
 
+    
+    
+    
+    
+    
+    
+    
+    
+    ################################
+    #      TECHNICAL FUNCTIONS     #
+    ################################
     def run(self):
         self.app.run(host="0.0.0.0", port=7777)
 
