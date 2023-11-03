@@ -71,7 +71,7 @@ class Server(): # The main server handler class
             else:
                 print('An unexpected error occured in the verification of the masterList.')
 
-    def _setupDBConnection(self, address="localhost", port="27017"):
+    def _setupDBConnection(self, address="127.0.0.1", port="27017"):
         """_summary_
 
         Args:

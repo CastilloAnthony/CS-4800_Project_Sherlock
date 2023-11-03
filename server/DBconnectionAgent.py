@@ -16,7 +16,7 @@ class DBConnectionAgent():
         del self.__client
         del self.__db
 
-    def connect(self, address="localhost", port="27017"):
+    def connect(self, address="127.0.0.1", port="27017"):
         """Connects to a specified server
 
         Args:
