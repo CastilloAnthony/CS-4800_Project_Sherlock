@@ -7,6 +7,7 @@ import re
 class EditPreset(): # Controller
     def __init__(self, requestQ, dataQ):
         self.__requestQ, self.__dataQ = requestQ, dataQ
+        self.old = []
 
     def __del__(self):
         pass
@@ -40,6 +41,17 @@ class EditPreset(): # Controller
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT
         temp = self.requestData(presetRequest)
         return temp
+    
+    def query1(self):
+        #ASKING
+        masterListRequest = {
+            'id': uuid.uuid4(),
+            'request_type': 'request',
+            'column': 'masterList',
+            'query': {}
+        }
+        temp = self.requestData(masterListRequest)
+        return temp
         
     def parseStringToDict(self, stringedDictionary:str):
         # Define a regular expression pattern to match key-value pairs
@@ -70,25 +82,32 @@ class EditPreset(): # Controller
     def editPreset(self):
         #should return a list of presets wanted to be deleted
         
-        preset_to_be_changed = request.form['selected_option[]']#.replace("'", "\"")
+        preset_to_be_changed = request.form['selected_option[]']
         
         preset_to_be_changed = self.parseStringToDict(preset_to_be_changed)
+        self.old.append(preset_to_be_changed)
+        #return this and on the next page show this up top as a reference to what it is currently
         
-        
-        #HARD CODING
-        new_dictionary = {'name':'taco', 'presetLists':['www.google.com', 'chat.openai.com', 'www.bbc.co.uk']}
+        return preset_to_be_changed        
+
+    def editPreset1(self):
+        preset_to_be_changed = self.old[0]
+        #GRAB THINGS USER WANTED TO CHANGE: NAME OR PRESETLIST
+        urlList = request.form.getlist('selected_options[]') #WE HAVE THIS
+        name = request.form['name'] #WE HAVE THIS
+        newDictionary = {
+            'name':name,
+            'presetLists':urlList,
+        }
         presetRequest = {
             'id': uuid.uuid4(),
             'request_type': 'update',
             'column': 'presets', 
             #filter_criteria = {"_id": ObjectId("your-document-id")}
             'query': {'_id': ObjectId(str(preset_to_be_changed['_id']))},
-            'changeTo': new_dictionary
+            'changeTo': newDictionary
         }
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT
         temp = self.requestData(presetRequest)
         return temp
-
-    def editPreset1(self):
-        self.query()
 #end AddPreset

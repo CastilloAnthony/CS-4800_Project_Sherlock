@@ -2,10 +2,9 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Add Preset</title>
+        <title>Edit Preset</title>
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style1.css') }}">
     </head>
-
     <body>
         <ul>
             <li><a class="current" href="/">Home</a></li>
@@ -14,10 +13,7 @@
             <li><a href="addPreset">Add Preset</a></li>
             <li><a href="editPreset">Edit Preset</a></li>
             <li><a href="deletePreset">Delete Preset</a></li>
-        </ul>
-        <br>
-        <h1 style="color:white">Preset Creation List</h1>
-        <br><br>
+        </ul><br>
         <!--
             I am giving the value in the form of: 
         {'id': UUID('36d8c82d-4a56-4860-8f71-aff5f350f45e'), 
@@ -29,8 +25,9 @@
         timestamp
         data
         -->
-        
-        <form action="addPreset/newAddedPreset" style="background-color:white; display:inline-block" method="POST">
+        <h1>NEW EDITED PRESET</h1>
+        <p style="color:white">{{oldPreset}}</p>
+        <form action="newEditedPreset/edit" style="background-color:white; display:inline-block" method="POST">
             <!--
                 Need a name for the respective preset so the user knows what to ask for later
                 Make it easier to recall for them. 

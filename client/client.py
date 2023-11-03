@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for
 import uuid
 import time
 from multiprocessing import Queue
@@ -92,16 +92,26 @@ class MyFlaskApp:
         self.deleteWebsiteClass.deleteWebsite()
         return "YOU HAVE SUCCESSFULLY DELETED A WEBSITE PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
 
-    #TODO
     def editPreset(self):
         return render_template('EditPreset.html', presets=self.editPresetClass.query())
-    #TODO
+    
     def newEditedPreset(self):
-        self.editPresetClass.editPreset()
-        return "YOU HAVE SUCCESSFULLY EDITED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
-    #TODO   
+        return render_template('EditPresetNew.html', oldPreset=self.editPresetClass.editPreset(),masterList=self.editPresetClass.query1())
+    
     def edit(self):
-        return render_template('EditPreset.html')
+        self.editPresetClass.editPreset1()
+        return """
+            <html>
+            <head>
+                <title>Edit Preset</title>
+            </head>
+            <body>
+                YOU HAVE SUCCESSFULLY DELETED A WEBSITE PRESS THIS LINK TO GET BACK TO THE HOMEPAGE
+                <a href="{}">Go to Home</a>
+            </body>
+            </html>
+            """.format(url_for('index'))
+
     
     def addWebsite(self):
         return render_template('AddWebsite.html')
