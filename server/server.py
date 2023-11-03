@@ -20,7 +20,7 @@ class Server(): # The main server handler class
         self.__requestsQ = mp.Queue(maxsize=1000) # The request queue, only a clinet will put to this queue
         self.__dataQ = mp.Queue(maxsize=1000) # The request queue, only the server will put to this queue
         self.__processes = {} # Process handles identifiers and handles for all processes created by the server
-        self._setupDBConnection()
+        
 
     def __del__(self): # WIP
         """_summary_
@@ -79,27 +79,30 @@ class Server(): # The main server handler class
             port (str, optional): _description_. Defaults to "27017".
         """
         self.__DBconneciton = DBConnectionAgent() # Maybe setup as a Daemon
-        if self.__DBconneciton.connect(address, port):
-            print("Successfully connected to DB at "+"mongodb://"+address+":"+port+"/")
-            if self.__DBconneciton.useDB('SHERLOCK'):
-                print('Using the SHERLOCK database.')
-                self._checkForMasterlist()
-                self._checkForPresets()
-            else:
-                print('Could not connect to the SHERLOCK database. Creating new one...')
-                self.__DBconneciton.createNewDB('SHERLOCK')
-                if 'SHERLOCK' in self.__DBconneciton.getDBs():
-                    print('Successfully created new database.')
-                    if self.__DBconneciton.useDB('SHERLOCK'):
-                        print('Using the SHERLOCK database.')
-                        self._checkForMasterlist()
-                        self._checkForPresets()
-                    else:
-                        print('Could not connect to the new SHERLOCK database.')
+        try:
+            if self.__DBconneciton.connect(address, port):
+                print("Successfully connected to DB at "+"mongodb://"+address+":"+port+"/")
+                if self.__DBconneciton.useDB('SHERLOCK'):
+                    print('Using the SHERLOCK database.')
+                    self._checkForMasterlist()
+                    self._checkForPresets()
                 else:
-                    print('An Error occured while creating the new SHERLOCK database.')
-        else:
-            print("Unable to connect to DB at "+"mongodb://"+address+":"+port+"/")
+                    print('Could not connect to the SHERLOCK database. Creating new one...')
+                    self.__DBconneciton.createNewDB('SHERLOCK')
+                    if 'SHERLOCK' in self.__DBconneciton.getDBs():
+                        print('Successfully created new database.')
+                        if self.__DBconneciton.useDB('SHERLOCK'):
+                            print('Using the SHERLOCK database.')
+                            self._checkForMasterlist()
+                            self._checkForPresets()
+                        else:
+                            print('Could not connect to the new SHERLOCK database.')
+                    else:
+                        print('An Error occured while creating the new SHERLOCK database.')
+            else:
+                print("Unable to connect to DB at "+"mongodb://"+address+":"+port+"/")
+        except:
+            print('There was an error in connecting to MongoDB via ', address, ':', port)
 
     def setPollingSpeed(self, speed:int):
         """_summary_
