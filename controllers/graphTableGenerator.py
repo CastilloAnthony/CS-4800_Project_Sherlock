@@ -13,8 +13,10 @@ class graphTableGenerator:
 
     def requestData(self, request):
         self.__requestQ.put(request)
+        time = ()
         time.sleep(0.1)
         initialDataID = False
+        selectedData = []
         while self.__dataQ.empty() != True:
             newData = self.__dataQ.get()
             print(newData)
@@ -36,7 +38,7 @@ class graphTableGenerator:
     def timeConversion():
         registeredStartDate = datetime()
         GMT = [] # This our GMT_time 
-        for i in TimeDate: 
+        for i in datetime: 
             dt = datetime.strptime(i,"%d:%m:%Y %H:%M:%S") # Stripped information from each row 
             GMT.append(dt)   
             
@@ -72,18 +74,6 @@ class graphTableGenerator:
 
 
 
-#load files
-#need function to read requested websites from database
-#class DBconnectionAgent:
-    #self. 
-
-#df = pd.read_#
-#for index, websites in df.iterrows():
-##
-#print(df)
-
-#initialize timestamp
-#format for timestamp function: ??
 
 #need functions for uptime, downtime, and latency calculations
 #response = requests.get()
