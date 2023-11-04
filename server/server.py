@@ -8,7 +8,7 @@ import client.client
 import webbrowser
 
 class Server(): # The main server handler class
-    # Communicates with DB using DBconnection and Clients with clientManager
+    # Communicates with the MongoDB using DBconnection on behalf of the Clients using two multiprocessing.Queues 
     def __init__(self):
         """Initializes all attributes of the server class and calls the setupDBConnection function.
         """
