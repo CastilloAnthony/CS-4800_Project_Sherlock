@@ -1,3 +1,4 @@
+# Created by Anthony Castillo
 import time
 import multiprocessing as mp
 import socket
@@ -9,7 +10,7 @@ import webbrowser
 class Server(): # The main server handler class
     # Communicates with DB using DBconnection and Clients with clientManager
     def __init__(self):
-        """_summary_
+        """Initializes all attributes of the server class and calls the setupDBConnection function.
         """
         self.__DBconneciton = False # The connection agent
         self.__columns = ['masterList', 'pollingData', 'presets', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
@@ -23,7 +24,7 @@ class Server(): # The main server handler class
         self._setupDBConnection()
 
     def __del__(self): # WIP
-        """_summary_
+        """Closes open processes and queues and destroys all attributes of the server class
         """
         for i in self.__processes:
             if self.__processes[i].is_alive():
@@ -43,7 +44,7 @@ class Server(): # The main server handler class
         del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes
 
     def _checkForPresets(self):
-        """_summary_
+        """Checks for the existence of the preset collection within the database and creates a default one if the collection could not be verified.
         """
         if self.__DBconneciton.verifyCollection('presets'):
             print('Presets collection verified.')
@@ -57,7 +58,7 @@ class Server(): # The main server handler class
                 print('An unexpected error occured in the verification of the Preset collection.')
 
     def _checkForMasterlist(self):
-        """_summary_
+        """Checks for the existence of the master list collection within the database and creates a default one if the collection could not be verified.
         """
         if self.__DBconneciton.verifyCollection('masterList'):
             print('Masterlist collection verified.')
@@ -72,11 +73,11 @@ class Server(): # The main server handler class
                 print('An unexpected error occured in the verification of the masterList.')
 
     def _setupDBConnection(self, address="127.0.0.1", port="27017"):
-        """_summary_
+        """Attempts to connect to the MongoDB at the specified address and port. Additionally, creates the SHERLOCK database if it doesn't exist and setups default collections for master list and preset
 
         Args:
-            address (str, optional): _description_. Defaults to "localhost".
-            port (str, optional): _description_. Defaults to "27017".
+            address (str, optional): The address for which the MongoDB is located. Defaults to "localhost".
+            port (str, optional): The port number for which the MongoDB should be accessed from. Defaults to "27017".
         """
         self.__DBconneciton = DBConnectionAgent() # Maybe setup as a Daemon
         try:
@@ -107,13 +108,13 @@ class Server(): # The main server handler class
             self.__del__()
 
     def setPollingSpeed(self, speed:int):
-        """_summary_
+        """Sets the current polling speed, in seconds, that the server should wait before attempting to poll the URLs in the master list.
 
         Args:
-            speed (int): _description_
+            speed (int): The polling speed, in seconds, that the server will be set to
 
         Returns:
-            _type_: _description_
+            bool: True/False on success/failure.
         """
         if isinstance(speed, int):
             self.__pollingSpeed = speed
@@ -122,10 +123,10 @@ class Server(): # The main server handler class
             return False
 
     def getPollingSpeed(self):
-        """_summary_
+        """Returns the current polling speed, in seconds, that the server waits before attempting to poll the URLs in the master list.
 
         Returns:
-            _type_: _description_
+            integer: The current polling speed, in seconds, of the server
         """
         return self.__pollingSpeed
     
@@ -145,14 +146,14 @@ class Server(): # The main server handler class
             return False
 
     def sendToDB(self, column:str, content:dict):
-        """_summary_
+        """Inserts a single dictionary into the database, formatted by the source of the dictionary. (Make sure everyone is inserting consistently.)
 
         Args:
-            column (str): _description_
-            content (dict): _description_
+            column (str): The specific collection to insert the data into 
+            content (dict): The content being added into the collection
 
         Returns:
-            _type_: _description_
+            bool: True/False on success/failure.
         """
         if column in self.__columns:
             self.__DBconneciton.addToDB(column, content)
@@ -169,14 +170,14 @@ class Server(): # The main server handler class
         pass
 
     def requestFromDB(self, column:str, query:dict):
-        """_summary_
+        """Requests the first entry from the database in the specified collection that matches the given query. 
 
         Args:
-            column (str): _description_
-            query (dict): _description_
+            column (str): The specific collection to get data from
+            query (dict): The content to match to in the database
 
         Returns:
-            _type_: _description_
+            bool: True/False on success/failure.
         """
         if column in self.__columns:
             return self.__DBconneciton.requestFromDB(column, query)
@@ -184,14 +185,14 @@ class Server(): # The main server handler class
             return False
     
     def requestManyFromDB(self, column:str, queries:dict):
-        """_summary_
+        """Requests all entries within the database in the specified colleciton that matches the given query.
 
         Args:
-            column (str): _description_
-            queries (dict): _description_
+            column (str): The specific collection to get data from
+            queries (dict): The content to match to in the database
 
         Returns:
-            _type_: _description_
+            bool: True/False on success/failure.
         """
         if column in self.__columns:
             return self.__DBconneciton.requestManyFromDB(column, queries)
@@ -199,14 +200,14 @@ class Server(): # The main server handler class
                 return False
 
     def removeFromDB(self, column:str, query:dict):
-        """_summary_
+        """Removes the first entry from the database in the specified collection that matches the given query. 
 
         Args:
-            column (str): _description_
-            query (dict): _description_
+            column (str): The specific collection to remove data from
+            query (dict): The content to match to in the database
 
         Returns:
-            _type_: _description_
+            bool: True/False on success/failure.
         """
         if column in self.__columns:
             return self.__DBconneciton.removeFromDB(column, query)
@@ -214,14 +215,14 @@ class Server(): # The main server handler class
             return False
 
     def removeManyFromDB(self, column:str, queries:dict):
-        """_summary_
+        """Removes all entries from the database in the specified collection that matches the given query(queries).
 
         Args:
-            column (str): _description_
-            queries (dict): _description_
+            column (str): The specific collection to remove data from
+            queries (dict): The content to match to in the database
 
         Returns:
-            _type_: _description_
+            bool: True/False on success/failure.
         """
         if column in self.__columns:
             return self.__DBconneciton.removeManyFromDB(column, queries)
@@ -229,14 +230,14 @@ class Server(): # The main server handler class
             return False
     
     def _changeSettings(self, setting:str, changeTo):
-        """_summary_
+        """Changes settings within the server. Currently supports changing the pollingSpeed
 
         Args:
-            setting (str): _description_
-            changeTo (_type_): _description_
+            setting (str): The specific setting to be changed
+            changeTo (int): The value to change the setting to
 
         Returns:
-            _type_: _description_
+            bool: True/False on success/failure.
         """
         if setting == 'pollingSpeed':
                 return self.setPollingSpeed(changeTo)
@@ -244,7 +245,7 @@ class Server(): # The main server handler class
             return False
 
     def _checkForRequests(self):
-        """_summary_
+        """This function is responsible for checking the requestsQ and responding to each request as is appropraite.
         """
         # Expected Request Formats # WIP
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'masterList', 'query':{}}                                                               ### Gets all urls from the master list
@@ -312,7 +313,7 @@ class Server(): # The main server handler class
                 self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':'Not Implemented'})
 
     def _pollWebsites(self):
-        """_summary_
+        """Funciton for requesting the masterlist from the database and for recording the latency for connections to each url in the masterlist. 
         """
         print(str(time.ctime())+' - Polling sites...')
         masterList = self.requestManyFromDB('masterList', {})
@@ -329,7 +330,7 @@ class Server(): # The main server handler class
                     self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':np.nan})
     
     def _mainLoop(self):
-        """_summary_
+        """The primary loop for the server, calls checkForRequests and pollWebsites.
         """
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
         homepage = "http://127.0.0.1:7777"
@@ -343,7 +344,7 @@ class Server(): # The main server handler class
                 self._pollWebsites()
 
     def startServer(self):
-        """_summary_
+        """Creates the flask app in a separate processes, starts that process, and then intiates the mainloop. 
         """
         self.__processes['app'] = mp.Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'].start()

@@ -3,7 +3,7 @@ import pymongo
 from time import ctime
 
 class DBConnectionAgent():
-    # Communicates directly with DB and Server
+    # Communicates directly with DB on behalf of the Server
     def __init__(self):
         """Initialization function setting client and db to false.
         """
