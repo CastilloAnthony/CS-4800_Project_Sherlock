@@ -61,13 +61,14 @@ class graphTableGenerator:
             print(abs(np.mean(df[selectedData]))**2)
     '''
 
-    def timeConvert(self, dataQ):
-        print('ggg')
+    #def timeConvert(self, dataQ):
+     #   print('ggg')
 
     #def upTime
     #def downTime
     def monitorWebsite(self, dataQ): #initially confirms whether the webpage is active or not
-        r = requests.get(dataQ, timeout = 5)
+        listOfURLs = self.requestData({'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'masterList', 'query':{}}) #line implemented by Anthony
+        r = requests.get(listOfURLs, timeout = 5)
         if r.status_code != 200:
             print ("Error: {} is unavailable")
         else:
