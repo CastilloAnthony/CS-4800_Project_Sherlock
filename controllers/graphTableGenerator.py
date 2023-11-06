@@ -15,6 +15,7 @@ class graphTableGenerator:
     def __init__(self, requestQ, dataQ):
         self.__requestQ, self.__dataQ = requestQ, dataQ
 
+    #requestData implemented by Anthony
     def requestData(self, request):
         self.__requestQ.put(request)
         time = ()
@@ -59,6 +60,10 @@ class graphTableGenerator:
             print(abs(df[selectedData].mean())**2)
             print(abs(np.mean(df[selectedData]))**2)
     '''
+
+    def timeConvert(self, dataQ):
+        print('ggg')
+
     #def upTime
     #def downTime
     def monitorWebsite(self, dataQ): #initially confirms whether the webpage is active or not
