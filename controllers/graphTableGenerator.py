@@ -35,31 +35,30 @@ class graphTableGenerator:
                     return newData
             else:
                 self.__dataQ.put(newData)
-
-    
-    def timeConversion():
-        registeredStartDate = datetime()
-        for i in datetime: 
-            dt = datetime.strptime(i,"%d:%m:%Y %H:%M:%S") # Stripped information from each row 
-            
-        #PDT_time = []  
-        T = pd.Series(data=GMT) # Inputting GMT_time into a series 
-        # Storing local dates and times into list  
-        PDT_Date_time = []
-        for i in local_Date_time: 
-            dt_objects = i.to_pydatetime() # Turns the timestamps to datetime objects 
-            PDT_Date_time.append(dt_objects)
-        PDT_time = [] # official PDT time 
-        for i in PDT_Date_time: # Takes time in 
-            timediff = i.timestamp() - registeredStartDate.timestamp()
-            PDT_time.append(timediff)
-            
-        print(PDT_Date_time[0])
-        print(PDT_Date_time[0]- registeredStartDate)
-        print(PDT_time[0])
-        print(abs(df[selectedData].mean())**2)
-        print(abs(np.mean(df[selectedData]))**2)
-
+    '''
+        def timeConversion():
+            registeredStartDate = datetime()
+            for i in datetime: 
+                dt = datetime.strptime(i,"%d:%m:%Y %H:%M:%S") # Stripped information from each row 
+                
+            #PDT_time = []  
+            T = pd.Series(data=GMT) # Inputting GMT_time into a series 
+            # Storing local dates and times into list  
+            PDT_Date_time = []
+            for i in local_Date_time: 
+                dt_objects = i.to_pydatetime() # Turns the timestamps to datetime objects 
+                PDT_Date_time.append(dt_objects)
+            PDT_time = [] # official PDT time 
+            for i in PDT_Date_time: # Takes time in 
+                timediff = i.timestamp() - registeredStartDate.timestamp()
+                PDT_time.append(timediff)
+                
+            print(PDT_Date_time[0])
+            print(PDT_Date_time[0]- registeredStartDate)
+            print(PDT_time[0])
+            print(abs(df[selectedData].mean())**2)
+            print(abs(np.mean(df[selectedData]))**2)
+    '''
     #def upTime
     #def downTime
     def monitorWebsite(self, dataQ):
@@ -88,22 +87,18 @@ class graphTableGenerator:
             mb_new_sent = new_sent / 1024 / 1024 
             mb_new_total = new_total / 1024 / 1024
 
-            print (f"{mb_new_received:.2f} MB received")
-            print (f"{mb_new_sent:.2f} MB sent")
-            print (f"{mb_new_total:.2f} MB total")
+            print(f"{mb_new_received:.2f} MB received")
+            print(f"{mb_new_sent:.2f} MB sent")
+            print(f"{mb_new_total:.2f} MB total")
 
             last_received = bytes_received
             last_sent = bytes_sent
             last_total = bytes_total
 
-            time.sleep (15) #recounts every 15 seconds
+            time.sleep(15) #recounts every 15 seconds
 
-        if False:
-            print ("Error: Latency Unavailable")
-
-
-
-
+            if False:
+                print('Error: Latency Unavailable')
 
 #need functions for uptime, downtime, and latency calculations
 #response = requests.get()
