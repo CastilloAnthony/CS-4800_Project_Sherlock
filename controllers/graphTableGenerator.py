@@ -61,12 +61,15 @@ class graphTableGenerator:
     '''
     #def upTime
     #def downTime
-    def monitorWebsite(self, dataQ):
+    def monitorWebsite(self, dataQ): #initially confirms whether the webpage is active or not
         r = requests.get(dataQ, timeout = 5)
         if r.status_code != 200:
-            return False
+            print ("Error: {} is unavailable")
         else:
             return True
+        
+    def upTime(self, dataQ):
+        print('ggg')
 
 
     def latency(self, dataQ):
