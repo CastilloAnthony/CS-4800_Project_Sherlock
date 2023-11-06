@@ -35,7 +35,6 @@ class graphTableGenerator:
                     return newData
             else:
                 self.__dataQ.put(newData)
-                print(len(newData))
 
     
     def timeConversion():
@@ -63,14 +62,22 @@ class graphTableGenerator:
 
     #def upTime
     #def downTime
-    def latency(self):
-        last_received = psutil.net_io_counters().bytes_recv
-        last_sent = psutil.net_io_counters().bytes_sent
+    def monitorWebsite(self, dataQ):
+        r = requests.get(dataQ, timeout = 5)
+        if r.status_code != 200:
+            return False
+        else:
+            return True
+
+
+    def latency(self, dataQ):
+        last_received = psutil.net_io_counters(dataQ).bytes_recv
+        last_sent = psutil.net_io_counters(dataQ).bytes_sent
         last_total = last_received + last_sent
 
         while True:
-            bytes_received = psutil.net_io_counters().bytes_recv
-            bytes_sent = psutil.net_io_counters().bytes_sent
+            bytes_received = psutil.net_io_counters(dataQ).bytes_recv
+            bytes_sent = psutil.net_io_counters(dataQ).bytes_sent
             bytes_total = bytes_received + bytes_sent
 
             new_received = bytes_received + last_received
@@ -89,7 +96,7 @@ class graphTableGenerator:
             last_sent = bytes_sent
             last_total = bytes_total
 
-            time.sleep (15)
+            time.sleep (15) #recounts every 15 seconds
 
         if False:
             print ("Error: Latency Unavailable")
