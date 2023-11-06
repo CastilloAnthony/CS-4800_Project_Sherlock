@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 import pytz
 import requests
 import controllers.predictionModel
+import time
+import psutil
 
 
 class graphTableGenerator:
@@ -35,7 +37,6 @@ class graphTableGenerator:
                 self.__dataQ.put(newData)
                 print(len(newData))
 
-        
     
     def timeConversion():
         registeredStartDate = datetime()
@@ -59,6 +60,40 @@ class graphTableGenerator:
         print(PDT_time[0])
         print(abs(df[selectedData].mean())**2)
         print(abs(np.mean(df[selectedData]))**2)
+
+    #def upTime
+    #def downTime
+    def latency(self):
+        last_received = psutil.net_io_counters().bytes_recv
+        last_sent = psutil.net_io_counters().bytes_sent
+        last_total = last_received + last_sent
+
+        while True:
+            bytes_received = psutil.net_io_counters().bytes_recv
+            bytes_sent = psutil.net_io_counters().bytes_sent
+            bytes_total = bytes_received + bytes_sent
+
+            new_received = bytes_received + last_received
+            new_sent = bytes_sent - last_sent
+            new_total = bytes_total - last_total
+
+            mb_new_received = new_received / 1024 / 1024
+            mb_new_sent = new_sent / 1024 / 1024 
+            mb_new_total = new_total / 1024 / 1024
+
+            print (f"{mb_new_received:.2f} MB received")
+            print (f"{mb_new_sent:.2f} MB sent")
+            print (f"{mb_new_total:.2f} MB total")
+
+            last_received = bytes_received
+            last_sent = bytes_sent
+            last_total = bytes_total
+
+            time.sleep (15)
+
+        if False:
+            print ("Error: Latency Unavailable")
+
 
 
 
