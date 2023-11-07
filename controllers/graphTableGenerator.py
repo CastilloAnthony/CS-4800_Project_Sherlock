@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from datetime import datetime, timedelta
+import datetime
 import pytz
 import requests
 import controllers.predictionModel
@@ -61,22 +61,17 @@ class graphTableGenerator:
             print(abs(np.mean(df[selectedData]))**2)
     '''
 
-    #def timeConvert(self, dataQ):
-     #   print('ggg')
-
-    #def upTime
-    #def downTime
-    def monitorWebsite(self, dataQ): #initially confirms whether the webpage is active or not
+    def timeConvert(self, dataQ):
+       seconds = (datetime.datetime(dataQ))
+       time_response = time.strftime('%m/%d/%y %H:%M:%S', time.localtime(seconds))
+       
+    def monitorWebsite(self, dataQ, requestData): #initially confirms whether the webpage is active or not
         listOfURLs = self.requestData({'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'masterList', 'query':{}}) #line implemented by Anthony
         r = requests.get(listOfURLs, timeout = 5)
         if r.status_code != 200:
             print ("Error: {} is unavailable")
         else:
             return True
-        
-    def upTime(self, dataQ):
-        print('ggg')
-
 
     def latency(self, dataQ):
         last_received = psutil.net_io_counters(dataQ).bytes_recv
@@ -108,7 +103,3 @@ class graphTableGenerator:
 
             if False:
                 print('Error: Latency Unavailable')
-
-#need functions for uptime, downtime, and latency calculations
-#response = requests.get()
-#print(response.status_code) #gives the status of whether or not a website is active/inactive
