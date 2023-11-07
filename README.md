@@ -19,7 +19,7 @@ This program is designed for California State University Stanislaus' CS-4800 202
 - Can trace connections to see where the connection ends if it is unable to reach its destination. (WIP)
 
 ### Disclaimer
-- All aspects are subject to change as the project progresses.
+- All aspects of the project are subject to change as the project progresses.
 
 #### Explanation of Folders and Files.
 - client: Contains the main python file which connects all the controllers together and communicates to the server on behalf of the controllers.
@@ -43,6 +43,7 @@ This program is designed for California State University Stanislaus' CS-4800 202
   -  seaborn
   -  datetime
   -  pytz
+  -  psutil
   -  tensorflow
   -  uuid
   -  time
