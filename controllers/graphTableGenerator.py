@@ -101,3 +101,28 @@ class graphTableGenerator:
             last_total = bytes_total
 
             time.sleep(15) #recounts every 15 seconds
+
+    def generate_graph(self, url, duration=300, interval=15):
+        time_values, latency_values = self.latency(psutil.net_io_counters(), duration, interval)
+
+        website_status = self.monitorWebsite(url)
+
+        #predictions = predictionModel(latency_values)
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(time_values, latency_values, label='Latency (MB)')
+        plt.xlabel('Time')
+        plt.ylabel('Latency (MB)')
+        plt.title('Latency and Website Monitoring')
+        plt.grid(True)
+        plt.legend()
+
+        if website_status:
+            plt.axvline(x=datetime.datetime.now(), color='green', linestyle='--', label='Website UP')
+        else:
+            plt.axvline(x=datetime.datetime.now(), color='red', linestyle='--', label='Website DOWN')
+
+        plt.text(datetime.datetime.now(), max(latency_values) * 0.9, f'Prediction: {predictions}', fontsize=12)
+
+        plt.legend()
+        plt.show()
