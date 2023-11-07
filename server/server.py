@@ -16,7 +16,7 @@ class Server(): # The main server handler class
         self.__columns = ['masterList', 'pollingData', 'presets', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
         self.__requestTypes = ['insert', 'remove', 'request', 'update', 'setting'] # Types of requests the server can handle
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
-        self.__pollingSpeed = 60*1 # The seconds between each master list poll
+        self.__pollingSpeed = 60/60 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
         self.__requestsQ = mp.Queue(maxsize=1000) # The request queue, only a clinet will put to this queue
         self.__dataQ = mp.Queue(maxsize=1000) # The request queue, only the server will put to this queue
@@ -251,9 +251,11 @@ class Server(): # The main server handler class
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'masterList', 'query':{}}                                                               ### Gets all urls from the master list
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'pollingData', 'query':'wwww.google.com'}                                               ### Requests the polling data for a specific url
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'pollingData', 'query':['wwww.google.com', 'www.instgram.com', 'www.csustan.edu']}      ### Requests the polling data for a list of urls
+        #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'pollingData', 'query':{'url':'wwww.google.com', 'timestamp':{$gte:time.time()-60*3}}}  ### Requests the polling data for a specified url with a timestamp greater tna or equal to the current timestamp - 3 minutes 
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'insert', 'column':'masterList', 'query':'wwww.google.com'}                                                 ### Inserts a url into the masterList
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'remove', 'column':'masterList', 'query':{url:'wwww.google.com'}}                                           ### Removes a url from the master list, be careful with this
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'setting', 'column':'pollingSpeed', 'query':60}                                                             ### Changes the polling speed of the server. Query must be an integer
+        # Additonal info: https://www.mongodb.com/docs/manual/reference/operator/query/#std-label-query-projection-operators-top
         while self.__requestsQ.empty() != True:
             newRequest = self.__requestsQ.get()
             if newRequest['request_type'] == 'request': # For requesting any data from the system
@@ -318,6 +320,7 @@ class Server(): # The main server handler class
         print(str(time.ctime())+' - Polling sites...')
         masterList = self.requestManyFromDB('masterList', {})
         for object in masterList:
+            self._checkForRequests()
             for port in self.__httpPorts:
                 try:
                     latencyTimerStart = time.time()
