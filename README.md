@@ -30,3 +30,24 @@ This program is designed for California State University Stanislaus' CS-4800 202
 - exampleCode: Just some exploration on how things work and give a shot to some things.
 - oldFiles: Temporary Storage of old files.
 - start.py: The single file which initializes the core of our project.
+
+#### Requirements/Dependancies
+- IDE (Recommending VS Code)
+- MongoDB
+- Python 3
+  -  pymongo
+  -  flask
+  -  numpy
+  -  pandas
+  -  matplotlib
+  -  seaborn
+  -  datetime
+  -  pytz
+  -  tensorflow
+  -  uuid
+  -  time
+  -  multiprocessing
+  -  socket
+  -  webbrowser
+  -  bson
+  -  re
