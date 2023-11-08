@@ -7,14 +7,22 @@ from multiprocessing import Queue
 from controllers.addPreset import AddPreset
 from controllers.deletePreset import DeletePreset 
 from controllers.editPreset import EditPreset 
+from controllers.viewPreset import ViewPreset 
+
+
+
 from controllers.addWebsite import AddWebsite 
 from controllers.deleteWebsite import DeleteWebsite 
+from controllers.viewWebsite import ViewWebsite 
+
 
 # import controllers.graphTableGenerator
 
 class MyFlaskApp:
     def __init__(self, requestQ:Queue, dataQ:Queue):
         self.app = Flask(__name__, template_folder='../templates', static_folder='../static')
+        # self.admin_view = Blueprint('admin_routes',__name__, template_folder='../templates', static_folder='../static')
+        
         self.app.requestQ = requestQ
         self.app.dataQ = dataQ
         
@@ -53,9 +61,13 @@ class MyFlaskApp:
         self.addPresetClass = AddPreset(self.app.requestQ, self.app.dataQ)
         self.deletePresetClass = DeletePreset(self.app.requestQ, self.app.dataQ)
         self.editPresetClass = EditPreset(self.app.requestQ, self.app.dataQ)    
+        self.viewPresetClass = ViewPreset(self.app.requestQ, self.app.dataQ)
+        
         
         self.addWebsiteClass = AddWebsite(self.app.requestQ, self.app.dataQ)
-        self.deleteWebsiteClass = DeleteWebsite(self.app.requestQ, self.app.dataQ)        
+        self.deleteWebsiteClass = DeleteWebsite(self.app.requestQ, self.app.dataQ)   
+        self.viewWebsiteClass = ViewWebsite(self.app.requestQ, self.app.dataQ)
+             
             
         
         
@@ -76,19 +88,11 @@ class MyFlaskApp:
 
     #TODO
     def viewPreset(self):
-        presetRequest = {
-            'id': uuid.uuid4(),
-            'request_type': 'insert',
-            'column': 'masterList',
-            'query': {}
-        }
-        self.app.requestQ.put(presetRequest)
-        allPresets = self.app.dataQ.get()
-        return render_template('viewPreset.html', allPresets=allPresets)
+        return render_template('viewPreset.html')
     
     #TODO
     def viewWebsite(self):
-        return render_template('viewWebsite.html')
+        return render_template('viewWebsite.html', data=self.viewWebsiteClass.query1())
 
     #FINISHED
     def deletePreset(self):

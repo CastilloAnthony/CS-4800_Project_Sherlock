@@ -18,8 +18,8 @@ class Server(): # The main server handler class
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
         self.__pollingSpeed = 60/60 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
-        self.__requestsQ = mp.Queue(maxsize=1000) # The request queue, only a clinet will put to this queue
-        self.__dataQ = mp.Queue(maxsize=1000) # The request queue, only the server will put to this queue
+        self.__requestsQ = mp.Queue(maxsize=1000000) # The request queue, only a clinet will put to this queue
+        self.__dataQ = mp.Queue(maxsize=1000000) # The request queue, only the server will put to this queue
         self.__processes = {} # Process handles identifiers and handles for all processes created by the server
         self._setupDBConnection()
 
@@ -275,6 +275,8 @@ class Server(): # The main server handler class
                             tempData.append(self.requestManyFromDB(newRequest['column'], newRequest['query']))
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':tempData})
                         del tempData
+                    elif isinstance(newRequest['query'], dict):
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestManyFromDB(newRequest['column'], newRequest['query'])})
                     elif isinstance(newRequest['query'], str): # For a single url
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestManyFromDB(newRequest['column'], newRequest['query'])})
                     else:
@@ -314,13 +316,35 @@ class Server(): # The main server handler class
             else:
                 self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':'Not Implemented'})
 
+    def _clearDataQ(self):
+        initial = None
+        while not self.__dataQ.empty():
+            tempData = self.__dataQ.get()
+            print(tempData)
+        '''
+        while not self.__dataQ.empty():
+            if initial == None:
+                initial = self.__dataQ.get()
+                while initial['timestamp'] < (time.time() - 60*1):
+                    initial = self.__dataQ.get()
+            tempData = self.__dataQ.get()
+            print(tempData)
+            if tempData == initial:
+                self.__dataQ.put(tempData)
+                break
+            elif tempData['timestamp'] < (time.time() - 60*1):
+                continue
+            else:
+                self.__dataQ.put(tempData)
+        '''
+        
+
     def _pollWebsites(self):
         """Funciton for requesting the masterlist from the database and for recording the latency for connections to each url in the masterlist. 
         """
         print(str(time.ctime())+' - Polling sites...')
         masterList = self.requestManyFromDB('masterList', {})
         for object in masterList:
-            self._checkForRequests()
             for port in self.__httpPorts:
                 try:
                     latencyTimerStart = time.time()
@@ -336,15 +360,20 @@ class Server(): # The main server handler class
         """The primary loop for the server, calls checkForRequests and pollWebsites.
         """
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
+        dataQTimerStart = time.time()
         homepage = "http://127.0.0.1:7777"
         time.sleep(3)
         webbrowser.open(homepage)
         while True:
             self._checkForRequests()
             mainLoopTimerEnd = time.time()
+            dataQTimerEnd = time.time()
             if (mainLoopTimerEnd-mainLoopTimerStart) >= self.__pollingSpeed:
                 mainLoopTimerStart = time.time()
                 self._pollWebsites()
+            if (dataQTimerEnd-dataQTimerStart) >= 60:
+                dataQTimerStart = time.time()
+                self._clearDataQ()
 
     def startServer(self):
         """Creates the flask app in a separate processes, starts that process, and then intiates the mainloop. 

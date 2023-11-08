@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Edit Preset</title>
+        <title>View Websites</title>
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style1.css') }}">
     </head>
     <body>
@@ -19,6 +19,29 @@
             <li><a href="viewWebsite">View Website</a></li>
 
         </ul><br>
-        <h1  style="text-align:center;color:white;">View Website</h1><br>
+        <h1 style="text-align:center;color:white;">View Website</h1><br>
+        <div style="text-align:center;color:white;">
+            AVERAGE LATENCY OVER THE LAST MINUTE
+            <table style="margin-left:auto;margin-right:auto;text-align:left">
+                <thead>
+                    <tr>
+                        <th>URL</th>
+                        <th></th>
+                        <th>Latency</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for url, value in data.items() %}
+                    <tr>
+                        <td>{{ url }} </td> 
+                        <td>-</td>
+                        <td>{{ value }}</td>
+                        <td>ms</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </body>
 </html>
