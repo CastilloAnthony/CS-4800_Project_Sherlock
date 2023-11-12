@@ -1,7 +1,9 @@
 # Created by Anthony Castillo
 import time
+import datetime
 import tensorflow as tf
-
+import pandas as pd
+import numpy as np
 class PredictionModel():
     """_summary_
     """
@@ -15,7 +17,7 @@ class PredictionModel():
         """
         del self.__data, self.__model
 
-    def requestData(self, request): # Not Used
+    def requestData(self, request): # Not Used, data should be passed to this class instead
         """_summary_
 
         Args:
@@ -45,13 +47,17 @@ class PredictionModel():
     def createModel(self):
         """WIP
         """
-        OUT_STEPS, num_features = 1
         self.__model = tf.keras.Sequential([
-            tf.keras.layers.Lambda(lambda x: x[:, -11:, :]),
-            tf.keras.layers.Dense(512, activation='relu'),
-            tf.keras.layers.Dense(OUT_STEPS*num_features, kernel_initializer=tf.initializaers.zeros()),
-            tf.keras.layers.Reshape([OUT_STEPS, num_features])
+            #tf.keras.layers.Lambda(lambda x: x[:, -11:, :]),
+            tf.keras.Input(shape=(1,)),
+            tf.keras.layers.Dense(8, activation='relu'),
+            tf.keras.layers.Dense(4, activation='relu'),
+            tf.keras.layers.Dense(1, activation='relu')
         ])
+        #loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)
+        self.__model.compile(optimizer='adam', loss='mse')#loss_fn,)
+        #print(len(self.__model.weights))
+        #self.__model.summary()
         '''
         Image Model Example
         self.__model = tf.keras.Sequential([
@@ -78,12 +84,20 @@ class PredictionModel():
     def saveModel(self):
         """Saves the model to a file using the name provided in self.__modelFilename
         """
-        self.__modle.save(self.__modelFilename)
+        try:
+            self.__model.summary()
+            self.__modle.save(self.__modelFilename)
+        except:
+            print('Could not save prediction model.')
 
     def readModel(self):
         """Reads a model from file using the name provided in self.__modelFilename
         """
-        self.__model = tf.keras.models.load_model(self.__modelFilename)
+        try:
+            self.__model = tf.keras.models.load_model(self.__modelFilename)
+            self.__model.summary()
+        except:
+            self.createModel()
 
     def setFilename(self, name:str):
         """Changes the file name that the model gets saved as. Additionally creates a new model and then saves it to the new file.
@@ -132,8 +146,12 @@ class PredictionModel():
         Returns:
             list: A list of all the predictions
         """
-        predicitons = [{'data0'}, {'data1'}, {'data2'}, {'etc.'}, {'data#quantity-1#'}]
-        return predicitons
+        # https://www.tensorflow.org/tutorials/structured_data/time_series#data_windowing
+        
+        predictions = self.__model.predict([np.arange(0, quantity)])#tf.expand_dims(self.__data, axis=0))
+        outputDF = pd.DataFrame(predictions) # [{'data0'}, {'data1'}, {'data2'}, {'etc.'}, {'data#quantity-1#'}]
+        #outputDF.add()
+        return outputDF
 
     def trainModel(self, iterations:int = 3):
         """Trians the model on the data given using the 
@@ -141,17 +159,23 @@ class PredictionModel():
         Args:
             iterations (int, optional): The number of time the model will be fitted to the data. Defaults to 3.
         """
+        #print(self.__data)
+        train_mean = self.__data['latency'].mean()
+        train_std = self.__data['latency'].std()
+
+        train_latency = self.__data['latency'] - train_mean / train_std
+        #val_latency = tf.keras.utils.timeseries_dataset_from_array()
         for i in range(iterations):
-            self.__model.fit()
+            self.__model.fit(self.__data['latency'], self.__data['timestamp'], batch_size=32)
         self.saveModel()
 
-    def predictOnData(self, data:list, iterations:int=3, predictions=180):
+    def predictOnData(self, data:list, iterations:int=3, predictions:int=180):
         """An all in one simplified function for giving the prediciton model data, training the model, and then makeing predictions.
 
         Args:
             data (list): The data to train and predict over.
             iterations (int, optional): The number of times to fit the model to the data. Defaults to 3.
-            predictions (int, optional): The number of minutes to project over. Defaults to 180
+            predictions (int, optional): The number of minutes to project over. Defaults to 180.
         Returns:
             list: A list of all the predictions for the next few data points
         """

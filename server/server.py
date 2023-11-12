@@ -6,6 +6,7 @@ import numpy as np
 from server.DBconnectionAgent import DBConnectionAgent
 import client.client 
 import webbrowser
+from controllers.predictionModel import PredictionModel # Temporary, testing
 
 class Server(): # The main server handler class
     # Communicates with the MongoDB using DBconnection on behalf of the Clients using two multiprocessing.Queues 
@@ -362,6 +363,7 @@ class Server(): # The main server handler class
     def _mainLoop(self):
         """The primary loop for the server, calls checkForRequests and pollWebsites.
         """
+        self.test()
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
         dataQTimerStart = time.time()
         homepage = "http://127.0.0.1:7777"
@@ -384,6 +386,26 @@ class Server(): # The main server handler class
         self.__processes['app'] = mp.Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'].start()
         self._mainLoop()
+
+    def test(self):
+        """Used for testing things at the start of the program
+        """
+        print('Begin test.')
+        predModel = PredictionModel()
+        data = self.requestManyFromDB('pollingData', {'url':'www.google.com'})
+        #tensorData = np.empty(2)
+        tensorDataTime = np.empty(1)
+        tensorDataLatency = np.empty(1)
+        for i in data:
+            np.append(tensorDataTime, i['timestamp'])
+            np.append(tensorDataLatency, i['latency'])
+        tensorData = {'timestamp':tensorDataTime, 'latency':tensorDataLatency}
+        predicitedData = predModel.predictOnData(tensorData)
+        print('testing 5')
+        print('predictiedData =', predicitedData)
+        print('length: ', len(predicitedData))
+        print('Completed test.')
+        
 # end Server
 
 def testServer():
