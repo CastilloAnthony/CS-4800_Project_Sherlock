@@ -248,6 +248,9 @@ class Server(): # The main server handler class
         """This function is responsible for checking the requestsQ and responding to each request as is appropraite.
         """
         # Expected Request Formats # WIP
+        #auth {'username':'Christian', 'email':'something@csustan.edu', 'id':uuid.uuid4(), 'password':'??????'}
+        #users {'id':uuid.uuid4(), 'username':'Christian', 'email':'something@csustan.edu', 'websitesList':['www.google.com', 'www.csustan.edu'], 'presets':[{"name": "Christian", "presetLists": ["www.google.com", "www.csustan.edu", "www.microsoft.com", "www.nasa.gov"],"timestamp": 1698890950.1513646}, {"name": "Anthony", "presetLists": ["www.google.com", "www.instagram.com", "www.csustan.edu"], "timestamp": 1698890933.333366}]
+        
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'masterList', 'query':{}}                                                               ### Gets all urls from the master list
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'pollingData', 'query':'wwww.google.com'}                                               ### Requests the polling data for a specific url
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'pollingData', 'query':['wwww.google.com', 'www.instgram.com', 'www.csustan.edu']}      ### Requests the polling data for a list of urls
