@@ -11,6 +11,7 @@ class PredictionModel():
         self.__data = False
         self.__model = False
         self.__modelFilename = 'predictionModel.keras'
+        self.__size = 0
 
     def __del__(self):
         """_summary_
@@ -49,13 +50,13 @@ class PredictionModel():
         """
         self.__model = tf.keras.Sequential([
             #tf.keras.layers.Lambda(lambda x: x[:, -11:, :]),
-            tf.keras.Input(shape=(1,)),
-            tf.keras.layers.Dense(8, activation='relu'),
-            tf.keras.layers.Dense(4, activation='relu'),
-            tf.keras.layers.Dense(1, activation='relu')
+            #tf.keras.Input(shape=(int(self.__size*0.7))), #, int(self.__size*0.7))),
+            tf.keras.layers.Dense(8, activation='relu', input_shape=(int(self.__size*0.7),)),
+            tf.keras.layers.Dense(4, activation='relu', input_shape=(int(self.__size*0.7),)),
+            tf.keras.layers.Dense(1, activation='relu', input_shape=(int(self.__size*0.7),))
         ])
         #loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)
-        self.__model.compile(optimizer='adam', loss='mse')#loss_fn,)
+        self.__model.compile(optimizer='adam', loss='mse')#'sparse_categorical_crossentropy')#'mse')#loss_fn,)
         #print(len(self.__model.weights))
         #self.__model.summary()
         '''
@@ -159,14 +160,69 @@ class PredictionModel():
         Args:
             iterations (int, optional): The number of time the model will be fitted to the data. Defaults to 3.
         """
-        #print(self.__data)
-        train_mean = self.__data['latency'].mean()
-        train_std = self.__data['latency'].std()
+        #https://www.tensorflow.org/tutorials/structured_data/time_series
+        batch_size = 32
+        n = self.__data[0].size
+        #print(n, len(self.__data[0]), self.__data[0].size)
+        print(n)
+        #train_data = self.__data[0:int(n*0.)]
+        #val_data = self.__data[int(n*0.7):int(n*0.9)]
+        #test_data = self.__data[int(n*0.9):]
+    
+        train_dataX = self.__data[0][0:int(n*0.7)]
+        train_dataY = self.__data[1][0:int(n*0.7)]
+        val_dataX = self.__data[0][int(n*0.7):int(n*0.9)]
+        val_dataY = self.__data[1][int(n*0.7):int(n*0.9)]
+        test_dataX = self.__data[0][int(n*0.9):]
+        test_dataY = self.__data[1][int(n*0.9):]
 
-        train_latency = self.__data['latency'] - train_mean / train_std
+        train_data = np.vstack((train_dataX, train_dataY))
+        val_data = np.vstack((val_dataX, val_dataY))
+        test_data = np.vstack((test_dataX, test_dataY))
+        
+        #print(train_data)
+        #print(val_data)
+        #print(test_data)
+        train_mean = train_data[1].mean()
+        train_std = train_data[1].std()
+        print('Training Data:\n', train_data)
+        print('Validation Data:\n', val_data)
+        print('Test Data:\n', test_data)
+        print('Length: ', n, int(n*0.7))
+        print('Length: ', str(n), ' ', 'Mean: ', train_mean, ' ', 'STD: ', train_std)
+        train_data[1] = (train_data[1] - train_mean) / train_std
+        val_data[1] = (val_data[1] - train_mean) / train_std
+        test_data[1] = (test_data[1] - train_mean) / train_std
+        '''
+        train_ds = tf.keras.utils.timeseries_dataset_from_array(
+            data=train_data,
+            targets=None,
+            sequence_length=train_data.size+60*3,
+            sequence_stride=1,
+            shuffle=False,
+            batch_size=32
+        )
+        val_ds = tf.keras.utils.timeseries_dataset_from_array(
+            data=val_data,
+            targets=None,
+            sequence_length=val_data.size+60*3,
+            sequence_stride=1,
+            shuffle=False,
+            batch_size=32
+        )
+        '''
+        #print(train_ds, val_ds)
+        #train_latency = self.__data['latency'] - train_mean / train_std
         #val_latency = tf.keras.utils.timeseries_dataset_from_array()
+        
         for i in range(iterations):
-            self.__model.fit(self.__data['latency'], self.__data['timestamp'], batch_size=32)
+            self.__model.fit(
+                train_data[0],
+                train_data[1],
+                validation_data=(val_data[0], val_data[1]),
+                epochs=1
+                )
+            #self.__model.fit(self.__data['latency'], self.__data['timestamp'], batch_size=32)
         self.saveModel()
 
     def predictOnData(self, data:list, iterations:int=3, predictions:int=180):
@@ -179,6 +235,7 @@ class PredictionModel():
         Returns:
             list: A list of all the predictions for the next few data points
         """
+        self.__size = len(data[0])
         self.readModel()
         self.setData(data)
         self.trainModel(iterations)

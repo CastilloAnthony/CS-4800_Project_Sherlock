@@ -7,7 +7,7 @@ from server.DBconnectionAgent import DBConnectionAgent
 import client.client 
 import webbrowser
 from controllers.predictionModel import PredictionModel # Temporary, testing
-
+import pandas as pd
 class Server(): # The main server handler class
     # Communicates with the MongoDB using DBconnection on behalf of the Clients using two multiprocessing.Queues 
     def __init__(self):
@@ -363,7 +363,7 @@ class Server(): # The main server handler class
     def _mainLoop(self):
         """The primary loop for the server, calls checkForRequests and pollWebsites.
         """
-        self.test()
+        #self.test()
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
         dataQTimerStart = time.time()
         homepage = "http://127.0.0.1:7777"
@@ -393,13 +393,25 @@ class Server(): # The main server handler class
         print('Begin test.')
         predModel = PredictionModel()
         data = self.requestManyFromDB('pollingData', {'url':'www.google.com'})
-        #tensorData = np.empty(2)
-        tensorDataTime = np.empty(1)
-        tensorDataLatency = np.empty(1)
+        #tensorData = np.empty()
+        tensorDataTime = []
+        tensorDataLatency = []
+        #count = 0
         for i in data:
-            np.append(tensorDataTime, i['timestamp'])
-            np.append(tensorDataLatency, i['latency'])
-        tensorData = {'timestamp':tensorDataTime, 'latency':tensorDataLatency}
+            #np.append(tensorData, [i['timestamp'], i['latency']], axis=0)
+            #np.append(tensorData, i['latency'], axis=1)
+            #np.append(tensorDataTime, i['timestamp'])
+            #np.append(tensorDataLatency, i['latency'])
+            tensorDataTime.append(i['timestamp'])
+            tensorDataLatency.append(i['latency'])
+            #count += 1
+        #print(count, len(tensorDataLatency), len(tensorDataTime))
+        #tensorData = np.array([tensorDataTime, tensorDataLatency])
+        #print(tensorDataTime)
+        tensorData = np.vstack((tensorDataTime, tensorDataLatency))
+        #tensorData = pd.DataFrame(tensorDataLatency, index=pd.to_datetime(tensorDataTime, unit='s'), columns=['latency'])
+        #tensorData = {'timestamp':tensorDataTime, 'latency':tensorDataLatency}
+        #print(tensorData)
         predicitedData = predModel.predictOnData(tensorData)
         print('testing 5')
         print('predictiedData =', predicitedData)
