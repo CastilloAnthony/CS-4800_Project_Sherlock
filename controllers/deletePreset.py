@@ -37,7 +37,7 @@ class DeletePreset(): # Controller
             'column': 'presets', #Cannot get presets yet {'id': UUID('575b1827-40da-4141-b2fe-af951dd7a518'), 'timestamp': 1698523276.91872, 'data': 'Not Yet Implemented'}
             'query': {}
         }
-        print('something who cares')
+        #print('something who cares')
         temp = self.requestData(masterListRequest)
         return temp
         #requestQ.put(masterListRequest)
