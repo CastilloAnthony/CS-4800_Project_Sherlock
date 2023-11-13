@@ -18,6 +18,7 @@ from controllers.deleteWebsite import DeleteWebsite
 from controllers.viewWebsite import ViewWebsite 
 
 
+
 # import controllers.graphTableGenerator
 
 class MyFlaskApp:
@@ -111,7 +112,7 @@ class MyFlaskApp:
             email = request.form.get("email")
             password = request.form.get("password")
 
-            email_found = self.user_database.find_user_by_email(email)
+            email_found = self.user_database.find_user_by_email(email) #don't have user_database will need to to a query and find_user_by_email
             if email_found:
                 email_val = email_found['email']
                 passwordcheck = email_found['password']
@@ -140,9 +141,9 @@ class MyFlaskApp:
             return redirect(url_for("login"))
         
     def register_user(self, user, email, password1, password2):
-        
-        user_found = self.user_database.find_user_by_name(user)
-        email_found = self.user_database.find_user_by_email(email)
+        # don't have user_database will need to to a query and find_user_by_email as well as name
+        user_found = self.user_database.find_user_by_name(user) 
+        email_found = self.user_database.find_user_by_email(email) 
 
         if user_found:
             return 'There already is a user by that name'
@@ -153,6 +154,7 @@ class MyFlaskApp:
 
         hashed = bcrypt.hashpw(password2.encode('utf-8'), bcrypt.gensalt())
         user_input = {'name': user, 'email': email, 'password': hashed}
+        # don't have insert_user
         self.user_database.insert_user(user_input)
         user_data = self.user_database.find_user_by_email(email)
         new_email = user_data['email']
