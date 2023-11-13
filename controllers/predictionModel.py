@@ -51,6 +51,7 @@ class PredictionModel():
         self.__model = tf.keras.Sequential([
             #tf.keras.layers.Lambda(lambda x: x[:, -11:, :]),
             #tf.keras.Input(shape=(int(self.__size*0.7))), #, int(self.__size*0.7))),
+            tf.keras.layers.Reshape((int(self.__size*0.7*0.5), int(self.__size*0.7//(self.__size*0.7*0.5))), input_shape=(int(self.__size*0.7),)),
             tf.keras.layers.Dense(8, activation='relu', input_shape=(int(self.__size*0.7),)),
             tf.keras.layers.Dense(4, activation='relu', input_shape=(int(self.__size*0.7),)),
             tf.keras.layers.Dense(1, activation='relu', input_shape=(int(self.__size*0.7),))
@@ -214,7 +215,7 @@ class PredictionModel():
         #print(train_ds, val_ds)
         #train_latency = self.__data['latency'] - train_mean / train_std
         #val_latency = tf.keras.utils.timeseries_dataset_from_array()
-        
+        print(len(train_data))
         for i in range(iterations):
             self.__model.fit(
                 train_data[0],
@@ -235,8 +236,29 @@ class PredictionModel():
         Returns:
             list: A list of all the predictions for the next few data points
         """
-        self.__size = len(data[0])
+        tempData = False
+        print(len(data[0]))
+        if self.isOdd(len(data[0])):
+            tempDataX = np.delete(data[0], 0, None)
+            tempDataY = np.delete(data[1], 0, None)
+            self.__size = len(tempDataX)
+            tempData = np.vstack((tempDataX, tempDataY))
+        else:
+            tempData = data
+            self.__size = len(tempData[0])
+        print(self.__size, self.isOdd(self.__size))
         self.readModel()
-        self.setData(data)
+        self.setData(tempData)
         self.trainModel(iterations)
         return self.predict(predictions)
+
+    def isOdd(self, number):
+        k = 0
+        while k<number:
+            if 2*k+1 == number:
+                return True
+            elif 2*k == number:
+                return False
+            else:
+                k +=1
+        return None
