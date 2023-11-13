@@ -6,7 +6,7 @@ import seaborn as sns
 import datetime
 import pytz
 import requests
-import controllers.predictionModel
+import predictionModel
 import time
 import uuid
 import psutil
@@ -107,7 +107,7 @@ class graphTableGenerator:
 
         website_status = self.monitorWebsite(url)
 
-        #predictions = predictionModel(latency_values)
+        predictions = predictionModel(latency_values)
 
         plt.figure(figsize=(10, 6))
         plt.plot(time_values, latency_values, label='Latency (MB)')
