@@ -6,7 +6,8 @@ import numpy as np
 from server.DBconnectionAgent import DBConnectionAgent
 import client.client 
 import webbrowser
-
+from controllers.predictionModel import PredictionModel # Temporary, testing
+import pandas as pd
 class Server(): # The main server handler class
     # Communicates with the MongoDB using DBconnection on behalf of the Clients using two multiprocessing.Queues 
     def __init__(self):
@@ -16,7 +17,7 @@ class Server(): # The main server handler class
         self.__columns = ['masterList', 'pollingData', 'presets', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
         self.__requestTypes = ['insert', 'remove', 'request', 'update', 'setting'] # Types of requests the server can handle
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
-        self.__pollingSpeed = 60/60 # The seconds between each master list poll
+        self.__pollingSpeed = 60/12 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
         self.__requestsQ = mp.Queue(maxsize=1000000) # The request queue, only a clinet will put to this queue
         self.__dataQ = mp.Queue(maxsize=1000000) # The request queue, only the server will put to this queue
@@ -248,6 +249,9 @@ class Server(): # The main server handler class
         """This function is responsible for checking the requestsQ and responding to each request as is appropraite.
         """
         # Expected Request Formats # WIP
+        #auth {'username':'Christian', 'email':'something@csustan.edu', 'id':uuid.uuid4(), 'password':'??????'}
+        #users {'id':uuid.uuid4(), 'username':'Christian', 'email':'something@csustan.edu', 'websitesList':['www.google.com', 'www.csustan.edu'], 'presets':[{"name": "Christian", "presetLists": ["www.google.com", "www.csustan.edu", "www.microsoft.com", "www.nasa.gov"],"timestamp": 1698890950.1513646}, {"name": "Anthony", "presetLists": ["www.google.com", "www.instagram.com", "www.csustan.edu"], "timestamp": 1698890933.333366}]
+
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'masterList', 'query':{}}                                                               ### Gets all urls from the master list
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'pollingData', 'query':'wwww.google.com'}                                               ### Requests the polling data for a specific url
         #{'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'pollingData', 'query':['wwww.google.com', 'www.instgram.com', 'www.csustan.edu']}      ### Requests the polling data for a list of urls
@@ -359,6 +363,7 @@ class Server(): # The main server handler class
     def _mainLoop(self):
         """The primary loop for the server, calls checkForRequests and pollWebsites.
         """
+        #self.test()
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
         dataQTimerStart = time.time()
         homepage = "http://127.0.0.1:7777"
@@ -381,6 +386,38 @@ class Server(): # The main server handler class
         self.__processes['app'] = mp.Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'].start()
         self._mainLoop()
+
+    def test(self):
+        """Used for testing things at the start of the program
+        """
+        print('Begin test.')
+        predModel = PredictionModel()
+        data = self.requestManyFromDB('pollingData', {'url':'www.google.com'})
+        #tensorData = np.empty()
+        tensorDataTime = []
+        tensorDataLatency = []
+        #count = 0
+        for i in data:
+            #np.append(tensorData, [i['timestamp'], i['latency']], axis=0)
+            #np.append(tensorData, i['latency'], axis=1)
+            #np.append(tensorDataTime, i['timestamp'])
+            #np.append(tensorDataLatency, i['latency'])
+            tensorDataTime.append(i['timestamp'])
+            tensorDataLatency.append(i['latency'])
+            #count += 1
+        #print(count, len(tensorDataLatency), len(tensorDataTime))
+        #tensorData = np.array([tensorDataTime, tensorDataLatency])
+        #print(tensorDataTime)
+        tensorData = np.vstack((tensorDataTime, tensorDataLatency))
+        #tensorData = pd.DataFrame(tensorDataLatency, index=pd.to_datetime(tensorDataTime, unit='s'), columns=['latency'])
+        #tensorData = {'timestamp':tensorDataTime, 'latency':tensorDataLatency}
+        #print(tensorData)
+        predicitedData = predModel.predictOnData(tensorData)
+        print('testing 5')
+        print('predictiedData =', predicitedData)
+        print('length: ', len(predicitedData))
+        print('Completed test.')
+        
 # end Server
 
 def testServer():

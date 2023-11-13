@@ -52,3 +52,4 @@ This program is designed for California State University Stanislaus' CS-4800 202
   -  webbrowser
   -  bson
   -  re
+  -  bcrypt

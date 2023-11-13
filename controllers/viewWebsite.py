@@ -12,13 +12,14 @@ class ViewWebsite():
 
     def requestData(self, request):
         self.__requestQ.put(request)
-        time.sleep(0.1)
+        time.sleep(1)
         initialDataID = False
         while self.__dataQ.empty() != True:
             newData = self.__dataQ.get()
             if newData['id'] == initialDataID:
                 self.__requestQ.put(request)
-                time.sleep(0.1) #import time
+                print(request['id'])
+                time.sleep(1) #import time
                 initialDataID = False
             elif initialDataID == False:
                 initialDataID = newData['id']
@@ -81,7 +82,13 @@ class ViewWebsite():
                     x += doc['latency']
                 else:
                     nanCount += 1
-            averageLatencyOfUrl = (x/(y-nanCount)) * 1000
+            try:
+                averageLatencyOfUrl = (x/(y-nanCount)) * 1000
+            except ZeroDivisionError:
+                if y != 0:
+                    averageLatencyOfUrl = x/y * 1000
+                else:
+                    averageLatencyOfUrl = x *1000
             temp2[url] = round(averageLatencyOfUrl,4)
         
             

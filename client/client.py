@@ -1,15 +1,17 @@
 # CHRISTIAN
-from flask import Flask, render_template, request, url_for
+from flask import Flask, render_template, request, url_for, redirect, session, jsonify
+
 import uuid
 import time
+#pip install bcrypt
+import bcrypt
 from multiprocessing import Queue
+
 
 from controllers.addPreset import AddPreset
 from controllers.deletePreset import DeletePreset 
 from controllers.editPreset import EditPreset 
 from controllers.viewPreset import ViewPreset 
-
-
 
 from controllers.addWebsite import AddWebsite 
 from controllers.deleteWebsite import DeleteWebsite 
@@ -26,8 +28,15 @@ class MyFlaskApp:
         self.app.requestQ = requestQ
         self.app.dataQ = dataQ
         
+        self.curr_email = ''
         #ROUTECREATING
         #Example: self.app.add_url_rule(route='<route>', name='<name>', function=<function>, OPTIONAL methods=[<typeOfRequest>])
+        
+        ########
+        self.app.add_url_rule('/logged_in', 'logged_in', self.logged_in)
+        self.app.add_url_rule('/login', 'login', self.login, methods=['POST', 'GET'])
+        self.app.add_url_rule('/logout', 'logout', self.logout, methods=['POST', 'GET'])
+        ########
         
         #HOMEPAGE
         self.app.add_url_rule('/', 'index', self.index)
@@ -70,10 +79,105 @@ class MyFlaskApp:
              
             
         
+    ################################
+    #        AUTH ROUTING          #
+    ################################
+    def index(self):
+        message = ''
+        # if "email" in session:
+        #     return redirect(url_for("logged_in"))
+        if request.method == "POST":
+            user = request.form.get("fullname")
+            email = request.form.get("email")
+            password1 = request.form.get("password1")
+            password2 = request.form.get("password2")
+
+            result = self.register_user(user, email, password1, password2)
+
+            if result == email:
+                self.curr_email = email
+                return render_template('auth/logged_in.html', email=result)
+            else:
+                message = result
+                return render_template('auth/index.html', message=message)
+        return render_template('auth/index.html')
+    
+    def login(self):
+        message = 'Please login to your account'
+        # if "email" in session:
+        #     return redirect(url_for("logged_in"))
+
+        if request.method == "POST":
+            email = request.form.get("email")
+            password = request.form.get("password")
+
+            email_found = self.user_database.find_user_by_email(email)
+            if email_found:
+                email_val = email_found['email']
+                passwordcheck = email_found['password']
+
+                if bcrypt.checkpw(password.encode('utf-8'), passwordcheck):
+                    print('hello')
+                    session["email"] = email_val
+                    self.curr_email = email_val
+                    return redirect(url_for('logged_in'))#MAY CHANGE
+                else:
+                    if "email" in session:
+                        return redirect(url_for("logged_in"))#MAY CHANGE
+                    message = 'Wrong password'
+                    return render_template('auth/login.html', message=message)
+            else:
+                message = 'Email not found'
+                return render_template('auth/login.html', message=message)
+        return render_template('auth/login.html', message=message)
+
+    def logged_in(self):
+        if "email" in session:
+            email = session["email"]
+            self.curr_email = email
+            return render_template('home.html', email=email)#changed from auth/logged_in.html
+        else:
+            return redirect(url_for("login"))
         
+    def register_user(self, user, email, password1, password2):
+        
+        user_found = self.user_database.find_user_by_name(user)
+        email_found = self.user_database.find_user_by_email(email)
+
+        if user_found:
+            return 'There already is a user by that name'
+        if email_found:
+            return 'This email already exists in the database'
+        if password1 != password2:
+            return 'Passwords should match'
+
+        hashed = bcrypt.hashpw(password2.encode('utf-8'), bcrypt.gensalt())
+        user_input = {'name': user, 'email': email, 'password': hashed}
+        self.user_database.insert_user(user_input)
+        user_data = self.user_database.find_user_by_email(email)
+        new_email = user_data['email']
+        return new_email
+    
+    #NOT REALLY USING THIS
+    def logout(self):
+        if "email" in session:
+            session.pop("email", None)
+            return render_template("auth/signout.html")
+        else:
+            return redirect(url_for('index'))
+    
+    
+    
+    
+    
     ################################
-    #         ROUTING              #
+    #        NORMAL ROUTING        #
     ################################
+    
+    
+    
+    
+    
     #TODO
     def index(self):
         return render_template('homepage.html')

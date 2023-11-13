@@ -1,36 +1,25 @@
-<!--CHRISTIAN-->
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Track Website</title>
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style1.css') }}">
-    </head>
-    <body>
-        <ul>
-            <li><a class="current" href="/">Home</a></li>
-            <li><a href="addWebsite">Add Website</a></li>
-            <li><a href="deleteWebsite">Delete Website</a></li>
-            <li><a href="addPreset">Add Preset</a></li>
-            <li><a href="editPreset">Edit Preset</a></li>
-            <li><a href="deletePreset">Delete Preset</a></li>
-            
-            <li><a href="viewPreset">View Preset</a></li>
-            <li><a href="viewWebsite">View Website</a></li>
-        </ul>
-        <br>
-        <br>
-        <h1  style="text-align:center;color:white;">Add Website</h1>
-        <form action="addWebsite/newAddedWebsite" method="POST">
-            <!--
-                GET: unsafe way to send info,
-                POST: safe way to send info,
-                REQUEST: if you don't know you used
-                        in the other php file,
-            -->
-            <label style="color:white;" for="fname">url:</label>
-            <input type="text" name="url">
-            <button type="submit">Click Me!!!</button>
-        </form>
-    </body>
-</html>
+{%extends "base.html" %} 
+{% block content %}
+    <!--CHRISTIAN-->
+    
+        <head>
+            <meta charset="UTF-8">
+            <title>Track Website</title>
+            <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style1.css') }}">
+        </head>
+        <body>
+            <h1  style="text-align:center;color:white;">Add Website</h1>
+            <form action="addWebsite/newAddedWebsite" method="POST">
+                <!--
+                    GET: unsafe way to send info,
+                    POST: safe way to send info,
+                    REQUEST: if you don't know you used
+                            in the other php file,
+                -->
+                <label style="color:white;" for="fname">url:</label>
+                <input type="text" name="url">
+                <button type="submit">Click Me!!!</button>
+            </form>
+        </body>
+    
+{% endblock%}
