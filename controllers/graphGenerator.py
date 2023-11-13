@@ -6,15 +6,16 @@ import seaborn as sns
 import datetime
 import pytz
 import requests
-import predictionModel
+from predictionModel import PredictionModel
 import time
 import uuid
 import psutil
 
 
-class graphTableGenerator:
+class GraphGenerator:
     def __init__(self, requestQ, dataQ):
         self.__requestQ, self.__dataQ = requestQ, dataQ
+        self.__predict = PredictionModel()
 
     #requestData implemented by Anthony
     def requestData(self, request):
@@ -102,17 +103,20 @@ class graphTableGenerator:
 
             time.sleep(15) #recounts every 15 seconds
 
+# generate two separ
     def generate_graph(self, url, duration=300, interval=15):
         time_values, latency_values = self.latency(psutil.net_io_counters(), duration, interval)
 
         website_status = self.monitorWebsite(url)
 
-        predictions = predictionModel(latency_values)
+        predictions = self.__predict.predictOnData(None) #change None to np arrary 
+        ## send data to prediction model
 
         plt.figure(figsize=(10, 6))
-        plt.plot(time_values, latency_values, label='Latency (MB)')
+        plt.plot(time_values, latency_values, label='Latency (ms)')
+        plt.plot(predictions[0], predictions[1], label='Prediction (ms)')
         plt.xlabel('Time')
-        plt.ylabel('Latency (MB)')
+        plt.ylabel('Latency (ms)')
         plt.title('Latency and Website Monitoring')
         plt.grid(True)
         plt.legend()
@@ -126,3 +130,8 @@ class graphTableGenerator:
 
         plt.legend()
         plt.show()
+        #image = plt.show() -> return image in server.py?
+
+
+## needs to be able to accept data from ViewWebsite
+        
