@@ -1,4 +1,5 @@
 #implemented by Sierra
+#tested by Anthony
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -6,7 +7,8 @@ import seaborn as sns
 import datetime
 import pytz
 import requests
-from predictionModel import PredictionModel
+#from predictionModel import PredictionModel
+from controllers.predictionModel import PredictionModel
 import time
 import uuid
 import psutil
@@ -103,7 +105,7 @@ class GraphGenerator:
 
             time.sleep(15) #recounts every 15 seconds
 
-# generate two separ
+# generate two separate
     def generate_graph(self, url, duration=300, interval=15):
         time_values, latency_values = self.latency(psutil.net_io_counters(), duration, interval)
 
