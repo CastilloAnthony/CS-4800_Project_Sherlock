@@ -1,18 +1,12 @@
 import bcrypt
 import uuid
 import time
-#ERROR: tensorflow-1.0.1-py2-none-any.whl is not a supported wheel on this platform.
 
 
-# python3 -m pip install --upgrade https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.12.0-py3-none-any.whl
-#ERROR: Could not install packages due to an OSError: [Errno 2] No such file or directory: 'C:\\Users\\Christian Alameda\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python310\\site-packages\\tensorflow\\include\\external\\aws\\aws-cpp-sdk-kinesis\\include\\aws\\kinesis\\model\\DecreaseStreamRetentionPeriodRequest.h'
-#HINT: This error might have occurred since this system does not have Windows Long Path support enabled. You can find information on how to enable this at https://pip.pypa.io/warnings/enable-long-paths
-# https://pip.pypa.io/warnings/enable-long-paths
-# New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
-# -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+
 class Login:
-    def __init__(self):
-        pass
+    def __init__(self, requestQ, dataQ):
+        self.__requestQ, self.__dataQ = requestQ, dataQ
     
     def requestData(self, request):
         """_summary_: returns data or returns a not good query message

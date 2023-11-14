@@ -1,4 +1,25 @@
 # Created by Anthony Castillo
+
+#TENSORFLOW INSTALL 
+"""
+FOR WINDOWS: powershell => run as administer => run this command
+___________________________________________________________________
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
+-Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+___________________________________________________________________
+After that go back to terminal:
+___________________________________________________________________
+pip show tensorflow
+pip install --upgrade tensorflow
+___________________________________________________________________
+"""
+#PSUTIL Install
+"""
+pip install psutil
+"""
+
+
+
 import time
 import datetime
 import tensorflow as tf
