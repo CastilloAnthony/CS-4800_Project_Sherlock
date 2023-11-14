@@ -7,6 +7,7 @@ import time
 import bcrypt
 from multiprocessing import Queue
 
+from controllers.login import Login
 
 from controllers.addPreset import AddPreset
 from controllers.deletePreset import DeletePreset 
@@ -37,6 +38,8 @@ class MyFlaskApp:
         self.app.add_url_rule('/logged_in', 'logged_in', self.logged_in)
         self.app.add_url_rule('/login', 'login', self.login, methods=['POST', 'GET'])
         self.app.add_url_rule('/logout', 'logout', self.logout, methods=['POST', 'GET'])
+        # self.app.add_url_rule('/', 'index', self.index, methods=['POST', 'GET'])
+        
         ########
         
         #HOMEPAGE
@@ -68,6 +71,9 @@ class MyFlaskApp:
         
         
         #CLASS_INITIALIZATION
+        
+        self.loginClass = Login(self.app.requestQ, self.app.dataQ)
+        
         self.addPresetClass = AddPreset(self.app.requestQ, self.app.dataQ)
         self.deletePresetClass = DeletePreset(self.app.requestQ, self.app.dataQ)
         self.editPresetClass = EditPreset(self.app.requestQ, self.app.dataQ)    
@@ -84,6 +90,7 @@ class MyFlaskApp:
     #        AUTH ROUTING          #
     ################################
     def index(self):
+        #FOR FIRST TIME LOGGIN IN
         message = ''
         # if "email" in session:
         #     return redirect(url_for("logged_in"))
@@ -93,8 +100,9 @@ class MyFlaskApp:
             password1 = request.form.get("password1")
             password2 = request.form.get("password2")
 
+            
+            #result needs to be a 
             result = self.register_user(user, email, password1, password2)
-
             if result == email:
                 self.curr_email = email
                 return render_template('auth/logged_in.html', email=result)
@@ -111,14 +119,14 @@ class MyFlaskApp:
         if request.method == "POST":
             email = request.form.get("email")
             password = request.form.get("password")
-
-            email_found = self.user_database.find_user_by_email(email) #don't have user_database will need to to a query and find_user_by_email
+            #Start an insert query
+            #don't have user_database will need to to a query and find_user_by_email
+            email_found = self.loginClass.find_user_by_email(email) 
             if email_found:
                 email_val = email_found['email']
                 passwordcheck = email_found['password']
 
                 if bcrypt.checkpw(password.encode('utf-8'), passwordcheck):
-                    print('hello')
                     session["email"] = email_val
                     self.curr_email = email_val
                     return redirect(url_for('logged_in'))#MAY CHANGE
@@ -142,8 +150,8 @@ class MyFlaskApp:
         
     def register_user(self, user, email, password1, password2):
         # don't have user_database will need to to a query and find_user_by_email as well as name
-        user_found = self.user_database.find_user_by_name(user) 
-        email_found = self.user_database.find_user_by_email(email) 
+        user_found = self.loginClass.find_user_by_name(user) 
+        email_found = self.loginClass.find_user_by_email(email) 
 
         if user_found:
             return 'There already is a user by that name'
@@ -153,10 +161,10 @@ class MyFlaskApp:
             return 'Passwords should match'
 
         hashed = bcrypt.hashpw(password2.encode('utf-8'), bcrypt.gensalt())
-        user_input = {'name': user, 'email': email, 'password': hashed}
+        user_input = {'name': user, 'email': email, 'id':uuid.uuid4(), 'password': hashed}
         # don't have insert_user
-        self.user_database.insert_user(user_input)
-        user_data = self.user_database.find_user_by_email(email)
+        self.loginClass.insert_user(user_input)
+        user_data = self.loginClass.find_user_by_email(email)
         new_email = user_data['email']
         return new_email
     
