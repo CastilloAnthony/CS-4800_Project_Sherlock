@@ -33,7 +33,7 @@ class Login:
                 self.__dataQ.put(newData)
     
     #HELPER FUNCTIONS
-    def find_user_by_name(self, name):
+    def find_user_by_name(self, name): #Should this work?
         """_summary_: find out if name is in dictionary
 
         Args:
@@ -46,7 +46,7 @@ class Login:
         nameRequest = {
             'id': uuid.uuid4(),
             'request_type': 'request',
-            'column': 'users',
+            'column': 'auth',
             'query': {"name":name}
         }
         temp = self.requestData(nameRequest)
@@ -55,7 +55,6 @@ class Login:
             pass
         else: 
             return temp
-        return self.mycol.find_one({"name": name})
 
     def find_user_by_email(self, email):
         """_summary_: find out if email is in dictionary
@@ -70,7 +69,7 @@ class Login:
         emailRequest = {
             'id': uuid.uuid4(),
             'request_type': 'request',
-            'column': 'users',
+            'column': 'auth',
             'query': {"email":email}
         }
         temp = self.requestData(emailRequest)
@@ -90,7 +89,7 @@ class Login:
         insertUserRequest = {
             'id': uuid.uuid4(),
             'request_type': 'insert',
-            'column': 'users',
+            'column': 'auth',
             'query': {user_data}
         }
         self.requestData(insertUserRequest)
