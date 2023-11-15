@@ -7,6 +7,7 @@ import time
 import bcrypt
 from multiprocessing import Queue
 
+#CLASS IMPORTATION
 from controllers.login import Login
 
 from controllers.addPreset import AddPreset
@@ -174,7 +175,7 @@ class MyFlaskApp:
             session.pop("email", None)
             return render_template("auth/signout.html")
         else:
-            return redirect(url_for('index'))
+            return redirect(url_for('index')) #right now index is home.html but it will be index when done
     
     
     
@@ -183,10 +184,6 @@ class MyFlaskApp:
     ################################
     #        NORMAL ROUTING        #
     ################################
-    
-    
-    
-    
     
     #TODO
     def index(self):
@@ -270,22 +267,23 @@ class MyFlaskApp:
     def newRequest(self, queryRequest):
         pass
 
-    def checkForData(self, queryRequest):
-        #ANTHONY
-        initialDataID = False
-        while self.app.dataQ.empty() != True:
-            newData = self.app.dataQ.get()
-            if newData['id'] == initialDataID:
-                self.app.requestQ.put(queryRequest)
-                time.sleep(1) #import time
-                initialDataID = False
-            elif initialDataID == False:
-                initialDataID = newData['id']
-            if newData['id'] == queryRequest['id']:
-                if newData['data'] is not False:
-                    return newData
-            else:
-                self.app.dataQ.put(newData)
+    # NOT USED
+    # def checkForData(self, queryRequest):
+    #     #ANTHONY
+    #     initialDataID = False
+    #     while self.app.dataQ.empty() != True:
+    #         newData = self.app.dataQ.get()
+    #         if newData['id'] == initialDataID:
+    #             self.app.requestQ.put(queryRequest)
+    #             time.sleep(1) #import time
+    #             initialDataID = False
+    #         elif initialDataID == False:
+    #             initialDataID = newData['id']
+    #         if newData['id'] == queryRequest['id']:
+    #             if newData['data'] is not False:
+    #                 return newData
+    #         else:
+    #             self.app.dataQ.put(newData)
 
 def startFlask(requestQ, dataQ):
     newFlask = MyFlaskApp(requestQ, dataQ)

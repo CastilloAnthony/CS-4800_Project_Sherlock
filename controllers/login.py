@@ -1,8 +1,5 @@
-import bcrypt
 import uuid
 import time
-
-
 
 class Login:
     def __init__(self, requestQ, dataQ):
