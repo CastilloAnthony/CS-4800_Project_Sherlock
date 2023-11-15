@@ -5,10 +5,9 @@ import socket
 import numpy as np
 from server.DBconnectionAgent import DBConnectionAgent
 import client.client 
-import webbrowser
 from controllers.predictionModel import PredictionModel # Temporary, testing
 from controllers.graphGenerator import GraphGenerator
-import pandas as pd
+
 class Server(): # The main server handler class
     # Communicates with the MongoDB using DBconnection on behalf of the Clients using two multiprocessing.Queues 
     def __init__(self):
@@ -368,9 +367,6 @@ class Server(): # The main server handler class
         #self.test2()
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
         dataQTimerStart = time.time()
-        homepage = "http://127.0.0.1:7777"
-        time.sleep(3)
-        webbrowser.open(homepage)
         while True:
             self._checkForRequests()
             mainLoopTimerEnd = time.time()

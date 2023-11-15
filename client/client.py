@@ -19,7 +19,7 @@ from controllers.addWebsite import AddWebsite
 from controllers.deleteWebsite import DeleteWebsite 
 from controllers.viewWebsite import ViewWebsite 
 
-
+import webbrowser
 
 # import controllers.graphTableGenerator
 
@@ -84,6 +84,8 @@ class MyFlaskApp:
         self.addWebsiteClass = AddWebsite(self.app.requestQ, self.app.dataQ)
         self.deleteWebsiteClass = DeleteWebsite(self.app.requestQ, self.app.dataQ)   
         self.viewWebsiteClass = ViewWebsite(self.app.requestQ, self.app.dataQ)
+
+        webbrowser.open("http://127.0.0.1:7777")
              
             
         
