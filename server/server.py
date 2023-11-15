@@ -15,7 +15,7 @@ class Server(): # The main server handler class
         """Initializes all attributes of the server class and calls the setupDBConnection function.
         """
         self.__DBconneciton = False # The connection agent
-        self.__columns = ['masterList', 'pollingData', 'presets', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
+        self.__columns = ['masterList', 'pollingData', 'presets', 'users', 'auth'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
         self.__requestTypes = ['insert', 'remove', 'request', 'update', 'setting'] # Types of requests the server can handle
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
         self.__pollingSpeed = 60/12 # The seconds between each master list poll
