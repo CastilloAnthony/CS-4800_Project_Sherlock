@@ -98,7 +98,9 @@ class DBConnectionAgent():
         """
         if self.__db != False:
             try:
-                return self.__db[column].insert_one(content).acknowledged
+                temp = self.__db[column].insert_one(content).acknowledged
+                print('Add to:', content, temp)
+                return temp
             except:
                 return False
         else:
@@ -144,7 +146,7 @@ class DBConnectionAgent():
             bool: True/False on success/failure.
         """
         if self.__db != False:
-            print(query, self.__db[column].find_one(query))
+            print('requestFromDB:', query, self.__db[column].find_one(query))
             return self.__db[column].find_one(query)
         else:
             return False
