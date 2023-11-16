@@ -81,7 +81,7 @@ class Server(): # The main server handler class
         else:
             print('Error in auth, rebuilding the default auth.')
             self.__DBconneciton.clearDB('Auth')
-            self.sendToDB('auth', {'name': 'admin', 'email': 'admin@admin.com', 'id':1, 'password': 12345})
+            self.sendToDB('auth', {'name': 'admin', 'email': 'admin@admin.com', 'id':1, 'password': Binary.createFromBase64('JDJiJDEyJHFkbmg2VGlwUHUvMU9uR1oyVi5kVS5OSlREc1BySVBDU05Sb21VQTJ6NkRkNVl0TWZzaktL', 0)})
             if self.__DBconneciton.verifyCollection('auth'):
                 print('Auth rebuilt successfully.')
             else:

@@ -49,11 +49,7 @@ class Login:
             'query': {"name":name}
         }
         temp = self.requestData(nameRequest)['data']
-        some_shit = int# or something idk
-        if isinstance(temp, some_shit):
-            pass
-        else: 
-            return temp
+        return temp
 
     def find_user_by_email(self, email):
         """_summary_: find out if email is in dictionary
@@ -72,26 +68,56 @@ class Login:
             'query': {"email":email}
         }
         temp = self.requestData(emailRequest)['data']
-        some_shit = int# or something idk
-        if isinstance(temp, some_shit):
-            pass
-        else: 
-            return temp
+        return temp
 
-    def insert_user(self, user_data):
+    def insert_user(self, auth_data):
         """_summary_: simply inserting the data into the database
 
         Args:
             user_data (dictionary): should be in form of {'name': user, 'email': email, 'id':uuid.uuid4(), 'password': hashed}
         """
         #ASKING
-        insertUserRequest = {
+        insertAuthRequest = {
             'id': uuid.uuid4(),
             'request_type': 'insert',
             'column': 'auth',
-            'query': user_data
+            'query': auth_data
         }
-        print(self.requestData(insertUserRequest))
+        self.requestData(insertAuthRequest)
+        
+        #ADDING IN A USER DOCUMENT Should be like:
+        #users {
+        # 'id':uuid.uuid4(),
+        # 'username':'Christian', 
+        # 'email':'something@csustan.edu', 
+        # 'websitesList':['www.google.com', 'www.csustan.edu'], 
+        # 'presets':[
+            # {"name": "Christian", "presetLists": ["www.google.com", "www.csustan.edu", "www.microsoft.com", "www.nasa.gov"],"timestamp": 1698890950.1513646}, 
+            # {"name": "Anthony", "presetLists": ["www.google.com", "www.instagram.com", "www.csustan.edu"], "timestamp": 1698890933.333366}
+        # ]
+        #WHAT auth_data is:
+        #{'name': user, 
+        # 'email': email, 
+        # 'id':str(uuid.uuid4()), 
+        # 'password': hashed}
+        parse = auth_data
+        user_document = {
+            'id': parse['id'],
+            'username':parse['name'],
+            'email': parse['email'],
+            'websitesList':[],
+            'presets':[]
+        }
+        #ASKING
+        insertUserRequest = {
+            'id': uuid.uuid4(),
+            'request_type': 'insert',
+            'column': 'users',
+            'query': user_document
+        }
+        self.requestData(insertUserRequest)
+        
+
         
     
     

@@ -149,6 +149,7 @@ class MyFlaskApp:
         if "email" in session:
             email = session["email"]
             self.curr_email = email
+            self.addPresetClass.getEmail(self.curr_email)
             return render_template('homepage.html', email=email)#changed from auth/logged_in.html
         else:
             return redirect(url_for("login"))
@@ -174,7 +175,6 @@ class MyFlaskApp:
 
         hashed = bcrypt.hashpw(password2.encode('utf-8'), bcrypt.gensalt())
         user_input = {'name': user, 'email': email, 'id':str(uuid.uuid4()), 'password': hashed}
-        # don't have insert_user
         self.loginClass.insert_user(user_input)
         user_data = self.loginClass.find_user_by_email(email)
         print('user_data|', user_data)
