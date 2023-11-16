@@ -28,6 +28,8 @@ class MyFlaskApp:
         self.app = Flask(__name__, template_folder='../templates', static_folder='../static')
         # self.admin_view = Blueprint('admin_routes',__name__, template_folder='../templates', static_folder='../static')
         
+        self.app.secret_key = 'your_secret_key_here'
+        
         self.app.requestQ = requestQ
         self.app.dataQ = dataQ
         
@@ -147,7 +149,7 @@ class MyFlaskApp:
         if "email" in session:
             email = session["email"]
             self.curr_email = email
-            return render_template('home.html', email=email)#changed from auth/logged_in.html
+            return render_template('homepage.html', email=email)#changed from auth/logged_in.html
         else:
             return redirect(url_for("login"))
         
