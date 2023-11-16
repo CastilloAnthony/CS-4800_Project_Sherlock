@@ -39,12 +39,12 @@ class MyFlaskApp:
         self.app.add_url_rule('/logged_in', 'logged_in', self.logged_in)
         self.app.add_url_rule('/login', 'login', self.login, methods=['POST', 'GET'])
         self.app.add_url_rule('/logout', 'logout', self.logout, methods=['POST', 'GET'])
-        # self.app.add_url_rule('/', 'index', self.index, methods=['POST', 'GET'])
+        self.app.add_url_rule('/', 'index', self.index, methods=['POST', 'GET'])
         
         ########
         
         #HOMEPAGE
-        self.app.add_url_rule('/', 'index', self.index)
+        self.app.add_url_rule('/home', 'home', self.home)
         
         #FORPRESETS
         #ADDPRESET
@@ -188,7 +188,7 @@ class MyFlaskApp:
     ################################
     
     #TODO
-    def index(self):
+    def home(self):
         return render_template('homepage.html')
     
     #FINISHED
@@ -197,7 +197,7 @@ class MyFlaskApp:
 
     def newAddedPreset(self):
         self.addPresetClass.addPreset()
-        return "YOU HAVE SUCCESSFULLY ADDED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
+        return "YOU HAVE SUCCESSFULLY ADDED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='home'>Visit Homepage</a>"
 
     #TODO
     def viewPreset(self):
@@ -213,7 +213,7 @@ class MyFlaskApp:
 
     def newDeletedPreset(self):
         self.deletePresetClass.deletePreset()
-        return "YOU HAVE SUCCESSFULLY ADDED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
+        return "YOU HAVE SUCCESSFULLY ADDED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='home'>Visit Homepage</a>"
 
     #FINISHED
     def deleteWebsite(self):
@@ -221,7 +221,7 @@ class MyFlaskApp:
     
     def newDeletedWebsite(self):
         self.deleteWebsiteClass.deleteWebsite()
-        return "YOU HAVE SUCCESSFULLY DELETED A WEBSITE PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
+        return "YOU HAVE SUCCESSFULLY DELETED A WEBSITE PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='home'>Visit Homepage</a>"
 
     #FINISHED
     def editPreset(self):
@@ -250,7 +250,7 @@ class MyFlaskApp:
     
     def newAddedWebsite(self):
         self.addWebsiteClass.addWebsite()
-        return "YOU HAVE SUCCESSFULLY ADDED A WEBSITE, PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
+        return "YOU HAVE SUCCESSFULLY ADDED A WEBSITE, PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='home'>Visit Homepage</a>"
 
     
     
