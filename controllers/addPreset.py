@@ -7,7 +7,7 @@ from flask import Flask, render_template, request
 class AddPreset(): # Controller
     def __init__(self, requestQ, dataQ):
         self.__requestQ, self.__dataQ = requestQ, dataQ
-        self.email = self.getEmail()
+        self.email = ''
 
     def __del__(self):
         pass
@@ -46,7 +46,7 @@ class AddPreset(): # Controller
         #return super().checkForData(masterListRequest)7
     
     def getEmail(self, email):
-        return email
+        self.curr_email = email
     
     #FIGURE OUT HOW TO GRAB curr_email
     def getCurrentUser(self, curr_email):
