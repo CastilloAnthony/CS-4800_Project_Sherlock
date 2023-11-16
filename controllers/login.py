@@ -90,7 +90,7 @@ class Login:
             'id': uuid.uuid4(),
             'request_type': 'insert',
             'column': 'auth',
-            'query': {user_data}
+            'query': user_data
         }
         self.requestData(insertUserRequest)
         
