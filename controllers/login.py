@@ -15,11 +15,10 @@ class Login:
             dict: returns wanted data
         """
         self.__requestQ.put(request)
-        time.sleep(0.1)
+        time.sleep(1.1)
         initialDataID = False
         while self.__dataQ.empty() != True:
             newData = self.__dataQ.get()
-            print(newData)
             if newData['id'] == initialDataID:
                 self.__requestQ.put(request)
                 time.sleep(0.1) #import time
@@ -49,7 +48,7 @@ class Login:
             'column': 'auth',
             'query': {"name":name}
         }
-        temp = self.requestData(nameRequest)
+        temp = self.requestData(nameRequest)['data']
         some_shit = int# or something idk
         if isinstance(temp, some_shit):
             pass
@@ -72,7 +71,7 @@ class Login:
             'column': 'auth',
             'query': {"email":email}
         }
-        temp = self.requestData(emailRequest)
+        temp = self.requestData(emailRequest)['data']
         some_shit = int# or something idk
         if isinstance(temp, some_shit):
             pass
@@ -90,9 +89,9 @@ class Login:
             'id': uuid.uuid4(),
             'request_type': 'insert',
             'column': 'auth',
-            'query': {user_data}
+            'query': user_data
         }
-        self.requestData(insertUserRequest)
+        print(self.requestData(insertUserRequest))
         
     
     
