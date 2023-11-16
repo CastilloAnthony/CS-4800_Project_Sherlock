@@ -73,6 +73,35 @@ class Server(): # The main server handler class
             else:
                 print('An unexpected error occured in the verification of the masterList.')
 
+    def _checkForAuth(self):
+        """Checks for the existence of the auth collection within the database and creates a default one if the collection could not be verified.
+        """
+        if self.__DBconneciton.verifyCollection('auth'):
+            print('Auth collection verified.')
+        else:
+            print('Error in auth, rebuilding the default auth.')
+            self.__DBconneciton.clearDB('Auth')
+            self.sendToDB('auth', {'name': 'admin', 'email': 'admin@admin.com', 'id':1, 'password': 12345})
+            if self.__DBconneciton.verifyCollection('auth'):
+                print('Auth rebuilt successfully.')
+            else:
+                print('An unexpected error occured in the verification of auth.')
+
+    def _checkForUsers(self):
+        """Checks for the existence of the users collection within the database and creates a default one if the collection could not be verified.
+        """
+        if self.__DBconneciton.verifyCollection('users'):
+            print('Users collection verified.')
+        else:
+            print('Error in users, rebuilding the default users.')
+            self.__DBconneciton.clearDB('users')
+            for i in self.__sampleSites:
+                self.sendToDB('users', {'url':i, 'timestamp':time.time()})
+            if self.__DBconneciton.verifyCollection('users'):
+                print('Users rebuilt successfully.')
+            else:
+                print('An unexpected error occured in the verification of the users.')
+
     def _setupDBConnection(self, address="127.0.0.1", port="27017"):
         """Attempts to connect to the MongoDB at the specified address and port. Additionally, creates the SHERLOCK database if it doesn't exist and setups default collections for master list and preset
 
@@ -88,6 +117,8 @@ class Server(): # The main server handler class
                     print('Using the SHERLOCK database.')
                     self._checkForMasterlist()
                     self._checkForPresets()
+                    self._checkForAuth()
+                    self._checkForUsers()
                 else:
                     print('Could not connect to the SHERLOCK database. Creating new one...')
                     self.__DBconneciton.createNewDB('SHERLOCK')
@@ -97,6 +128,8 @@ class Server(): # The main server handler class
                             print('Using the SHERLOCK database.')
                             self._checkForMasterlist()
                             self._checkForPresets()
+                            self._checkForAuth()
+                            self._checkForUsers()
                         else:
                             print('Could not connect to the new SHERLOCK database.')
                     else:
