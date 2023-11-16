@@ -34,7 +34,7 @@ class Server(): # The main server handler class
                 print('Terminated: '+str(self.__processes[i].terminate()))
             else:
                 print('Process Alive: '+str(self.__processes[i].is_alive()))
-                print('Joined: '+str(self.__processes[i].join(timeout=3)))
+                #print('Joined: '+str(self.__processes[i].join(timeout=3)))
             self.__processes[i].close()
         self.__requestsQ.close()
         while not self.__requestsQ.empty():
@@ -298,6 +298,16 @@ class Server(): # The main server handler class
                         del tempData
                     elif isinstance(newRequest['query'], dict):
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':'Not Yet Implemented'})
+                elif newRequest['column'] in 'users':
+                    if isinstance(newRequest['query'], dict):
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestFromDB(newRequest['column'], newRequest['query'])})
+                elif newRequest['column'] in 'auth':
+                    self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestFromDB(newRequest['column'], newRequest['query'])})
+                    #temp = self.requestFromDB(newRequest['column'], )
+                    #if newRequest['query'] == '':
+                        #if bcrypt.checkpw(newRequest['query']['password'], passwordcheck):
+                    #else:
+                        #self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':False})
                 elif newRequest['column'] in self.__columns: # For all other requests
                     self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':'Not Yet Implemented'})
             elif newRequest['request_type'] == 'insert':
@@ -308,6 +318,7 @@ class Server(): # The main server handler class
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':False})
                 elif newRequest['column'] == 'presets':
                     self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.sendToDB(newRequest['column'], newRequest['query'])})
+                #elif newRequest['column'] == 'auth':
                 elif newRequest['column'] in self.__columns: # For all other insertions, might not be necessary (infact might not be good either)
                     self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.sendToDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'remove':
@@ -382,7 +393,7 @@ class Server(): # The main server handler class
         """Creates the flask app in a separate processes, starts that process, and then intiates the mainloop. 
         """
         self.__processes['app'] = mp.Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
-        self.__processes['app'].start()
+        #self.__processes['app'].start()
         self._mainLoop()
 
     def test(self):
@@ -391,27 +402,13 @@ class Server(): # The main server handler class
         print('Begin test.')
         predModel = PredictionModel()
         data = self.requestManyFromDB('pollingData', {'url':'www.google.com'})
-        #tensorData = np.empty()
-        tensorDataTime = []
-        tensorDataLatency = []
-        #count = 0
+        tensorDataTime, tensorDataLatency = [], []
         for i in data:
-            #np.append(tensorData, [i['timestamp'], i['latency']], axis=0)
-            #np.append(tensorData, i['latency'], axis=1)
-            #np.append(tensorDataTime, i['timestamp'])
-            #np.append(tensorDataLatency, i['latency'])
             tensorDataTime.append(i['timestamp'])
             tensorDataLatency.append(i['latency'])
-            #count += 1
-        #print(count, len(tensorDataLatency), len(tensorDataTime))
-        #tensorData = np.array([tensorDataTime, tensorDataLatency])
-        #print(tensorDataTime)
         tensorData = np.vstack((tensorDataTime, tensorDataLatency))
-        #tensorData = pd.DataFrame(tensorDataLatency, index=pd.to_datetime(tensorDataTime, unit='s'), columns=['latency'])
-        #tensorData = {'timestamp':tensorDataTime, 'latency':tensorDataLatency}
-        #print(tensorData)
+        print('Data gathered, transferring to PredictionModel...')
         predicitedData = predModel.predictOnData(tensorData)
-        print('testing 5')
         print('predictiedData =', predicitedData)
         print('length: ', len(predicitedData))
         print('Completed test.')
@@ -420,7 +417,6 @@ class Server(): # The main server handler class
         graph = GraphGenerator()
         data = self.requestManyFromDB('pollingData', {'url':'www.google.com'})
         # add functions needed to generate graph from GenerateGraph
-
 # end Server
 
 def testServer():
