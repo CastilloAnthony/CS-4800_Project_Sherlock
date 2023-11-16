@@ -7,6 +7,7 @@ from server.DBconnectionAgent import DBConnectionAgent
 import client.client 
 from controllers.predictionModel import PredictionModel # Temporary, testing
 from controllers.graphGenerator import GraphGenerator
+from uuid import uuid4
 
 class Server(): # The main server handler class
     # Communicates with the MongoDB using DBconnection on behalf of the Clients using two multiprocessing.Queues 
@@ -81,7 +82,7 @@ class Server(): # The main server handler class
         else:
             print('Error in auth, rebuilding the default auth.')
             self.__DBconneciton.clearDB('Auth')
-            self.sendToDB('auth', {'name': 'admin', 'email': 'admin@admin.com', 'id':1, 'password': 12345})
+            self.sendToDB('auth', {'name': 'admin', 'email': 'admin@admin.com', 'id':str(uuid4()), 'password': 12345})
             if self.__DBconneciton.verifyCollection('auth'):
                 print('Auth rebuilt successfully.')
             else:
