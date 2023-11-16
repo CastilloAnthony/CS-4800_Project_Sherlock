@@ -72,8 +72,8 @@ class PredictionModel():
         """
         self.__model = tf.keras.Sequential([
             #tf.keras.layers.Lambda(lambda x: x[:, -11:, :]),
-            tf.keras.Input(shape=(int(self.__size*0.7))), #, int(self.__size*0.7))),
-            tf.keras.layers.Reshape((int(self.__size*0.7*0.5), 2), input_shape=(self.__size*0.7,)),# dtype=tf.float32), # int(int(self.__size*0.7)//(self.__size*0.7*0.5))
+            #tf.keras.Input(shape=(int(self.__size*0.7))), #, int(self.__size*0.7))),
+            tf.keras.layers.Reshape((int(self.__size*0.7*0.5), 2), input_shape=(int(self.__size*0.7),)),# dtype=tf.float32), # int(int(self.__size*0.7)//(self.__size*0.7*0.5))
             tf.keras.layers.Dense(8, activation='relu'),# input_shape=(32,)),#(self.__size*0.7), 2)),
             tf.keras.layers.Dense(4, activation='relu'), #input_shape=(int(self.__size*0.7), 2)),
             tf.keras.layers.Dense(1, activation='relu')#, input_shape=(int(self.__size*0.7), 2))
@@ -82,6 +82,7 @@ class PredictionModel():
         self.__model.compile(optimizer='adam', loss='mse')#'sparse_categorical_crossentropy')#'mse')#loss_fn,)
         #print(len(self.__model.weights))
         print(self.__model.get_config())
+        self.__model.build()
         self.__model.summary()
         print("Model Input Shape:", self.__model.input_shape)
         '''
@@ -239,6 +240,7 @@ class PredictionModel():
         # print('Validation Data:\n', val_data)
         # print('Test Data:\n', test_data)
         print(tf.shape(train_data[0]))
+        '''
         train_ds = tf.keras.utils.timeseries_dataset_from_array(
             data=train_data[1],
             targets=train_data[0],
@@ -255,6 +257,7 @@ class PredictionModel():
             shuffle=False,
             batch_size=32
         )
+        '''
         #print(train_ds)
         print('Shape of train_data:', tf.shape(train_data))
         #print(train_ds, val_ds)

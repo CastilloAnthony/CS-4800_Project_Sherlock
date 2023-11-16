@@ -7,6 +7,7 @@ from server.DBconnectionAgent import DBConnectionAgent
 import client.client 
 from controllers.predictionModel import PredictionModel # Temporary, testing
 from controllers.graphGenerator import GraphGenerator
+from uuid import uuid4
 
 class Server(): # The main server handler class
     # Communicates with the MongoDB using DBconnection on behalf of the Clients using two multiprocessing.Queues 
@@ -28,22 +29,27 @@ class Server(): # The main server handler class
         """Closes open processes and queues and destroys all attributes of the server class
         """
         for i in self.__processes:
+            print('Process: '+i)
+            print('\tIs Alive: '+str(self.__processes[i].is_alive()))
             if self.__processes[i].is_alive():
-                print('Process Alive: '+str(self.__processes[i].is_alive()))
-                print('Joined: '+str(self.__processes[i].join(timeout=3)))
-                print('Terminated: '+str(self.__processes[i].terminate()))
+                print('\tJoined: '+str(self.__processes[i].join(timeout=3)==None))
+                print('\tTerminated: '+str(self.__processes[i].terminate()==None))
+                print('\tClosed: '+str(self.__processes[i].close()==None))
             else:
-                print('Process Alive: '+str(self.__processes[i].is_alive()))
-                #print('Joined: '+str(self.__processes[i].join(timeout=3)))
-            self.__processes[i].close()
-        self.__requestsQ.close()
-        while not self.__requestsQ.empty():
-            print('Pulled '+str(self.__requestsQ.get())+' from queue.')
-        self.__dataQ.close()
-        while not self.__dataQ.empty():
-            print('Pulled '+str(self.__dataQ.get())+' from queue.')
+                try:
+                    print('\tJoined: '+str(self.__processes[i].join(timeout=3)==None))
+                    print('\tTerminated: '+str(self.__processes[i].terminate()==None))
+                    print('\tClosed: '+str(self.__processes[i].close()==None))
+                except:
+                    print('\tClosed: '+str(self.__processes[i].close()==None))
+        print('Queue: Request')
+        print('\tClosed: '+str(self.__requestsQ.close()==None))
+        print('\tJoined: '+str(self.__requestsQ.join_thread()==None))
+        print('Queue: Data')
+        print('\tClosed: '+str(self.__dataQ.close()==None))
+        print('\tJoined: '+str(self.__dataQ.join_thread()==None))
         del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes
-
+    
     def _checkForPresets(self):
         """Checks for the existence of the preset collection within the database and creates a default one if the collection could not be verified.
         """
@@ -81,7 +87,11 @@ class Server(): # The main server handler class
         else:
             print('Error in auth, rebuilding the default auth.')
             self.__DBconneciton.clearDB('Auth')
+<<<<<<< HEAD
             self.sendToDB('auth', {'name': 'admin', 'email': 'admin@admin.com', 'id':1, 'password': Binary.createFromBase64('JDJiJDEyJHFkbmg2VGlwUHUvMU9uR1oyVi5kVS5OSlREc1BySVBDU05Sb21VQTJ6NkRkNVl0TWZzaktL', 0)})
+=======
+            self.sendToDB('auth', {'name': 'admin', 'email': 'admin@admin.com', 'id':str(uuid4()), 'password': 12345})
+>>>>>>> f65fc2cdf7117cb6d4a1aad80ec65963b3fd6675
             if self.__DBconneciton.verifyCollection('auth'):
                 print('Auth rebuilt successfully.')
             else:
