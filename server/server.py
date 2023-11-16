@@ -95,8 +95,7 @@ class Server(): # The main server handler class
         else:
             print('Error in users, rebuilding the default users.')
             self.__DBconneciton.clearDB('users')
-            for i in self.__sampleSites:
-                self.sendToDB('users', {'url':i, 'timestamp':time.time()})
+            self.sendToDB('users', {'name':'admin', 'timestamp':time.time()})
             if self.__DBconneciton.verifyCollection('users'):
                 print('Users rebuilt successfully.')
             else:
@@ -175,7 +174,7 @@ class Server(): # The main server handler class
             bool: True/False for success/failure to update data already existing in the database
         """
         if column in self.__columns:
-            self.__DBconneciton.updateInDB(column, content, changeTo)
+            return self.__DBconneciton.updateInDB(column, content, changeTo)
         else:
             return False
 
@@ -190,7 +189,7 @@ class Server(): # The main server handler class
             bool: True/False on success/failure.
         """
         if column in self.__columns:
-            self.__DBconneciton.addToDB(column, content)
+            return self.__DBconneciton.addToDB(column, content)
         else:
             return False
 

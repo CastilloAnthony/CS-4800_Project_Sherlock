@@ -144,6 +144,7 @@ class DBConnectionAgent():
             bool: True/False on success/failure.
         """
         if self.__db != False:
+            print(query, self.__db[column].find_one(query))
             return self.__db[column].find_one(query)
         else:
             return False
