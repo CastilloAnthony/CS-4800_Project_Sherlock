@@ -29,22 +29,27 @@ class Server(): # The main server handler class
         """Closes open processes and queues and destroys all attributes of the server class
         """
         for i in self.__processes:
+            print('Process: '+i)
+            print('\tIs Alive: '+str(self.__processes[i].is_alive()))
             if self.__processes[i].is_alive():
-                print('Process Alive: '+str(self.__processes[i].is_alive()))
-                print('Joined: '+str(self.__processes[i].join(timeout=3)))
-                print('Terminated: '+str(self.__processes[i].terminate()))
+                print('\tJoined: '+str(self.__processes[i].join(timeout=3)==None))
+                print('\tTerminated: '+str(self.__processes[i].terminate()==None))
+                print('\tClosed: '+str(self.__processes[i].close()==None))
             else:
-                print('Process Alive: '+str(self.__processes[i].is_alive()))
-                #print('Joined: '+str(self.__processes[i].join(timeout=3)))
-            self.__processes[i].close()
-        self.__requestsQ.close()
-        while not self.__requestsQ.empty():
-            print('Pulled '+str(self.__requestsQ.get())+' from queue.')
-        self.__dataQ.close()
-        while not self.__dataQ.empty():
-            print('Pulled '+str(self.__dataQ.get())+' from queue.')
+                try:
+                    print('\tJoined: '+str(self.__processes[i].join(timeout=3)==None))
+                    print('\tTerminated: '+str(self.__processes[i].terminate()==None))
+                    print('\tClosed: '+str(self.__processes[i].close()==None))
+                except:
+                    print('\tClosed: '+str(self.__processes[i].close()==None))
+        print('Queue: Request')
+        print('\tClosed: '+str(self.__requestsQ.close()==None))
+        print('\tJoined: '+str(self.__requestsQ.join_thread()==None))
+        print('Queue: Data')
+        print('\tClosed: '+str(self.__dataQ.close()==None))
+        print('\tJoined: '+str(self.__dataQ.join_thread()==None))
         del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes
-
+    
     def _checkForPresets(self):
         """Checks for the existence of the preset collection within the database and creates a default one if the collection could not be verified.
         """
@@ -410,7 +415,7 @@ class Server(): # The main server handler class
     def _mainLoop(self):
         """The primary loop for the server, calls checkForRequests and pollWebsites.
         """
-        #self.test()
+        self.test()
         #self.test2()
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
         dataQTimerStart = time.time()
@@ -429,7 +434,8 @@ class Server(): # The main server handler class
         """Creates the flask app in a separate processes, starts that process, and then intiates the mainloop. 
         """
         self.__processes['app'] = mp.Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
-        self.__processes['app'].start()
+        #temp = mp.Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
+        #self.__processes['app'].start()
         self._mainLoop()
 
     def test(self):
