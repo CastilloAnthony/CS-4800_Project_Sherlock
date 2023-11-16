@@ -171,7 +171,7 @@ class MyFlaskApp:
             return 'Passwords should match'
 
         hashed = bcrypt.hashpw(password2.encode('utf-8'), bcrypt.gensalt())
-        user_input = {'name': user, 'email': email, 'id':uuid.uuid4(), 'password': hashed}
+        user_input = {'name': user, 'email': email, 'id':str(uuid.uuid4()), 'password': hashed}
         # don't have insert_user
         self.loginClass.insert_user(user_input)
         user_data = self.loginClass.find_user_by_email(email)

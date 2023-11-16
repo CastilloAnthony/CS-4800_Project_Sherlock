@@ -188,8 +188,6 @@ class Server(): # The main server handler class
         Returns:
             bool: True/False on success/failure.
         """
-        if column != 'pollingData':
-            print('SendToDB:', column, content)
         if column in self.__columns:
             return self.__DBconneciton.addToDB(column, content)
         else:
