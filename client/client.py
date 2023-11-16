@@ -158,10 +158,10 @@ class MyFlaskApp:
         
         
         # user_found= {'id': UUID('103d3cac-3fe3-4e19-bfa2-c551456d9d4a'), 'timestamp': 1700092919.792062, 'data': 'Not Yet Implemented'}
-        user_found = (user_found['data'] != 'Not Yet Implemented') #should be False if it is not
-        email_found = (email_found['data'] != 'Not Yet Implemented') #should be False if it is not
-        print('user_found',user_found)
-        print('email_found',email_found)
+        # user_found = (user_found['data'] != 'Not Yet Implemented') #should be False if it is not
+        # email_found = (email_found['data'] != 'Not Yet Implemented') #should be False if it is not
+        # print('user_found',user_found)
+        # print('email_found',email_found)
         
         if user_found:
             return 'There already is a user by that name'
@@ -175,6 +175,7 @@ class MyFlaskApp:
         # don't have insert_user
         self.loginClass.insert_user(user_input)
         user_data = self.loginClass.find_user_by_email(email)
+        print('user_data|', user_data)
         new_email = user_data['email']
         return new_email
     
