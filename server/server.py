@@ -415,7 +415,7 @@ class Server(): # The main server handler class
     def _mainLoop(self):
         """The primary loop for the server, calls checkForRequests and pollWebsites.
         """
-        self.test()
+        #self.test()
         #self.test2()
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
         dataQTimerStart = time.time()
@@ -434,8 +434,7 @@ class Server(): # The main server handler class
         """Creates the flask app in a separate processes, starts that process, and then intiates the mainloop. 
         """
         self.__processes['app'] = mp.Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
-        #temp = mp.Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
-        #self.__processes['app'].start()
+        self.__processes['app'].start()
         self._mainLoop()
 
     def test(self):
