@@ -8,6 +8,7 @@ import client.client
 from controllers.predictionModel import PredictionModel # Temporary, testing
 from controllers.graphGenerator import GraphGenerator
 from uuid import uuid4
+import bcrypt
 
 class Server(): # The main server handler class
     # Communicates with the MongoDB using DBconnection on behalf of the Clients using two multiprocessing.Queues 
@@ -87,10 +88,7 @@ class Server(): # The main server handler class
         else:
             print('Error in auth, rebuilding the default auth.')
             self.__DBconneciton.clearDB('Auth')
-
-            self.sendToDB('auth', {'name': 'admin', 'email': 'admin@admin.com', 'id':1, 'password': 12345})
-
-            self.sendToDB('auth', {'name': 'admin', 'email': 'admin@admin.com', 'id':str(uuid4()), 'password': 12345})
+            self.sendToDB('auth', {'name': 'admin', 'email': 'admin@admin.com', 'id':str(uuid4()), 'password': bcrypt.hashpw('12345'.encode('utf-8'), bcrypt.gensalt())})
             if self.__DBconneciton.verifyCollection('auth'):
                 print('Auth rebuilt successfully.')
             else:
@@ -104,7 +102,7 @@ class Server(): # The main server handler class
         else:
             print('Error in users, rebuilding the default users.')
             self.__DBconneciton.clearDB('users')
-            self.sendToDB('users', {'name':'admin', 'timestamp':time.time()})
+            self.sendToDB('users', {'id': str(uuid4()),'username':'admin', 'email':'admin@admin.com', 'creationTime':time.time(), 'websitesList':[], 'presets':[]})
             if self.__DBconneciton.verifyCollection('users'):
                 print('Users rebuilt successfully.')
             else:
