@@ -92,7 +92,7 @@ class ViewWebsite():
             temp2[url] = round(averageLatencyOfUrl,4)
         
             
-        
+        print(temp2)
         return temp2 #got rid temp1
     
     def query2(self):

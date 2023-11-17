@@ -98,8 +98,9 @@ class MyFlaskApp:
     def index(self):
         #FOR FIRST TIME LOGGIN IN
         message = ''
-        # if "email" in session:
-        #     return redirect(url_for("logged_in"))
+        if "email" in session:
+            self.curr_email = session["email"]
+            return redirect(url_for("home"))
         if request.method == "POST":
             user = request.form.get("fullname")
             email = request.form.get("email")
@@ -135,10 +136,10 @@ class MyFlaskApp:
                 if bcrypt.checkpw(password.encode('utf-8'), passwordcheck):
                     session["email"] = email_val
                     self.curr_email = email_val
-                    return redirect(url_for('logged_in'))#MAY CHANGE
+                    return redirect(url_for('home'))#MAY CHANGE
                 else:
                     if "email" in session:
-                        return redirect(url_for("logged_in"))#MAY CHANGE
+                        return redirect(url_for("home"))#MAY CHANGE
                     message = 'Wrong password'
                     return render_template('auth/login.html', message=message)
             else:
@@ -199,9 +200,11 @@ class MyFlaskApp:
     #        NORMAL ROUTING        #
     ################################
     
-    #TODO
+    #TODO: get numpy in in the query1() so it isn't as slow
     def home(self):
-        return render_template('homepage.html')
+        # please put data back in when a little quicker for debugging purposes
+        # works just fine
+        return render_template('homepage.html', email=self.curr_email) #, data=self.viewWebsiteClass.query1()
     
     #FINISHED
     def addPreset(self):
@@ -212,13 +215,13 @@ class MyFlaskApp:
         # Redirect to the /home route and render the home.html template
         return redirect(url_for('home'))
 
-    #TODO
+    #TODO: grab graphs to put into this
     def viewPreset(self):
         return render_template('viewPreset.html')
     
-    #TODO
+    #: grab graphs to put into this
     def viewWebsite(self):
-        return render_template('viewWebsite.html', data=self.viewWebsiteClass.query1())
+        return render_template('viewWebsite.html')#,data=self.viewWebsiteClass.query1()
 
     #FINISHED
     def deletePreset(self):
@@ -249,17 +252,7 @@ class MyFlaskApp:
     
     def edit(self):
         self.editPresetClass.editPreset1()
-        return """
-            <html>
-            <head>
-                <title>Edit Preset</title>
-            </head>
-            <body>
-                YOU HAVE SUCCESSFULLY DELETED A WEBSITE PRESS THIS LINK TO GET BACK TO THE HOMEPAGE
-                <a href="{}">Go to Home</a>
-            </body>
-            </html>
-            """.format(url_for('index'))
+        return redirect(url_for('home'))
 
     #FINISHED
     def addWebsite(self):
