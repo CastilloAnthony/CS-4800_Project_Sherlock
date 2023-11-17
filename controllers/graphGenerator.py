@@ -111,13 +111,15 @@ class GraphGenerator:
         website_status = self.monitorWebsite(url)
 
         #sending data to the prediction model
-        time_values, latency_values = np.array([[1,2,3], [4,5,6]])
+        '''
+        time_values = np.array([1,2,3])
+        latency_values = np.array([4,5,6])
         predictions = self.__predict.predictOnData(time_values, latency_values)
-        
+        '''
         
         plt.figure(figsize=(10, 6))
         plt.plot(time_values, latency_values, label='Latency (ms)')
-        plt.plot(predictions[0], predictions[1], label='Prediction (ms)')
+        #plt.plot(predictions[0], predictions[1], label='Prediction (ms)')
         plt.xlabel('Time')
         plt.ylabel('Latency (ms)')
         plt.title('Latency and Website Monitoring')
@@ -129,7 +131,7 @@ class GraphGenerator:
         else:
             plt.axvline(x=datetime.datetime.now(), color='red', linestyle='--', label='Website DOWN')
 
-        plt.text(datetime.datetime.now(), max(latency_values) * 0.9, f'Prediction: {predictions}', fontsize=12)
+        #plt.text(datetime.datetime.now(), max(latency_values) * 0.9, f'Prediction: {predictions}', fontsize=12)
 
         plt.legend()
         plt.show()
