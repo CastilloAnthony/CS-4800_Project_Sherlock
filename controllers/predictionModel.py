@@ -35,11 +35,14 @@ class PredictionModel():
         self.__model = False
         self.__modelFilename = 'predictionModel.keras'
         self.__size = 0
+        self.__train_ds = False
+        self.__val_ds = False
+        self.__test_ds = False
 
     def __del__(self):
         """_summary_
         """
-        del self.__timestampData, self.__latencyData, self.__model, self.__modelFilename, self.__size
+        del self.__train_data, self.__val_data, self.__test_data, self.__model, self.__modelFilename, self.__size, self.__train_ds, self.__val_ds, self.__test_ds
 
     def requestData(self, request): # Not Used, data should be passed to this class instead
         """_summary_
@@ -74,7 +77,7 @@ class PredictionModel():
         self.__model = tf.keras.Sequential([
             #tf.keras.layers.Lambda(lambda x: x[:, -11:, :]),
             #tf.keras.Input(shape=(int(self.__size*0.7))), #, int(self.__size*0.7))),
-            tf.keras.layers.Reshape((int(self.__size*0.7*0.5), 2), input_shape=(int(self.__size*0.7),)),# dtype=tf.float32), # int(int(self.__size*0.7)//(self.__size*0.7*0.5))
+            #tf.keras.layers.Reshape((int(self.__size*0.7*0.5), 2), input_shape=(int(self.__size*0.7),)),# dtype=tf.float32), # int(int(self.__size*0.7)//(self.__size*0.7*0.5))
             tf.keras.layers.Dense(8, activation='relu'),# input_shape=(32,)),#(self.__size*0.7), 2)),
             tf.keras.layers.Dense(4, activation='relu'), #input_shape=(int(self.__size*0.7), 2)),
             tf.keras.layers.Dense(1, activation='relu')#, input_shape=(int(self.__size*0.7), 2))
@@ -82,10 +85,10 @@ class PredictionModel():
         #loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)
         self.__model.compile(optimizer='adam', loss='mse')#'sparse_categorical_crossentropy')#'mse')#loss_fn,)
         #print(len(self.__model.weights))
-        print(self.__model.get_config())
-        self.__model.build()
+        #print(self.__model.get_config())
+        self.__model.build(input_shape=(32, 1,))
         self.__model.summary()
-        print("Model Input Shape:", self.__model.input_shape)
+        #print("Model Input Shape:", self.__model.input_shape)
         '''
         Image Model Example
         self.__model = tf.keras.Sequential([
@@ -114,7 +117,7 @@ class PredictionModel():
         """
         try:
             self.__model.summary()
-            self.__modle.save(self.__modelFilename)
+            self.__model.save(self.__modelFilename)
         except:
             print('Could not save prediction model.')
 
@@ -156,14 +159,20 @@ class PredictionModel():
         tempDataX = data[0] # Timestamp
         tempDataY = data[1] # Latency
 
+        for i, v in enumerate(tempDataX):
+            if np.isnan(v):
+                print(i, v)
+                tempDataX = np.delete(tempDataX, i)
+                tempDataY = np.delete(tempDataY, i)
+
         self.__size = len(tempDataX)
-        print('Starting Size: ', self.__size, int(self.__size*0.7))
+        #print('Starting Size: ', self.__size, int(self.__size*0.7))
         while self.isOdd(int(self.__size*0.7)):
             tempDataX = np.delete(tempDataX, 0, None)
             tempDataY = np.delete(tempDataY, 0, None)
             self.__size = len(tempDataX)
             print(self.__size, int(self.__size*0.7))
-        print('Ending Size: ', self.__size, int(self.__size*0.7))
+        #print('Ending Size: ', self.__size, int(self.__size*0.7))
         #tempData = np.vstack((tempDataX, tempDataY))
         for i in tempDataY:
             #print(i)
@@ -192,10 +201,10 @@ class PredictionModel():
         self.__val_data = np.vstack((val_dataX, val_dataY))
         self.__test_data = np.vstack((test_dataX, test_dataY))
         
-        print('Training Data:\n', self.__train_data)
-        print('Validation Data:\n', self.__val_data)
-        print('Test Data:\n', self.__test_data)
-        print('Length: ', self.__size, '70%: ', int(self.__size*0.7), ' ', 'Mean: ', train_mean, ' ', 'STD: ', train_std)
+        # print('Training Data:\n', self.__train_data)
+        # print('Validation Data:\n', self.__val_data)
+        # print('Test Data:\n', self.__test_data)
+        # print('Length: ', self.__size, '70%: ', int(self.__size*0.7), ' ', 'Mean: ', train_mean, ' ', 'STD: ', train_std)
 
         self.__train_data[1] = (self.__train_data[1] - train_mean) / train_std
         self.__val_data[1] = (self.__val_data[1] - train_mean) / train_std
@@ -203,31 +212,40 @@ class PredictionModel():
         # print('Training Data:\n', train_data)
         # print('Validation Data:\n', val_data)
         # print('Test Data:\n', test_data)
-        print(tf.shape(self.__train_data[0]))
-        '''
-        self.__train_ds = tf.keras.utils.timeseries_dataset_from_array(
-            data=train_data[1],
-            targets=train_data[0],
-            sequence_length=train_data.size+60*3,
-            sequence_stride=1,
-            shuffle=False,
-            batch_size=32
-        )
-        self.__val_ds = tf.keras.utils.timeseries_dataset_from_array(
-            data=val_data[1],
-            targets=val_data[0],
-            sequence_length=val_data.size+60*3,
-            sequence_stride=1,
-            shuffle=False,
-            batch_size=32
-        )
-        '''
-        #print(train_ds)
-        print('Shape of train_data:', tf.shape(self.__train_data))
+        #print(tf.shape(self.__train_data[0]))
+        
+        # self.__train_ds = tf.keras.utils.timeseries_dataset_from_array(
+        #     data=self.__train_data[1],
+        #     targets=self.__train_data[0],
+        #     sequence_length=int(self.__train_data.size*0.7),
+        #     sequence_stride=1,
+        #     shuffle=False,
+        #     batch_size=32
+        # )
+        # self.__val_ds = tf.keras.utils.timeseries_dataset_from_array(
+        #     data=self.__val_data[1],
+        #     targets=self.__val_data[0],
+        #     sequence_length=int(self.__val_data.size*0.9-self.__val_ds*0.7),
+        #     sequence_stride=1,
+        #     shuffle=False,
+        #     batch_size=32
+        # )
+
+        # self.__train_ds = tf.data.Dataset.from_tensor_slices((self.__train_data[1], self.__train_data[0]))
+        # self.__val_ds = tf.data.Dataset.from_tensor_slices((self.__val_data[1], self.__val_data[0]))
+
+        #self.__train_ds = tf.data.Dataset.from_tensor_slices((self.__train_data[1], self.__train_data[0]))
+        #self.__val_ds = tf.data.Dataset.from_tensor_slices((self.__val_data[1], self.__val_data[0]))
+        #self.__test_ds = tf.data.Dataset.from_tensor_slices((self.__test_data[1], self.__test_data[0]))
+        
+        #print('Shape of train_data:', tf.shape(self.__train_data))
+        #print('Cardinality of Train_ds:', tf.data.experimental.cardinality(self.__train_ds))
+        
+        #print('Shape of train_ds:', tf.shape(self.__train_ds))
         #print(train_ds, val_ds)
         #train_latency = self.__data['latency'] - train_mean / train_std
         #val_latency = tf.keras.utils.timeseries_dataset_from_array()
-        print(len(self.__train_data), len(self.__train_data[0]), len(self.__train_data[1]))
+        #print(len(self.__train_data), len(self.__train_data[0]), len(self.__train_data[1]))
 
     def clearData(self):
         """Empties the data that is currently stored by the model
@@ -266,10 +284,12 @@ class PredictionModel():
         """
         #https://www.tensorflow.org/tutorials/structured_data/time_series
 
+        #print('Training Data:', self.__train_data[1], self.__train_data[0])
         for i in range(iterations):
             self.__model.fit(
-                self.__train_data[1],
+                #self.__train_ds,
                 self.__train_data[0],
+                self.__train_data[1],
                 #self.__train_ds,
                 validation_data=(self.__val_data[0], self.__val_data[1]),
                 #validation_data=self.__val_ds,
@@ -277,6 +297,10 @@ class PredictionModel():
                 epochs=1
                 )
             #self.__model.fit(self.__data['latency'], self.__data['timestamp'], batch_size=32)
+        self.__model.evaluate(
+            self.__test_data[0],
+            self.__test_data[1]
+        )
         self.saveModel()
 
     def predictOnData(self, data:np.array, iterations:int=3, predictions:int=180):
