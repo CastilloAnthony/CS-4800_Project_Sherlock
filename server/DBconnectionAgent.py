@@ -120,7 +120,6 @@ class DBConnectionAgent():
         #     { _id: <ObjectId("your_document_id")> },
         #     { $pull: { 'websiteLists': "<removedWebsite>" } }
         # );
-        print('hi')
         if self.__db != False:
             return self.__db[column].update_one(
                 query,
@@ -247,5 +246,26 @@ class DBConnectionAgent():
             # return self.__db[column].update_one(query, {"$set":changeTo}).acknowledged
         else:
             return False
+        
+    def update2(self, column:str, query:dict, old:dict, changeTo:dict):
+        # Define the filter to identify the document and element to update
+        filter_criteria = {
+            '_id': query,
+            'presets': {
+                '$elemMatch': {
+                    'name': old['name']
+                }
+            }
+        }
+
+        # Define the update operation
+        update_operation = {
+            '$set': {
+                'presets.$.name': changeTo['name'],
+                'presets.$.presetLists': changeTo['presetLists'],
+                'presets.$.timestamp': changeTo['timestamp']
+            }
+        }
+        self.__db[column].update_one(filter_criteria, update_operation)
 
 #end DBConnecitonAgent

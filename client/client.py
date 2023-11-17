@@ -245,6 +245,7 @@ class MyFlaskApp:
 
     #TODO
     def editPreset(self):
+        self.editPresetClass.getEmail(self.curr_email)
         return render_template('EditPreset.html', presets=self.editPresetClass.query())
     
     def newEditedPreset(self):

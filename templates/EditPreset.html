@@ -14,13 +14,31 @@
                     Need a name for the respective preset so the user knows what to ask for later
                     Make it easier to recall for them. 
                 -->
-                
+                <!--
+                'data': 
+                {
+                    '_id': ObjectId('65565327c3a6e4404edd07d9'), 
+                    'id': 'ee76936a-d4b0-4050-986d-b4a71041138b', 
+                    'username': 'ca', 
+                    'email': 'ca', 
+                    'websitesList': [
+                        'https://www.youtube.com/watch?v=fU-hbVHNrzo', 'https://www.emuparadise.me/roms-isos-games.php'
+                        ], 
+                    'presets': [
+                        {
+                            'name': 'Big Ben', 
+                            'presetLists': ['www.google.com', 'www.instagram.com', 'chat.openai.com', 'www.reddit.com'], 
+                            'timestamp': 1700174848.542619
+                        }
+                    ]
+                }
+
+                -->
+                {{presets}}
                 <div style="background:black;color:white;">FROM THIS LIST PICK WHICH ONES YOU WOULD LIKE TO EDIT</div>
                 <br><br>
-                {% for item in presets['data'] %}
-                    
-                    <input type="checkbox" name="selected_option[]" value="{{ item }}"> {{ item['name'] }}<br>{{item['presetLists']}}<br>
-                    
+                {% for item in presets['presets'] %}<!--data['presets'] == presets[presets]-->
+                    <input type="checkbox" name="selected_option[]" value="{{ item }}"> {{ item['name'] }}<br>{{item['presetLists']}} || timestamp: {{item['timestamp']}}<br>
                 {% endfor %}
                 <input type="submit" value="Submit">
             </form>

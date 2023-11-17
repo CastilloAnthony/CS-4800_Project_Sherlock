@@ -37,14 +37,16 @@ class EditPreset(): # Controller
     
     def query(self):
         #ASKING
-        presetRequest = {
+        print(self.curr_email)
+        userRequest = {
             'id': uuid.uuid4(),
             'request_type': 'request',
             'column': 'users', 
-            'query': {}
+            'query': {"email":self.curr_email}
         }
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT
-        temp = self.requestData(presetRequest)
+        temp = self.requestData(userRequest)['data']
+        print(temp)
         return temp
     
     def query1(self):
@@ -89,6 +91,7 @@ class EditPreset(): # Controller
         
         preset_to_be_changed = request.form['selected_option[]']
         
+        print(preset_to_be_changed) #Big Ben: name of one of the presetLists
         preset_to_be_changed = self.parseStringToDict(preset_to_be_changed)
         self.old.append(preset_to_be_changed)
         #return this and on the next page show this up top as a reference to what it is currently
@@ -103,16 +106,27 @@ class EditPreset(): # Controller
         newDictionary = {
             'name':name,
             'presetLists':urlList,
+            'timestamp': time.time()
         }
+        # I want to make it so when they give me a new name
+        # and a new presetsList I will simply remove the old 
+        # list, grab the new list, and insert the new list in for 
+        # where the old list lived, I will do the same thing for 
+        # name as well
+        
+        
+        
         presetRequest = {
             'id': uuid.uuid4(),
             'request_type': 'update',
-            'column': 'presets', 
+            'column': 'users', 
             #filter_criteria = {"_id": ObjectId("your-document-id")}
-            'query': {'_id': ObjectId(str(preset_to_be_changed['_id']))},
+            'query': {'email':self.curr_email},
             'changeTo': newDictionary
         }
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT
         temp = self.requestData(presetRequest)
+        #reassigning self.old so that it will be fresh for next edit
+        self.old = []
         return temp
 #end AddPreset
