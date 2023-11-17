@@ -1,5 +1,5 @@
 # CHRISTIAN
-from flask import Flask, render_template, request, url_for, redirect, session, jsonify
+from flask import Flask, render_template, request, url_for, redirect, session, flash, jsonify
 
 import uuid
 import time
@@ -94,6 +94,7 @@ class MyFlaskApp:
     ################################
     #        AUTH ROUTING          #
     ################################
+    #FINISHED
     def index(self):
         #FOR FIRST TIME LOGGIN IN
         message = ''
@@ -115,7 +116,7 @@ class MyFlaskApp:
                 message = result
                 return render_template('auth/index.html', message=message)
         return render_template('auth/index.html')
-    
+    #FINISHED
     def login(self):
         message = 'Please login to your account'
         # if "email" in session:
@@ -144,7 +145,7 @@ class MyFlaskApp:
                 message = 'Email not found'
                 return render_template('auth/login.html', message=message)
         return render_template('auth/login.html', message=message)
-
+    #FINISHED
     def logged_in(self):
         if "email" in session:
             email = session["email"]
@@ -153,7 +154,7 @@ class MyFlaskApp:
             return render_template('homepage.html', email=email)#changed from auth/logged_in.html
         else:
             return redirect(url_for("login"))
-        
+    #FINISHED
     def register_user(self, user, email, password1, password2):
         # don't have user_database will need to to a query and find_user_by_email as well as name
         user_found = self.loginClass.find_user_by_name(user) 
@@ -182,7 +183,7 @@ class MyFlaskApp:
         new_email = user_data['email']
         return new_email
     
-    #NOT REALLY USING THIS
+    #NOT REALLY USING THIS: #FINISHED
     def logout(self):
         if "email" in session:
             session.pop("email", None)
@@ -208,7 +209,8 @@ class MyFlaskApp:
 
     def newAddedPreset(self):
         self.addPresetClass.addPreset()
-        return "YOU HAVE SUCCESSFULLY ADDED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='home'>Visit Homepage</a>"
+        # Redirect to the /home route and render the home.html template
+        return redirect(url_for('home'))
 
     #TODO
     def viewPreset(self):
@@ -218,23 +220,26 @@ class MyFlaskApp:
     def viewWebsite(self):
         return render_template('viewWebsite.html', data=self.viewWebsiteClass.query1())
 
-    #FINISHED
+    #TODO
     def deletePreset(self):
+        self.deletePresetClass.getEmail(self.curr_email)
         return render_template('DeletePreset.html', presets=self.deletePresetClass.query()['data'])
 
     def newDeletedPreset(self):
-        self.deletePresetClass.deletePreset()
+        # self.deletePresetClass.deletePreset()
         return "YOU HAVE SUCCESSFULLY ADDED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='home'>Visit Homepage</a>"
 
     #FINISHED
     def deleteWebsite(self):
+        self.deleteWebsiteClass.getEmail(self.curr_email)
         return render_template('DeleteWebsite.html', masterList = self.deleteWebsiteClass.query())
     
     def newDeletedWebsite(self):
         self.deleteWebsiteClass.deleteWebsite()
-        return "YOU HAVE SUCCESSFULLY DELETED A WEBSITE PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='home'>Visit Homepage</a>"
+        # Redirect to the /home route and render the home.html template
+        return redirect(url_for('home'))
 
-    #FINISHED
+    #TODO
     def editPreset(self):
         return render_template('EditPreset.html', presets=self.editPresetClass.query())
     
@@ -257,20 +262,21 @@ class MyFlaskApp:
 
     #FINISHED
     def addWebsite(self):
+        self.addWebsiteClass.getEmail(self.curr_email)
         return render_template('AddWebsite.html')
     
     def newAddedWebsite(self):
         self.addWebsiteClass.addWebsite()
-        return "YOU HAVE SUCCESSFULLY ADDED A WEBSITE, PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='home'>Visit Homepage</a>"
+        # Redirect to the /home route and render the home.html template
+        return redirect(url_for('home'))
 
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
     ################################
     #      TECHNICAL FUNCTIONS     #
     ################################

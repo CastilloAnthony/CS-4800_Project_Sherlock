@@ -49,11 +49,6 @@ class AddPreset(): # Controller
     def getEmail(self, email):
         self.curr_email = email
     
-    # ValueError: cannot encode native uuid.UUID with UuidRepresentation.UNSPECIFIED. 
-    # UUIDs can be manually converted to bson.Binary instances using bson.Binary.from_uuid() 
-    # or a different UuidRepresentation can be configured. See the documentation for 
-    # UuidRepresentation for more information.
-    
     #FIGURE OUT HOW TO GRAB curr_email
     def getCurrentUser(self):
         """_summary_
@@ -65,7 +60,7 @@ class AddPreset(): # Controller
                     id: uuid.uuid4()
                     password: hashed password
         """
-        print(self.curr_email) 
+        # print(self.curr_email) 
         #ca
         
         grabAuthThroughEmail = {
@@ -75,8 +70,9 @@ class AddPreset(): # Controller
             'query': {"email":self.curr_email}
         }
         temp = self.requestData(grabAuthThroughEmail)
-        print(temp)
-        #{'id': UUID('18938276-4528-4865-922d-d6f0673adab9'), 
+        
+        #temp = 
+        # {'id': UUID('18938276-4528-4865-922d-d6f0673adab9'), 
         # 'timestamp': 1700172860.5806377, 
         # 'data': {'_id': ObjectId('65565326c3a6e4404edd07d8'), 
         # 'name': 'ca', 
@@ -93,16 +89,6 @@ class AddPreset(): # Controller
         name = request.form['name'] #WE HAVE THIS
         #maybe once logged in client should send the email to each of the controllers
         
-        # grabPresetsList = {
-        #     'id': uuid.uuid4(),
-        #     'request_type': 'request',
-        #     'column': 'users',
-        #     'query': {"email":self.curr_email}
-        # }
-        # temp = self.requestData(grabPresetsList)
-        # Assuming this gives me empty list to start
-        # if it isn't an empty list it should still
-        # append toward the end
         parser = self.getCurrentUser()
         
         
@@ -140,7 +126,7 @@ class AddPreset(): # Controller
             'request_type': 'update',
             'column': 'users', 
             #filter_criteria = {"_id": ObjectId("your-document-id")}
-            'query': {'_id': identifier},#GOOD
+            'query': {'id': identifier},#GOOD
             'changeTo':  {'presets':addition} #GOOD?
         }
         print(self.requestData(presetUpdate))
