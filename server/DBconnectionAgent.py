@@ -105,7 +105,8 @@ class DBConnectionAgent():
         else:
             return False
 
-    def removeFromDB(self, column:str, query:dict):
+    def removeFromDB(self, column:str, query:dict, remove:dict):
+        #C.A.
         """Removes the first instance of an entry, within the column, that matches the inputted query.
 
         Args:
@@ -115,8 +116,16 @@ class DBConnectionAgent():
         Returns:
             bool: True/False on success/failure.
         """
+        # db.yourCollection.update_one(
+        #     { _id: <ObjectId("your_document_id")> },
+        #     { $pull: { 'websiteLists': "<removedWebsite>" } }
+        # );
         if self.__db != False:
-            return self.__db[column].delete_one(query).acknowledged
+            return self.__db[column].update_one(
+                query,
+                {'$pull': remove}
+            )
+            #return self.__db[column].delete_one(query).acknowledged
         else:
             return False
 

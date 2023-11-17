@@ -239,7 +239,7 @@ class Server(): # The main server handler class
         else:
                 return False
 
-    def removeFromDB(self, column:str, query:dict):
+    def removeFromDB(self, column:str, query:dict, remove:dict):
         """Removes the first entry from the database in the specified collection that matches the given query. 
 
         Args:
@@ -250,7 +250,7 @@ class Server(): # The main server handler class
             bool: True/False on success/failure.
         """
         if column in self.__columns:
-            return self.__DBconneciton.removeFromDB(column, query)
+            return self.__DBconneciton.removeFromDB(column, query, remove)
         else:
             return False
 
@@ -339,7 +339,7 @@ class Server(): # The main server handler class
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':'Not Yet Implemented'})
                 elif newRequest['column'] in 'users':
                     if isinstance(newRequest['query'], dict):
-                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestFromDB(newRequest['column'], newRequest['query'])})
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestFromDB(newRequest['column'], newRequest['query'])})#C.A.
                 elif newRequest['column'] in 'auth':
                     self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestFromDB(newRequest['column'], newRequest['query'])})
                     #temp = self.requestFromDB(newRequest['column'], )
@@ -365,7 +365,7 @@ class Server(): # The main server handler class
                     self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.sendToDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'remove':
                 if newRequest['column'] in self.__columns: # For all removals of data, might not be good, but works
-                    self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.removeFromDB(newRequest['column'], newRequest['query'])})
+                    self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.removeFromDB(newRequest['column'], newRequest['query'], newRequest['changeTo'])}) #C.A. up
             elif newRequest['request_type'] == 'setting': # For changing settings such as the polling speed of the server
                 self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self._changeSettings(newRequest['column'], newRequest['changeTo'])})
             elif newRequest['request_type'] == 'update':
