@@ -29,8 +29,9 @@ class PredictionModel():
     """_summary_
     """
     def __init__(self):
-        self.__timestampData = False
-        self.__latencyData = False
+        self.__train_data = False
+        self.__val_data = False
+        self.__test_data = False
         self.__model = False
         self.__modelFilename = 'predictionModel.keras'
         self.__size = 0
@@ -171,14 +172,69 @@ class PredictionModel():
         #print(tempDataY*100)
         #print(np.nanmean(tempDataY), np.nanstd(tempDataY))
         #print(tempDataY.mean(), tempDataY.std())
-        self.__timestampData = tempDataX
-        self.__latencyData = tempDataY
+        timestampData = tempDataX
+        latencyData = tempDataY
+
+        # Timestamp
+        train_dataX = timestampData[0:int(self.__size*0.7)]
+        val_dataX = timestampData[int(self.__size*0.7):int(self.__size*0.9)]
+        test_dataX = timestampData[int(self.__size*0.9):]
+
+        # Latency
+        train_dataY = latencyData[0:int(self.__size*0.7)]
+        val_dataY = latencyData[int(self.__size*0.7):int(self.__size*0.9)]
+        test_dataY = latencyData[int(self.__size*0.9):]
+
+        train_mean = np.nanmean(train_dataY)
+        train_std = np.nanstd(train_dataY)
+
+        self.__train_data = np.vstack((train_dataX, train_dataY))
+        self.__val_data = np.vstack((val_dataX, val_dataY))
+        self.__test_data = np.vstack((test_dataX, test_dataY))
+        
+        print('Training Data:\n', self.__train_data)
+        print('Validation Data:\n', self.__val_data)
+        print('Test Data:\n', self.__test_data)
+        print('Length: ', self.__size, '70%: ', int(self.__size*0.7), ' ', 'Mean: ', train_mean, ' ', 'STD: ', train_std)
+
+        self.__train_data[1] = (self.__train_data[1] - train_mean) / train_std
+        self.__val_data[1] = (self.__val_data[1] - train_mean) / train_std
+        self.__test_data[1] = (self.__test_data[1] - train_mean) / train_std
+        # print('Training Data:\n', train_data)
+        # print('Validation Data:\n', val_data)
+        # print('Test Data:\n', test_data)
+        print(tf.shape(self.__train_data[0]))
+        '''
+        self.__train_ds = tf.keras.utils.timeseries_dataset_from_array(
+            data=train_data[1],
+            targets=train_data[0],
+            sequence_length=train_data.size+60*3,
+            sequence_stride=1,
+            shuffle=False,
+            batch_size=32
+        )
+        self.__val_ds = tf.keras.utils.timeseries_dataset_from_array(
+            data=val_data[1],
+            targets=val_data[0],
+            sequence_length=val_data.size+60*3,
+            sequence_stride=1,
+            shuffle=False,
+            batch_size=32
+        )
+        '''
+        #print(train_ds)
+        print('Shape of train_data:', tf.shape(self.__train_data))
+        #print(train_ds, val_ds)
+        #train_latency = self.__data['latency'] - train_mean / train_std
+        #val_latency = tf.keras.utils.timeseries_dataset_from_array()
+        print(len(self.__train_data), len(self.__train_data[0]), len(self.__train_data[1]))
 
     def clearData(self):
         """Empties the data that is currently stored by the model
         """
-        self.__timestampData = False
-        self.__latencyData = False
+        self.__train_data = False
+        self.__val_data = False
+        self.__test_data = False
 
     def clearModel(self):
         """Resets the model back to a skeleton model (i.e., no training.)
@@ -210,67 +266,13 @@ class PredictionModel():
         """
         #https://www.tensorflow.org/tutorials/structured_data/time_series
 
-        # Timestamp
-        train_dataX = self.__timestampData[0:int(self.__size*0.7)]
-        val_dataX = self.__timestampData[int(self.__size*0.7):int(self.__size*0.9)]
-        test_dataX = self.__timestampData[int(self.__size*0.9):]
-
-        # Latency
-        train_dataY = self.__latencyData[0:int(self.__size*0.7)]
-        val_dataY = self.__latencyData[int(self.__size*0.7):int(self.__size*0.9)]
-        test_dataY = self.__latencyData[int(self.__size*0.9):]
-
-        train_mean = np.nanmean(train_dataY)
-        train_std = np.nanstd(train_dataY)
-
-        train_data = np.vstack((train_dataX, train_dataY))
-        val_data = np.vstack((val_dataX, val_dataY))
-        test_data = np.vstack((test_dataX, test_dataY))
-        
-        print('Training Data:\n', train_data)
-        print('Validation Data:\n', val_data)
-        print('Test Data:\n', test_data)
-        print('Length: ', self.__size, '70%: ', int(self.__size*0.7), ' ', 'Mean: ', train_mean, ' ', 'STD: ', train_std)
-
-        train_data[1] = (train_data[1] - train_mean) / train_std
-        val_data[1] = (val_data[1] - train_mean) / train_std
-        test_data[1] = (test_data[1] - train_mean) / train_std
-
-        # print('Training Data:\n', train_data)
-        # print('Validation Data:\n', val_data)
-        # print('Test Data:\n', test_data)
-        print(tf.shape(train_data[0]))
-        '''
-        train_ds = tf.keras.utils.timeseries_dataset_from_array(
-            data=train_data[1],
-            targets=train_data[0],
-            sequence_length=train_data.size+60*3,
-            sequence_stride=1,
-            shuffle=False,
-            batch_size=32
-        )
-        val_ds = tf.keras.utils.timeseries_dataset_from_array(
-            data=val_data[1],
-            targets=val_data[0],
-            sequence_length=val_data.size+60*3,
-            sequence_stride=1,
-            shuffle=False,
-            batch_size=32
-        )
-        '''
-        #print(train_ds)
-        print('Shape of train_data:', tf.shape(train_data))
-        #print(train_ds, val_ds)
-        #train_latency = self.__data['latency'] - train_mean / train_std
-        #val_latency = tf.keras.utils.timeseries_dataset_from_array()
-        print(len(train_data), len(train_data[0]), len(train_data[1]))
         for i in range(iterations):
             self.__model.fit(
-                train_data[1],
-                train_data[0],
-                #train_ds,
-                validation_data=(val_data[0], val_data[1]),
-                #validation_data=val_ds,
+                self.__train_data[1],
+                self.__train_data[0],
+                #self.__train_ds,
+                validation_data=(self.__val_data[0], self.__val_data[1]),
+                #validation_data=self.__val_ds,
                 batch_size=32,
                 epochs=1
                 )
