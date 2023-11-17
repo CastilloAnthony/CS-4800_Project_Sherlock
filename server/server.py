@@ -24,6 +24,7 @@ class Server(): # The main server handler class
         self.__requestsQ = mp.Queue(maxsize=1000000) # The request queue, only a clinet will put to this queue
         self.__dataQ = mp.Queue(maxsize=1000000) # The request queue, only the server will put to this queue
         self.__processes = {} # Process handles identifiers and handles for all processes created by the server
+        self.__adminID = False
         self._setupDBConnection()
 
     def __del__(self): # WIP
@@ -49,7 +50,7 @@ class Server(): # The main server handler class
         print('Queue: Data')
         print('\tClosed: '+str(self.__dataQ.close()==None))
         print('\tJoined: '+str(self.__dataQ.join_thread()==None))
-        del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes
+        del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes, self.__adminID
     
     def _checkForPresets(self):
         """Checks for the existence of the preset collection within the database and creates a default one if the collection could not be verified.
@@ -88,7 +89,9 @@ class Server(): # The main server handler class
         else:
             print('Error in auth, rebuilding the default auth.')
             self.__DBconneciton.clearDB('Auth')
-            self.sendToDB('auth', {'name': 'admin', 'email': 'admin@admin.com', 'id':str(uuid4()), 'password': bcrypt.hashpw('12345'.encode('utf-8'), bcrypt.gensalt())})
+            if self.__adminID == False:
+                self.__adminID = str(uuid4())
+            self.sendToDB('auth', {'name': 'admin', 'email': 'admin@admin.com', 'id':self.__adminID, 'password': bcrypt.hashpw('12345'.encode('utf-8'), bcrypt.gensalt())})
             if self.__DBconneciton.verifyCollection('auth'):
                 print('Auth rebuilt successfully.')
             else:
@@ -102,7 +105,9 @@ class Server(): # The main server handler class
         else:
             print('Error in users, rebuilding the default users.')
             self.__DBconneciton.clearDB('users')
-            self.sendToDB('users', {'id': str(uuid4()),'username':'admin', 'email':'admin@admin.com', 'creationTime':time.time(), 'websitesList':[], 'presets':[]})
+            if self.__adminID == False:
+                self.__adminID = str(uuid4())
+            self.sendToDB('users', {'id':self.__adminID,'username':'admin', 'email':'admin@admin.com', 'creationTime':time.time(), 'websitesList':[], 'presets':[]})
             if self.__DBconneciton.verifyCollection('users'):
                 print('Users rebuilt successfully.')
             else:
