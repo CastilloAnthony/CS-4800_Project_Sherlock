@@ -112,8 +112,8 @@ class GraphGenerator:
         website_status = self.monitorWebsite(url)
 
         #sending data to the prediction model
-        input_data = np.array([[1,2,3], [4,5,6]])
-        predictions = self.__predict.predictOnData(input_data) #change None to np arrary 
+        time_values, latency_values = np.array([[1,2,3], [4,5,6]])
+        predictions = self.__predict.predictOnData(time_values, latency_values) #change None to np arrary 
         
         
         plt.figure(figsize=(10, 6))
