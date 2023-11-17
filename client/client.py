@@ -204,6 +204,7 @@ class MyFlaskApp:
     def home(self):
         # please put data back in when a little quicker for debugging purposes
         # works just fine
+        print(self.viewWebsiteClass.query1())
         return render_template('homepage.html', email=self.curr_email) #, data=self.viewWebsiteClass.query1()
     
     #FINISHED
