@@ -120,3 +120,5 @@ class ViewWebsite():
 
     def viewWebsite(self):
         pass
+
+    ## new function to display graph from graphGenerator
