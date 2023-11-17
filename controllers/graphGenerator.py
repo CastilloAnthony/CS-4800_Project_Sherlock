@@ -105,20 +105,21 @@ class GraphGenerator:
 
             time.sleep(15) #recounts every 15 seconds
 
-# generate two separate
     def generate_graph(self, url, duration=300, interval=15):
         time_values, latency_values = self.latency(psutil.net_io_counters(), duration, interval)
 
         website_status = self.monitorWebsite(url)
 
         #sending data to the prediction model
-        time_values, latency_values = np.array([[1,2,3], [4,5,6]])
-        predictions = self.__predict.predictOnData(time_values, latency_values) #change None to np arrary 
-        
+        '''
+        time_values = np.array([1,2,3])
+        latency_values = np.array([4,5,6])
+        predictions = self.__predict.predictOnData(time_values, latency_values)
+        '''
         
         plt.figure(figsize=(10, 6))
         plt.plot(time_values, latency_values, label='Latency (ms)')
-        plt.plot(predictions[0], predictions[1], label='Prediction (ms)')
+        #plt.plot(predictions[0], predictions[1], label='Prediction (ms)')
         plt.xlabel('Time')
         plt.ylabel('Latency (ms)')
         plt.title('Latency and Website Monitoring')
@@ -130,7 +131,7 @@ class GraphGenerator:
         else:
             plt.axvline(x=datetime.datetime.now(), color='red', linestyle='--', label='Website DOWN')
 
-        plt.text(datetime.datetime.now(), max(latency_values) * 0.9, f'Prediction: {predictions}', fontsize=12)
+        #plt.text(datetime.datetime.now(), max(latency_values) * 0.9, f'Prediction: {predictions}', fontsize=12)
 
         plt.legend()
         plt.show()
