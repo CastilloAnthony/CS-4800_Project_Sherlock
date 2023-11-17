@@ -9,6 +9,7 @@ class EditPreset(): # Controller
     def __init__(self, requestQ, dataQ):
         self.__requestQ, self.__dataQ = requestQ, dataQ
         self.old = []
+        self.curr_email = ''
 
     def __del__(self):
         pass
@@ -31,12 +32,15 @@ class EditPreset(): # Controller
             else:
                 self.__dataQ.put(newData)
 
+    def getEmail(self, email):
+        self.curr_email = email
+    
     def query(self):
         #ASKING
         presetRequest = {
             'id': uuid.uuid4(),
             'request_type': 'request',
-            'column': 'presets', #Cannot get presets yet {'id': UUID('575b1827-40da-4141-b2fe-af951dd7a518'), 'timestamp': 1698523276.91872, 'data': 'Not Yet Implemented'}
+            'column': 'users', 
             'query': {}
         }
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT

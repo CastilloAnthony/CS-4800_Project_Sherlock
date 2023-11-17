@@ -1,5 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1  style="text-align:center;color:white;">HOMEPAGE</h1><br>
+    <h1  style="text-align:center;color:white;">WELCOME HOME {{email}}</h1><br>
+    <br>
+    <!--<div style="text-align:center;color:white;">
+        AVERAGE LATENCY OVER THE LAST MINUTE
+        <table style="margin-left:auto;margin-right:auto;text-align:left">
+            <thead>
+                <tr>
+                    <th>URL</th>
+                    <th></th>
+                    <th>Latency</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                <tr>
+                    <td>{{ url }} </td> 
+                    <td>-</td>
+                    <td>{{ value }}</td>
+                    <td>ms</td>
+                </tr>
+                
+            </tbody>
+        </table>
+    
+    </div>
+    -->
 {% endblock %}
