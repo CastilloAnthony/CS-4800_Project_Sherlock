@@ -2,6 +2,7 @@
 import uuid
 import time
 from flask import Flask, render_template, request
+import numpy as np
 
 class ViewWebsite():
     def __init__(self, requestQ, dataQ):
@@ -30,6 +31,7 @@ class ViewWebsite():
                 self.__dataQ.put(newData)
 
     def query1(self):
+        #Modified by Anthony Castillo
         #ASKING
         Request1 = {
             'id': uuid.uuid4(),
@@ -54,6 +56,7 @@ class ViewWebsite():
         # 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com']}
         temp2 = {}
         for url in temp1['data']:
+            tempNPArray = np.empty(1)
             Request2 = {
                 'id': uuid.uuid4(),
                 'request_type': 'request',
@@ -74,25 +77,14 @@ class ViewWebsite():
                     tempData = self.requestData(Request2)
                 else:
                     tempUrl = tempData
-            x = 0
-            y = len(tempUrl['data'])
-            nanCount = 0
-            for doc in tempUrl['data']:
-                if isinstance(doc['latency'], float) or isinstance(doc['latency'], int):
-                    x += doc['latency']
-                else:
-                    nanCount += 1
-            try:
-                averageLatencyOfUrl = (x/(y-nanCount)) * 1000
-            except ZeroDivisionError:
-                if y != 0:
-                    averageLatencyOfUrl = x/y * 1000
-                else:
-                    averageLatencyOfUrl = x *1000
-            temp2[url] = round(averageLatencyOfUrl,4)
-        
             
-        print(temp2)
+            for doc in tempUrl['data']:
+                tempNPArray = np.append(tempNPArray, doc['latency'])
+            
+            #print(tempNPArray)
+            temp2[url] = round(np.nanmean(tempNPArray), 4)
+            
+        #print(temp2)
         return temp2 #got rid temp1
     
     def query2(self):
