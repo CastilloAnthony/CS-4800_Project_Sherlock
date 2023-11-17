@@ -5,46 +5,53 @@ import socket
 import numpy as np
 from server.DBconnectionAgent import DBConnectionAgent
 import client.client 
-import webbrowser
 from controllers.predictionModel import PredictionModel # Temporary, testing
 from controllers.graphGenerator import GraphGenerator
-import pandas as pd
+from uuid import uuid4
+import bcrypt
+
 class Server(): # The main server handler class
     # Communicates with the MongoDB using DBconnection on behalf of the Clients using two multiprocessing.Queues 
     def __init__(self):
         """Initializes all attributes of the server class and calls the setupDBConnection function.
         """
         self.__DBconneciton = False # The connection agent
-        self.__columns = ['masterList', 'pollingData', 'presets', 'users'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
+        self.__columns = ['masterList', 'pollingData', 'presets', 'users', 'auth'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
         self.__requestTypes = ['insert', 'remove', 'request', 'update', 'setting'] # Types of requests the server can handle
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
         self.__pollingSpeed = 60/12 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
-        self.__requestsQ = mp.Queue(maxsize=1000000) # The request queue, only a clinet will put to this queue
-        self.__dataQ = mp.Queue(maxsize=1000000) # The request queue, only the server will put to this queue
+        self.__requestsQ = mp.Queue(maxsize=32767) # The request queue, only a clinet will put to this queue
+        self.__dataQ = mp.Queue(maxsize=32767) # The request queue, only the server will put to this queue
         self.__processes = {} # Process handles identifiers and handles for all processes created by the server
+        self.__adminID = False
         self._setupDBConnection()
 
     def __del__(self): # WIP
         """Closes open processes and queues and destroys all attributes of the server class
         """
         for i in self.__processes:
+            print('Process: '+i)
+            print('\tIs Alive: '+str(self.__processes[i].is_alive()))
             if self.__processes[i].is_alive():
-                print('Process Alive: '+str(self.__processes[i].is_alive()))
-                print('Joined: '+str(self.__processes[i].join(timeout=3)))
-                print('Terminated: '+str(self.__processes[i].terminate()))
+                print('\tJoined: '+str(self.__processes[i].join(timeout=3)==None))
+                print('\tTerminated: '+str(self.__processes[i].terminate()==None))
+                print('\tClosed: '+str(self.__processes[i].close()==None))
             else:
-                print('Process Alive: '+str(self.__processes[i].is_alive()))
-                print('Joined: '+str(self.__processes[i].join(timeout=3)))
-            self.__processes[i].close()
-        self.__requestsQ.close()
-        while not self.__requestsQ.empty():
-            print('Pulled '+str(self.__requestsQ.get())+' from queue.')
-        self.__dataQ.close()
-        while not self.__dataQ.empty():
-            print('Pulled '+str(self.__dataQ.get())+' from queue.')
-        del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes
-
+                try:
+                    print('\tJoined: '+str(self.__processes[i].join(timeout=3)==None))
+                    print('\tTerminated: '+str(self.__processes[i].terminate()==None))
+                    print('\tClosed: '+str(self.__processes[i].close()==None))
+                except:
+                    print('\tClosed: '+str(self.__processes[i].close()==None))
+        print('Queue: Request')
+        print('\tClosed: '+str(self.__requestsQ.close()==None))
+        print('\tJoined: '+str(self.__requestsQ.join_thread()==None))
+        print('Queue: Data')
+        print('\tClosed: '+str(self.__dataQ.close()==None))
+        print('\tJoined: '+str(self.__dataQ.join_thread()==None))
+        del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes, self.__adminID
+    
     def _checkForPresets(self):
         """Checks for the existence of the preset collection within the database and creates a default one if the collection could not be verified.
         """
@@ -74,6 +81,38 @@ class Server(): # The main server handler class
             else:
                 print('An unexpected error occured in the verification of the masterList.')
 
+    def _checkForAuth(self):
+        """Checks for the existence of the auth collection within the database and creates a default one if the collection could not be verified.
+        """
+        if self.__DBconneciton.verifyCollection('auth'):
+            print('Auth collection verified.')
+        else:
+            print('Error in auth, rebuilding the default auth.')
+            self.__DBconneciton.clearDB('Auth')
+            if self.__adminID == False:
+                self.__adminID = str(uuid4())
+            self.sendToDB('auth', {'name': 'admin', 'email': 'admin@admin.com', 'id':self.__adminID, 'password': bcrypt.hashpw('12345'.encode('utf-8'), bcrypt.gensalt())})
+            if self.__DBconneciton.verifyCollection('auth'):
+                print('Auth rebuilt successfully.')
+            else:
+                print('An unexpected error occured in the verification of auth.')
+
+    def _checkForUsers(self):
+        """Checks for the existence of the users collection within the database and creates a default one if the collection could not be verified.
+        """
+        if self.__DBconneciton.verifyCollection('users'):
+            print('Users collection verified.')
+        else:
+            print('Error in users, rebuilding the default users.')
+            self.__DBconneciton.clearDB('users')
+            if self.__adminID == False:
+                self.__adminID = str(uuid4())
+            self.sendToDB('users', {'id':self.__adminID,'username':'admin', 'email':'admin@admin.com', 'creationTime':time.time(), 'websitesList':[], 'presets':[]})
+            if self.__DBconneciton.verifyCollection('users'):
+                print('Users rebuilt successfully.')
+            else:
+                print('An unexpected error occured in the verification of the users.')
+
     def _setupDBConnection(self, address="127.0.0.1", port="27017"):
         """Attempts to connect to the MongoDB at the specified address and port. Additionally, creates the SHERLOCK database if it doesn't exist and setups default collections for master list and preset
 
@@ -89,6 +128,8 @@ class Server(): # The main server handler class
                     print('Using the SHERLOCK database.')
                     self._checkForMasterlist()
                     self._checkForPresets()
+                    self._checkForAuth()
+                    self._checkForUsers()
                 else:
                     print('Could not connect to the SHERLOCK database. Creating new one...')
                     self.__DBconneciton.createNewDB('SHERLOCK')
@@ -98,6 +139,8 @@ class Server(): # The main server handler class
                             print('Using the SHERLOCK database.')
                             self._checkForMasterlist()
                             self._checkForPresets()
+                            self._checkForAuth()
+                            self._checkForUsers()
                         else:
                             print('Could not connect to the new SHERLOCK database.')
                     else:
@@ -143,7 +186,7 @@ class Server(): # The main server handler class
             bool: True/False for success/failure to update data already existing in the database
         """
         if column in self.__columns:
-            self.__DBconneciton.updateInDB(column, content, changeTo)
+            return self.__DBconneciton.updateInDB(column, content, changeTo)
         else:
             return False
 
@@ -158,7 +201,7 @@ class Server(): # The main server handler class
             bool: True/False on success/failure.
         """
         if column in self.__columns:
-            self.__DBconneciton.addToDB(column, content)
+            return self.__DBconneciton.addToDB(column, content)
         else:
             return False
 
@@ -201,7 +244,7 @@ class Server(): # The main server handler class
         else:
                 return False
 
-    def removeFromDB(self, column:str, query:dict):
+    def removeFromDB(self, column:str, query:dict, remove:dict):
         """Removes the first entry from the database in the specified collection that matches the given query. 
 
         Args:
@@ -212,7 +255,7 @@ class Server(): # The main server handler class
             bool: True/False on success/failure.
         """
         if column in self.__columns:
-            return self.__DBconneciton.removeFromDB(column, query)
+            return self.__DBconneciton.removeFromDB(column, query, remove)
         else:
             return False
 
@@ -299,6 +342,16 @@ class Server(): # The main server handler class
                         del tempData
                     elif isinstance(newRequest['query'], dict):
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':'Not Yet Implemented'})
+                elif newRequest['column'] in 'users':
+                    if isinstance(newRequest['query'], dict):
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestFromDB(newRequest['column'], newRequest['query'])})#C.A.
+                elif newRequest['column'] in 'auth':
+                    self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestFromDB(newRequest['column'], newRequest['query'])})
+                    #temp = self.requestFromDB(newRequest['column'], )
+                    #if newRequest['query'] == '':
+                        #if bcrypt.checkpw(newRequest['query']['password'], passwordcheck):
+                    #else:
+                        #self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':False})
                 elif newRequest['column'] in self.__columns: # For all other requests
                     self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':'Not Yet Implemented'})
             elif newRequest['request_type'] == 'insert':
@@ -309,11 +362,15 @@ class Server(): # The main server handler class
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':False})
                 elif newRequest['column'] == 'presets':
                     self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.sendToDB(newRequest['column'], newRequest['query'])})
+                elif newRequest['column'] == 'auth':
+                    self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.sendToDB(newRequest['column'], newRequest['query'])})
+                elif newRequest['column'] == 'users':
+                    self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.sendToDB(newRequest['column'], newRequest['query'])})
                 elif newRequest['column'] in self.__columns: # For all other insertions, might not be necessary (infact might not be good either)
                     self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.sendToDB(newRequest['column'], newRequest['query'])})
             elif newRequest['request_type'] == 'remove':
                 if newRequest['column'] in self.__columns: # For all removals of data, might not be good, but works
-                    self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.removeFromDB(newRequest['column'], newRequest['query'])})
+                    self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.removeFromDB(newRequest['column'], newRequest['query'], newRequest['changeTo'])}) #C.A. up
             elif newRequest['request_type'] == 'setting': # For changing settings such as the polling speed of the server
                 self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self._changeSettings(newRequest['column'], newRequest['changeTo'])})
             elif newRequest['request_type'] == 'update':
@@ -368,9 +425,6 @@ class Server(): # The main server handler class
         #self.test2()
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
         dataQTimerStart = time.time()
-        homepage = "http://127.0.0.1:7777"
-        time.sleep(3)
-        webbrowser.open(homepage)
         while True:
             self._checkForRequests()
             mainLoopTimerEnd = time.time()
@@ -395,27 +449,13 @@ class Server(): # The main server handler class
         print('Begin test.')
         predModel = PredictionModel()
         data = self.requestManyFromDB('pollingData', {'url':'www.google.com'})
-        #tensorData = np.empty()
-        tensorDataTime = []
-        tensorDataLatency = []
-        #count = 0
+        tensorDataTime, tensorDataLatency = [], []
         for i in data:
-            #np.append(tensorData, [i['timestamp'], i['latency']], axis=0)
-            #np.append(tensorData, i['latency'], axis=1)
-            #np.append(tensorDataTime, i['timestamp'])
-            #np.append(tensorDataLatency, i['latency'])
             tensorDataTime.append(i['timestamp'])
             tensorDataLatency.append(i['latency'])
-            #count += 1
-        #print(count, len(tensorDataLatency), len(tensorDataTime))
-        #tensorData = np.array([tensorDataTime, tensorDataLatency])
-        #print(tensorDataTime)
         tensorData = np.vstack((tensorDataTime, tensorDataLatency))
-        #tensorData = pd.DataFrame(tensorDataLatency, index=pd.to_datetime(tensorDataTime, unit='s'), columns=['latency'])
-        #tensorData = {'timestamp':tensorDataTime, 'latency':tensorDataLatency}
-        #print(tensorData)
+        print('Data gathered, transferring to PredictionModel...')
         predicitedData = predModel.predictOnData(tensorData)
-        print('testing 5')
         print('predictiedData =', predicitedData)
         print('length: ', len(predicitedData))
         print('Completed test.')
@@ -424,7 +464,6 @@ class Server(): # The main server handler class
         graph = GraphGenerator()
         data = self.requestManyFromDB('pollingData', {'url':'www.google.com'})
         # add functions needed to generate graph from GenerateGraph
-
 # end Server
 
 def testServer():

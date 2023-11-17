@@ -1,5 +1,5 @@
 # CHRISTIAN
-from flask import Flask, render_template, request, url_for, redirect, session, jsonify
+from flask import Flask, render_template, request, url_for, redirect, session, flash, jsonify
 
 import uuid
 import time
@@ -7,6 +7,8 @@ import time
 import bcrypt
 from multiprocessing import Queue
 
+#CLASS IMPORTATION
+from controllers.login import Login
 
 from controllers.addPreset import AddPreset
 from controllers.deletePreset import DeletePreset 
@@ -17,7 +19,7 @@ from controllers.addWebsite import AddWebsite
 from controllers.deleteWebsite import DeleteWebsite 
 from controllers.viewWebsite import ViewWebsite 
 
-
+import webbrowser
 
 # import controllers.graphTableGenerator
 
@@ -25,6 +27,8 @@ class MyFlaskApp:
     def __init__(self, requestQ:Queue, dataQ:Queue):
         self.app = Flask(__name__, template_folder='../templates', static_folder='../static')
         # self.admin_view = Blueprint('admin_routes',__name__, template_folder='../templates', static_folder='../static')
+        
+        self.app.secret_key = 'your_secret_key_here'
         
         self.app.requestQ = requestQ
         self.app.dataQ = dataQ
@@ -37,10 +41,12 @@ class MyFlaskApp:
         self.app.add_url_rule('/logged_in', 'logged_in', self.logged_in)
         self.app.add_url_rule('/login', 'login', self.login, methods=['POST', 'GET'])
         self.app.add_url_rule('/logout', 'logout', self.logout, methods=['POST', 'GET'])
+        self.app.add_url_rule('/', 'index', self.index, methods=['POST', 'GET'])
+        
         ########
         
         #HOMEPAGE
-        self.app.add_url_rule('/', 'index', self.index)
+        self.app.add_url_rule('/home', 'home', self.home)
         
         #FORPRESETS
         #ADDPRESET
@@ -68,6 +74,9 @@ class MyFlaskApp:
         
         
         #CLASS_INITIALIZATION
+        
+        self.loginClass = Login(self.app.requestQ, self.app.dataQ)
+        
         self.addPresetClass = AddPreset(self.app.requestQ, self.app.dataQ)
         self.deletePresetClass = DeletePreset(self.app.requestQ, self.app.dataQ)
         self.editPresetClass = EditPreset(self.app.requestQ, self.app.dataQ)    
@@ -77,13 +86,17 @@ class MyFlaskApp:
         self.addWebsiteClass = AddWebsite(self.app.requestQ, self.app.dataQ)
         self.deleteWebsiteClass = DeleteWebsite(self.app.requestQ, self.app.dataQ)   
         self.viewWebsiteClass = ViewWebsite(self.app.requestQ, self.app.dataQ)
+
+        webbrowser.open("http://127.0.0.1:7777")
              
             
         
     ################################
     #        AUTH ROUTING          #
     ################################
+    #FINISHED
     def index(self):
+        #FOR FIRST TIME LOGGIN IN
         message = ''
         # if "email" in session:
         #     return redirect(url_for("logged_in"))
@@ -93,8 +106,9 @@ class MyFlaskApp:
             password1 = request.form.get("password1")
             password2 = request.form.get("password2")
 
+            
+            #result needs to be a 
             result = self.register_user(user, email, password1, password2)
-
             if result == email:
                 self.curr_email = email
                 return render_template('auth/logged_in.html', email=result)
@@ -102,7 +116,7 @@ class MyFlaskApp:
                 message = result
                 return render_template('auth/index.html', message=message)
         return render_template('auth/index.html')
-    
+    #FINISHED
     def login(self):
         message = 'Please login to your account'
         # if "email" in session:
@@ -111,14 +125,14 @@ class MyFlaskApp:
         if request.method == "POST":
             email = request.form.get("email")
             password = request.form.get("password")
-
-            email_found = self.user_database.find_user_by_email(email) #don't have user_database will need to to a query and find_user_by_email
+            #Start an insert query
+            #don't have user_database will need to to a query and find_user_by_email
+            email_found = self.loginClass.find_user_by_email(email) 
             if email_found:
                 email_val = email_found['email']
                 passwordcheck = email_found['password']
 
                 if bcrypt.checkpw(password.encode('utf-8'), passwordcheck):
-                    print('hello')
                     session["email"] = email_val
                     self.curr_email = email_val
                     return redirect(url_for('logged_in'))#MAY CHANGE
@@ -131,20 +145,28 @@ class MyFlaskApp:
                 message = 'Email not found'
                 return render_template('auth/login.html', message=message)
         return render_template('auth/login.html', message=message)
-
+    #FINISHED
     def logged_in(self):
         if "email" in session:
             email = session["email"]
             self.curr_email = email
-            return render_template('home.html', email=email)#changed from auth/logged_in.html
+            self.addPresetClass.getEmail(self.curr_email)
+            return render_template('homepage.html', email=email)#changed from auth/logged_in.html
         else:
             return redirect(url_for("login"))
-        
+    #FINISHED
     def register_user(self, user, email, password1, password2):
         # don't have user_database will need to to a query and find_user_by_email as well as name
-        user_found = self.user_database.find_user_by_name(user) 
-        email_found = self.user_database.find_user_by_email(email) 
-
+        user_found = self.loginClass.find_user_by_name(user) 
+        email_found = self.loginClass.find_user_by_email(email) 
+        
+        
+        # user_found= {'id': UUID('103d3cac-3fe3-4e19-bfa2-c551456d9d4a'), 'timestamp': 1700092919.792062, 'data': 'Not Yet Implemented'}
+        # user_found = (user_found['data'] != 'Not Yet Implemented') #should be False if it is not
+        # email_found = (email_found['data'] != 'Not Yet Implemented') #should be False if it is not
+        # print('user_found',user_found)
+        # print('email_found',email_found)
+        
         if user_found:
             return 'There already is a user by that name'
         if email_found:
@@ -153,20 +175,21 @@ class MyFlaskApp:
             return 'Passwords should match'
 
         hashed = bcrypt.hashpw(password2.encode('utf-8'), bcrypt.gensalt())
-        user_input = {'name': user, 'email': email, 'password': hashed}
-        # don't have insert_user
-        self.user_database.insert_user(user_input)
-        user_data = self.user_database.find_user_by_email(email)
+        
+        user_input = {'name': user, 'email': email, 'id':str(uuid.uuid4()), 'password': hashed}
+        self.loginClass.insert_user(user_input)
+        user_data = self.loginClass.find_user_by_email(email)
+        print('user_data|', user_data)
         new_email = user_data['email']
         return new_email
     
-    #NOT REALLY USING THIS
+    #NOT REALLY USING THIS: #FINISHED
     def logout(self):
         if "email" in session:
             session.pop("email", None)
             return render_template("auth/signout.html")
         else:
-            return redirect(url_for('index'))
+            return redirect(url_for('index')) #right now index is home.html but it will be index when done
     
     
     
@@ -176,12 +199,8 @@ class MyFlaskApp:
     #        NORMAL ROUTING        #
     ################################
     
-    
-    
-    
-    
     #TODO
-    def index(self):
+    def home(self):
         return render_template('homepage.html')
     
     #FINISHED
@@ -190,7 +209,8 @@ class MyFlaskApp:
 
     def newAddedPreset(self):
         self.addPresetClass.addPreset()
-        return "YOU HAVE SUCCESSFULLY ADDED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
+        # Redirect to the /home route and render the home.html template
+        return redirect(url_for('home'))
 
     #TODO
     def viewPreset(self):
@@ -202,21 +222,25 @@ class MyFlaskApp:
 
     #FINISHED
     def deletePreset(self):
+        self.deletePresetClass.getEmail(self.curr_email)
         return render_template('DeletePreset.html', presets=self.deletePresetClass.query()['data'])
 
     def newDeletedPreset(self):
         self.deletePresetClass.deletePreset()
-        return "YOU HAVE SUCCESSFULLY ADDED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
+        # Redirect to the /home route and render the home.html template
+        return redirect(url_for('home'))
 
     #FINISHED
     def deleteWebsite(self):
+        self.deleteWebsiteClass.getEmail(self.curr_email)
         return render_template('DeleteWebsite.html', masterList = self.deleteWebsiteClass.query())
     
     def newDeletedWebsite(self):
         self.deleteWebsiteClass.deleteWebsite()
-        return "YOU HAVE SUCCESSFULLY DELETED A WEBSITE PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
+        # Redirect to the /home route and render the home.html template
+        return redirect(url_for('home'))
 
-    #FINISHED
+    #TODO
     def editPreset(self):
         return render_template('EditPreset.html', presets=self.editPresetClass.query())
     
@@ -239,20 +263,21 @@ class MyFlaskApp:
 
     #FINISHED
     def addWebsite(self):
+        self.addWebsiteClass.getEmail(self.curr_email)
         return render_template('AddWebsite.html')
     
     def newAddedWebsite(self):
         self.addWebsiteClass.addWebsite()
-        return "YOU HAVE SUCCESSFULLY ADDED A WEBSITE, PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='../'>Visit Homepage</a>"
+        # Redirect to the /home route and render the home.html template
+        return redirect(url_for('home'))
 
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
     ################################
     #      TECHNICAL FUNCTIONS     #
     ################################
@@ -262,22 +287,23 @@ class MyFlaskApp:
     def newRequest(self, queryRequest):
         pass
 
-    def checkForData(self, queryRequest):
-        #ANTHONY
-        initialDataID = False
-        while self.app.dataQ.empty() != True:
-            newData = self.app.dataQ.get()
-            if newData['id'] == initialDataID:
-                self.app.requestQ.put(queryRequest)
-                time.sleep(1) #import time
-                initialDataID = False
-            elif initialDataID == False:
-                initialDataID = newData['id']
-            if newData['id'] == queryRequest['id']:
-                if newData['data'] is not False:
-                    return newData
-            else:
-                self.app.dataQ.put(newData)
+    # NOT USED
+    # def checkForData(self, queryRequest):
+    #     #ANTHONY
+    #     initialDataID = False
+    #     while self.app.dataQ.empty() != True:
+    #         newData = self.app.dataQ.get()
+    #         if newData['id'] == initialDataID:
+    #             self.app.requestQ.put(queryRequest)
+    #             time.sleep(1) #import time
+    #             initialDataID = False
+    #         elif initialDataID == False:
+    #             initialDataID = newData['id']
+    #         if newData['id'] == queryRequest['id']:
+    #             if newData['data'] is not False:
+    #                 return newData
+    #         else:
+    #             self.app.dataQ.put(newData)
 
 def startFlask(requestQ, dataQ):
     newFlask = MyFlaskApp(requestQ, dataQ)

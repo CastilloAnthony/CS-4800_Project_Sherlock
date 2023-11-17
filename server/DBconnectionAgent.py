@@ -97,6 +97,7 @@ class DBConnectionAgent():
             bool: Success/Failure to add content to the DB
         """
         if self.__db != False:
+            self.__db[column].insert_one(content).acknowledged
             try:
                 return self.__db[column].insert_one(content).acknowledged
             except:
@@ -104,7 +105,8 @@ class DBConnectionAgent():
         else:
             return False
 
-    def removeFromDB(self, column:str, query:dict):
+    def removeFromDB(self, column:str, query:dict, remove:dict):
+        #C.A.
         """Removes the first instance of an entry, within the column, that matches the inputted query.
 
         Args:
@@ -114,8 +116,17 @@ class DBConnectionAgent():
         Returns:
             bool: True/False on success/failure.
         """
+        # db.yourCollection.update_one(
+        #     { _id: <ObjectId("your_document_id")> },
+        #     { $pull: { 'websiteLists': "<removedWebsite>" } }
+        # );
+        print('hi')
         if self.__db != False:
-            return self.__db[column].delete_one(query).acknowledged
+            return self.__db[column].update_one(
+                query,
+                {'$pull': remove}
+            )
+            #return self.__db[column].delete_one(query).acknowledged
         else:
             return False
 
@@ -202,7 +213,8 @@ class DBConnectionAgent():
 
         Args:
             column (str): The collection to modify
-            query (dict): QUERY FORMAT EXAMPLE: query={'id':matchWithThis}, changeTo={'id':ModifyToThis}
+            query (dict): QUERY FORMAT EXAMPLE: query={'id':matchWithThis}, 
+            quer (dict): changeTo={'id':ModifyToThis}
 
         Returns:
             bool: True/False for a successful/unsuccessful update
@@ -217,7 +229,22 @@ class DBConnectionAgent():
             # print(query, '\n',changeTo)
             # query: {'_id': '6542ea812079dc2a9c74ca6d', 'name': 'adfa', 'presetLists': ['www.csustan.edu', 'www.bbc.co.uk', 'www.reddit.com', 'https://discord.gg/keAWQanBp8'], 'timestamp': 1698884225.4272666}
             # changeTo: {'_id':preset_to_be_changed['_id'],'name':'taco', 'presetLists':['www.google.com', 'chat.openai.com', 'www.bbc.co.uk'], 'timestamp':preset_to_be_changed['timestamp']}
-            return self.__db[column].update_one(query, {"$set":changeTo}).acknowledged
+            
+            #changeTo: Needs to be in form:
+            #{
+            #     'presets': {
+            #         'name': 'John',
+            #         'presetLists': ['www.example1.com', 'www.example2.com'],
+            #         'timestamp': 1698890950.1513646
+            #     }
+            # }
+            print('hi')
+            return self.__db[column].update_one(query, 
+                                                {"$push":
+                                                    changeTo
+                                                    }).acknowledged
+            
+            # return self.__db[column].update_one(query, {"$set":changeTo}).acknowledged
         else:
             return False
 
