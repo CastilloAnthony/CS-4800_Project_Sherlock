@@ -105,7 +105,6 @@ class GraphGenerator:
 
             time.sleep(15) #recounts every 15 seconds
 
-# generate two separate
     def generate_graph(self, url, duration=300, interval=15):
         time_values, latency_values = self.latency(psutil.net_io_counters(), duration, interval)
 
@@ -113,7 +112,7 @@ class GraphGenerator:
 
         #sending data to the prediction model
         time_values, latency_values = np.array([[1,2,3], [4,5,6]])
-        predictions = self.__predict.predictOnData(time_values, latency_values) #change None to np arrary 
+        predictions = self.__predict.predictOnData(time_values, latency_values)
         
         
         plt.figure(figsize=(10, 6))
