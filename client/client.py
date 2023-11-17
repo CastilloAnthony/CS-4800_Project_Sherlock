@@ -220,14 +220,15 @@ class MyFlaskApp:
     def viewWebsite(self):
         return render_template('viewWebsite.html', data=self.viewWebsiteClass.query1())
 
-    #TODO
+    #FINISHED
     def deletePreset(self):
         self.deletePresetClass.getEmail(self.curr_email)
         return render_template('DeletePreset.html', presets=self.deletePresetClass.query()['data'])
 
     def newDeletedPreset(self):
-        # self.deletePresetClass.deletePreset()
-        return "YOU HAVE SUCCESSFULLY ADDED A PRESET PRESS THIS LINK TO GET BACK TO THE HOMEPAGE <br><br><a href='home'>Visit Homepage</a>"
+        self.deletePresetClass.deletePreset()
+        # Redirect to the /home route and render the home.html template
+        return redirect(url_for('home'))
 
     #FINISHED
     def deleteWebsite(self):

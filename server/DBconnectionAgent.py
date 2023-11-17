@@ -120,6 +120,7 @@ class DBConnectionAgent():
         #     { _id: <ObjectId("your_document_id")> },
         #     { $pull: { 'websiteLists': "<removedWebsite>" } }
         # );
+        print('hi')
         if self.__db != False:
             return self.__db[column].update_one(
                 query,

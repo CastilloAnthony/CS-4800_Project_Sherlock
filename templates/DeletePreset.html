@@ -16,7 +16,20 @@
                     Make it easier to recall for them. 
                 -->
                 <br><br>
-                {% for preset in presets %}
+                <!--
+                    [ 
+                    {
+                    '_id': ObjectId('65565327c3a6e4404edd07d9'), 
+                    'id': 'ee76936a-d4b0-4050-986d-b4a71041138b', 
+                    'username': 'ca', 
+                    'email': 'ca', 
+                    'websitesList': ['https://www.youtube.com/watch?v=Kw0azb-lQTk', 'https://www.youtube.com/watch?v=fU-hbVHNrzo'], 
+                    'presets': [{'name': 'ca', 'presetLists': ['www.google.com', 'www.instagram.com'], 'timestamp': 1700173818.6764941}, {'name': 'taco', 'presetLists': ['www.google.com', 'www.instagram.com', 'www.csustan.edu'], 'timestamp': 1700174609.7962203}, {'name': 'Big Ben', 'presetLists': ['www.google.com', 'www.instagram.com', 'chat.openai.com', 'www.reddit.com'], 'timestamp': 1700174848.542619}
+                    }
+                    ]
+                -->
+                
+                {% for preset in presets['presets'] %}
                     <!--<label class="background">
                         
                             We want to look at the inputs name when returning these back to 
