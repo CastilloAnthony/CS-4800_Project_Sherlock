@@ -12,3 +12,4 @@ lib
 lib64
 *.svn
 **/.DS_Store
+*.keras
