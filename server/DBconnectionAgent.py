@@ -238,34 +238,33 @@ class DBConnectionAgent():
             #     }
             # }
             print('hi')
-            return self.__db[column].update_one(query, 
-                                                {"$push":
-                                                    changeTo
-                                                    }).acknowledged
+            return self.__db[column].update_one(
+                query, 
+                {"$push":
+                    changeTo
+                    }).acknowledged
             
             # return self.__db[column].update_one(query, {"$set":changeTo}).acknowledged
         else:
             return False
         
-    def update2(self, column:str, query:dict, old:dict, changeTo:dict):
-        # Define the filter to identify the document and element to update
-        filter_criteria = {
-            '_id': query,
-            'presets': {
-                '$elemMatch': {
-                    'name': old['name']
-                }
-            }
-        }
-
-        # Define the update operation
-        update_operation = {
-            '$set': {
-                'presets.$.name': changeTo['name'],
-                'presets.$.presetLists': changeTo['presetLists'],
-                'presets.$.timestamp': changeTo['timestamp']
-            }
-        }
-        self.__db[column].update_one(filter_criteria, update_operation)
+    def update2InDB(self, column:str, query:dict, old:dict, changeTo:dict):
+        if self.__db != False:
+            #remove old preset
+            self.__db[column].update_one(
+                query,
+                {'$pull': old}
+            )
+            #add new preset
+            return self.__db[column].update_one(
+                query, 
+                {"$push":
+                    changeTo
+                    }).acknowledged
+        else:
+            return False
+        
+        # self.__db[column].update_one(filter_query, new_values, array_filters=[{'elem.name': 'existing_name', 'elem.email': 'existing_email'}])
+        
 
 #end DBConnecitonAgent
