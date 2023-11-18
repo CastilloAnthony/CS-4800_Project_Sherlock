@@ -14,6 +14,14 @@ class AddPreset(): # Controller
         pass
 
     def requestData(self, request):
+        """_summary_: in order to get the correct data and check for wrong insertions
+
+        Args:
+            request (dict): uuid, request_type, column, query, changeTo
+
+        Returns:
+            dict: uuid, id?,data
+        """
         self.__requestQ.put(request)
         time.sleep(0.1)
         initialDataID = False
@@ -32,6 +40,11 @@ class AddPreset(): # Controller
                 self.__dataQ.put(newData)
 
     def query(self):
+        """_summary_: grab things from master list
+
+        Returns:
+            dict: uuid, id, data
+        """
         #ASKING
         masterListRequest = {
             'id': uuid.uuid4(),
@@ -47,9 +60,16 @@ class AddPreset(): # Controller
         #return super().checkForData(masterListRequest)7
     
     def getEmail(self, email):
+        """_summary_: simple get function for email which will be the key called in client.py
+
+        Args:
+            email (str): email that is learned from login
+        """
         self.curr_email = email
 
     def addPreset(self):
+        """_summary_: adding a preset given the information from the form in addPreset.html
+        """
         presetLists = request.form.getlist('selected_options[]') #WE HAVE THIS
         name = request.form['name'] #WE HAVE THIS
         #maybe once logged in client should send the email to each of the controllers

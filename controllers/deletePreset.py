@@ -33,6 +33,11 @@ class DeletePreset(): # Controller
         self.curr_email = email
         
     def query(self):
+        """_summary_: grabbing a specific document from collections: users using query of email 
+
+        Returns:
+            dict: everything in data so that includes name, email, websitesList, and presets 
+        """
         #ASKING
         masterListRequest = {
             'id': uuid.uuid4(),
@@ -52,6 +57,9 @@ class DeletePreset(): # Controller
         # }
         
     def deletePreset(self):
+        """_summary_: deleting a preset from collection: users using email as a query as well as giving a dictionary 
+                        over which will satisfy the removeinDB function in dbconncetion agent
+        """
         #should return a list of presets wanted to be deleted
         deletedPresets = request.form.getlist('selected_options[]') 
         

@@ -65,6 +65,8 @@ class AddWebsite(): # Controller
         return temp
         
     def addWebsite(self):
+        """_summary_: inputting the url into the masterlist collection as well as inputing the url into the users collection
+        """
         identifier = self.query()['data']['id']
         url = request.form['url']
         oneWebsite = {

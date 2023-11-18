@@ -34,9 +34,12 @@ class DeleteWebsite(): # Controller
         self.curr_email = email
     
     def query(self):
+        """_summary_: asking for a certain document in users using email as query
+
+        Returns:
+            dict: contains the document with the corresponding email
+        """
         #ASKING
-        #?should i be taking from masterlist or from users websitesList or from both
-        print(self.curr_email)
         masterListRequest = {
             'id': uuid.uuid4(),
             'request_type': 'request',
@@ -44,10 +47,12 @@ class DeleteWebsite(): # Controller
             'query': {"email":self.curr_email}
         }
         temp = self.requestData(masterListRequest)
-        print(temp)
         return temp
         
     def deleteWebsite(self):
+        """_summary_: grab information from deleteWebsite.html which will come in form of a list of names 
+                that correspond to fields in documents so we can disect and remove
+        """ 
         websiteLists = request.form.getlist('selected_options[]') #WE HAVE THIS
         
         for website in websiteLists:
