@@ -228,7 +228,7 @@ class MyFlaskApp:
     #FINISHED
     def deletePreset(self):
         self.deletePresetClass.getEmail(self.curr_email)
-        return render_template('DeletePreset.html', presets=self.deletePresetClass.query()['data'])
+        return render_template('DeletePreset.html', presets=self.deletePresetClass.query())
 
     def newDeletedPreset(self):
         self.deletePresetClass.deletePreset()

@@ -42,7 +42,9 @@ class DeletePreset(): # Controller
         }
         #print('something who cares')
         temp = self.requestData(masterListRequest)
-        return temp
+        if temp == None:
+            return None
+        else: return temp['data']
         #{'id': UUID('2cfd8df6-d169-4342-81d7-49c74ecb610d'), 
         # 'timestamp': 1700183925.3842254, 
         # 'data': {'_id': ObjectId('65565327c3a6e4404edd07d9'), 'id': 'ee76936a-d4b0-4050-986d-b4a71041138b', 'username': 'ca', 'email': 'ca', 'websitesList': ['https://www.youtube.com/watch?v=fU-hbVHNrzo'], 'presets': [{'name': 'ca', 'presetLists': ['www.google.com', 'www.instagram.com'], 'timestamp': 1700173818.6764941}, {'name': 'taco', 'presetLists': ['www.google.com', 'www.instagram.com', 'www.csustan.edu'], 'timestamp': 1700174609.7962203}, {'name': 'Big Ben', 'presetLists': ['www.google.com', 'www.instagram.com', 'chat.openai.com', 'www.reddit.com'], 'timestamp': 1700174848.542619}]
