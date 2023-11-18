@@ -205,7 +205,7 @@ class MyFlaskApp:
         # please put data back in when a little quicker for debugging purposes
         # works just fine
         #print(self.viewWebsiteClass.query1())
-        return render_template('homepage.html', email=self.curr_email) #, data=self.viewWebsiteClass.query1()
+        return render_template('homepage.html', email=self.curr_email, data=self.viewWebsiteClass.query1())
     
     #FINISHED
     def addPreset(self):
@@ -221,7 +221,7 @@ class MyFlaskApp:
     def viewPreset(self):
         return render_template('viewPreset.html')
     
-    #: grab graphs to put into this
+    #TODO: grab graphs to put into this
     def viewWebsite(self):
         return render_template('viewWebsite.html')#,data=self.viewWebsiteClass.query1()
 
@@ -245,7 +245,7 @@ class MyFlaskApp:
         # Redirect to the /home route and render the home.html template
         return redirect(url_for('home'))
 
-    #TODO
+    #FINISHED
     def editPreset(self):
         self.editPresetClass.getEmail(self.curr_email)
         return render_template('EditPreset.html', presets=self.editPresetClass.query())

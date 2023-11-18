@@ -54,6 +54,10 @@ class ViewWebsite():
         # 'timestamp': 1698420651.296685, 'data': ['www.google.com', 'www.instagram.com', 
         # 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 
         # 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com']}
+        
+        
+        
+        # ANTHONY CODE
         temp2 = {}
         for url in temp1['data']:
             tempNPArray = np.empty(1)
