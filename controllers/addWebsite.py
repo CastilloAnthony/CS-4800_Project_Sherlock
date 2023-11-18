@@ -18,7 +18,6 @@ class AddWebsite(): # Controller
         initialDataID = False
         while self.__dataQ.empty() != True:
             newData = self.__dataQ.get()
-            print(newData)
             if newData['id'] == initialDataID:
                 self.__requestQ.put(request)
                 time.sleep(0.1) #import time
@@ -84,7 +83,5 @@ class AddWebsite(): # Controller
             'changeTo':  {'websitesList':url} #GOOD?
         }
         self.__requestQ.put(oneWebsite)
-        
-
-    
+            
 #end AddPreset
