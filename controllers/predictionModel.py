@@ -76,28 +76,31 @@ class PredictionModel():
         """WIP
         """
         self.__model = tf.keras.Sequential([
-            #tf.keras.layers.Lambda(lambda x: x[:, -11:, :]),
+            #tf.keras.layers.Lambda(lambda x: x[:, -2:, :]),
             #tf.keras.Input(shape=(int(self.__size*0.7))), #, int(self.__size*0.7))),
             #tf.keras.layers.Reshape((int(self.__size*0.7*0.5), 2), input_shape=(int(self.__size*0.7),)),# dtype=tf.float32), # int(int(self.__size*0.7)//(self.__size*0.7*0.5))
-            #tf.keras.layers.Dense(256, activation='LeakyReLU'),# input_shape=(32,)),#(self.__size*0.7), 2)),
-            tf.keras.layers.Dense(256),
+            tf.keras.layers.Dense(256, activation='LeakyReLU'),# input_shape=(32,)),#(self.__size*0.7), 2)),
+            tf.keras.layers.Reshape((16, 16)),#, input_shape=(128, 256,)),
+            tf.keras.layers.Conv1D(32, 3, activation='relu'),
+            #tf.keras.layers.Conv2D(256 activation='LeakyReLU')
             tf.keras.layers.Dropout(0.2),
             tf.keras.layers.Dense(128, activation='gelu'), #input_shape=(int(self.__size*0.7), 2)),
             #tf.keras.layers.Dense(128),
             tf.keras.layers.Dropout(0.2),
             tf.keras.layers.Dense(2, activation='softmax'),# input_shape=(int(self.__size*0.7), 2))
+            tf.keras.layers.Dropout(0.2),
             tf.keras.layers.Dense(1)
         ])
         #loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)
         
         self.__model.compile(
-            optimizer='adam',#tf.keras.optimizers.Adam(learning_rate=0.001), 
-            loss='mse', 
-            metrics=['accuracy', tf.keras.metrics.MeanAbsoluteError()]#[tf.keras.metrics.SparseCategoricalAccuracy()]
+            optimizer='sgd',#tf.keras.optimizers.Adam(learning_rate=0.001), 
+            loss=tf.keras.losses.Huber(),#tf.keras.losses.LogCosh(),#'mse', 
+            metrics=['accuracy']
             )#'sparse_categorical_crossentropy')#'mse')#loss_fn,)
         #print(len(self.__model.weights))
         #print(self.__model.get_config())
-        self.__model.build(input_shape=(32, 1,))
+        self.__model.build(input_shape=(128, 1,))
         self.__model.summary()
         #print("Model Input Shape:", self.__model.input_shape)
         '''
@@ -300,21 +303,27 @@ class PredictionModel():
         """
         # https://www.tensorflow.org/tutorials/structured_data/time_series#data_windowing
         
-        temp = np.arange(self.__train_data[0][-1], self.__train_data[0][-1]+quantity, self.__avgDist)
+        temp = np.arange(self.__train_data[0][-1], self.__train_data[0][-1]+quantity, self.__avgDist**2)
         #print(temp)
         predictions = self.__model.predict(temp)#tf.expand_dims(self.__data, axis=0))
         outputDF = pd.DataFrame(predictions) # [{'data0'}, {'data1'}, {'data2'}, {'etc.'}, {'data#quantity-1#'}]
         #outputDF.add()
+        test = []
+        for i in predictions:
+            test.append(i)
         #plt.pyplot.plot(data[0], data[1], 'o', label='Original Data')
+        
         tempY = outputDF[0].to_numpy()
         #print(outputDF)
+        
         plt.pyplot.plot(self.__train_data[0], self.__train_data[1], 'o', alpha=1.0, label='Normalized Data')
         plt.pyplot.plot(temp, tempY, 'o', alpha=0.5, label='Predictions')
-
         plt.pyplot.legend()
         plt.pyplot.show()
-
-        return np.vstack(temp, tempY)
+        
+        #plt.pyplot.plot(self.__model)
+        #plt.pyplot.show()
+        return np.vstack((temp, tempY))
 
     def trainModel(self, epochs:int = 3):
         """Trians the model on the data given using the 
@@ -326,7 +335,7 @@ class PredictionModel():
 
         #print('Training Data:', self.__train_data[1], self.__train_data[0])
         print('Training:')
-        evaluation = [np.nan, 0.0]
+        evaluation = [np.nan, 0.0, np.nan]
         count = 0
         while (np.isnan(evaluation[0]) or evaluation[0] > 0.001) and count < 10:
             print(count)
@@ -339,7 +348,7 @@ class PredictionModel():
                     #self.__train_ds,
                     validation_data=(self.__val_data[0], self.__val_data[1]),
                     #validation_data=self.__val_ds,
-                    batch_size=32,
+                    batch_size=128,
                     epochs=1
                 )
             print('Evaluating:')
@@ -350,6 +359,7 @@ class PredictionModel():
             )
             print(evaluation)
             count += 1
+            self.__model.save(self.__modelFilename)
         print('Prediction:')
         predicted = self.__model.predict(
             self.__test_data[0][:3]
