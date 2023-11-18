@@ -45,9 +45,12 @@ class EditPreset(): # Controller
             'query': {"email":self.curr_email}
         }
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT
-        temp = self.requestData(userRequest)['data']
-        print(temp)
-        return temp
+        temp = self.requestData(userRequest)
+        if temp == None:
+            return None
+        else:
+            # print(temp)
+            return temp['data']
     
     def query1(self):
         #ASKING
@@ -87,12 +90,13 @@ class EditPreset(): # Controller
             return item
         
     def editPreset(self):
-        #should return a list of presets wanted to be deleted
+        #should return a list of presets
         
         preset_to_be_changed = request.form['selected_option[]']
         
-        print(preset_to_be_changed) #Big Ben: name of one of the presetLists
+        # print(preset_to_be_changed) #Big Ben: name of one of the presetLists
         preset_to_be_changed = self.parseStringToDict(preset_to_be_changed)
+        print(preset_to_be_changed)
         self.old.append(preset_to_be_changed)
         #return this and on the next page show this up top as a reference to what it is currently
         
@@ -100,6 +104,7 @@ class EditPreset(): # Controller
 
     def editPreset1(self):
         preset_to_be_changed = self.old[0]
+        # print(preset_to_be_changed)
         #GRAB THINGS USER WANTED TO CHANGE: NAME OR PRESETLIST
         urlList = request.form.getlist('selected_options[]') #WE HAVE THIS
         name = request.form['name'] #WE HAVE THIS
@@ -122,6 +127,7 @@ class EditPreset(): # Controller
             'column': 'users', 
             #filter_criteria = {"_id": ObjectId("your-document-id")}
             'query': {'email':self.curr_email},
+            'old': preset_to_be_changed,
             'changeTo': newDictionary
         }
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT

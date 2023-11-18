@@ -248,24 +248,28 @@ class DBConnectionAgent():
             return False
         
     def update2(self, column:str, query:dict, old:dict, changeTo:dict):
-        # Define the filter to identify the document and element to update
-        filter_criteria = {
-            '_id': query,
-            'presets': {
-                '$elemMatch': {
-                    'name': old['name']
-                }
+        #DOES NOT WORK HOW I WANT IT TO
+        #it does add the things but instead of removing the old things which is what
+        #i thought set did, it just adds a new category outside of presets for no reason
+        # I'm over it, please help me. 
+        new_values = {
+            '$set': {
+                'presets.$[elem].name': changeTo['name'],
+                'presets.$[elem].presetLists': changeTo['presetLists'],
+                'presets.$[elem].timestamp': changeTo['timestamp'],
+                
+                # Add other fields to update as needed
             }
         }
 
-        # Define the update operation
-        update_operation = {
-            '$set': {
-                'presets.$.name': changeTo['name'],
-                'presets.$.presetLists': changeTo['presetLists'],
-                'presets.$.timestamp': changeTo['timestamp']
+        # Define the filter criteria
+        filter_query = {
+            'presets': {
+                '$elemMatch': query
             }
         }
-        self.__db[column].update_one(filter_criteria, update_operation)
+
+        self.__db[column].update_one(filter_query, new_values, array_filters=[{'elem.name': 'existing_name', 'elem.email': 'existing_email'}])
+        
 
 #end DBConnecitonAgent

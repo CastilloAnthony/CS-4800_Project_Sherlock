@@ -48,69 +48,19 @@ class AddPreset(): # Controller
     
     def getEmail(self, email):
         self.curr_email = email
-    
-    #FIGURE OUT HOW TO GRAB curr_email
-    def getCurrentUser(self):
-        """_summary_
 
-        Returns:
-            dict:   _id: mongoDB id
-                    name: "name"
-                    email: "email"
-                    id: uuid.uuid4()
-                    password: hashed password
-        """
-        # print(self.curr_email) 
-        #ca
-        
-        grabAuthThroughEmail = {
-            'id': uuid.uuid4(),
-            'request_type': 'request',
-            'column': 'auth',
-            'query': {"email":self.curr_email}
-        }
-        temp = self.requestData(grabAuthThroughEmail)
-        
-        #temp = 
-        # {'id': UUID('18938276-4528-4865-922d-d6f0673adab9'), 
-        # 'timestamp': 1700172860.5806377, 
-        # 'data': {'_id': ObjectId('65565326c3a6e4404edd07d8'), 
-        # 'name': 'ca', 
-        # 'email': 'ca', 
-        # 'id': 'ee76936a-d4b0-4050-986d-b4a71041138b', 
-        # 'password': b'$2b$12$YL/oMnZx4cbALMWonGfQ4.WruGxhp/N/RPd.f3i.rg7aZxyEkW8Qi'}
-        # }
-        return temp
-        
-        
-        
     def addPreset(self):
         presetLists = request.form.getlist('selected_options[]') #WE HAVE THIS
         name = request.form['name'] #WE HAVE THIS
         #maybe once logged in client should send the email to each of the controllers
         
-        parser = self.getCurrentUser()
-        
-        
-        #GRAB OLD PRESETS LIST AND WE WANT TO ADD ON TO IT BY APPENDING THE PRESETSLISTS AS WELL AS NAME AND A LITTLE TIMESTAMP
-        # userDictionary = {
-        #     # 'id':parser['id'],
-        #     # 'username':parser['name'],
-        #     # 'email':parser['email'],
-        #     'name': name,
-        #     'presetLists': presetLists,
-        #     'timestamp':time.time()
-        # }
-        
-        
-        identifier = parser['data']['id']
-        print(identifier)
-        #ee76936a-d4b0-4050-986d-b4a71041138b
         addition = {
                 'name':name,
                 'presetLists':presetLists,
                 'timestamp':time.time()
             }
+        print(addition)
+        print(self.curr_email)
         presetUpdate = {
             #CHANGE WILL NEED TO BE INSERTED TO USERS
             #users {
@@ -126,10 +76,10 @@ class AddPreset(): # Controller
             'request_type': 'update',
             'column': 'users', 
             #filter_criteria = {"_id": ObjectId("your-document-id")}
-            'query': {'id': identifier},#GOOD
+            'query': {'email': self.curr_email},#GOOD
             'changeTo':  {'presets':addition} #GOOD?
         }
-        print(self.requestData(presetUpdate))
+        self.requestData(presetUpdate)
         # {'id': UUID('a846930f-60ab-40fd-adc0-9f1b5b6ece98'), 
         # 'timestamp': 1700172860.6941326, 
         # 'data': True}

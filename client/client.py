@@ -98,9 +98,9 @@ class MyFlaskApp:
     def index(self):
         #FOR FIRST TIME LOGGIN IN
         message = ''
-        if "email" in session:
-            self.curr_email = session["email"]
-            return redirect(url_for("home"))
+        # if "email" in session:
+        #     self.curr_email = session["email"]
+        #     return redirect(url_for("home"))
         if request.method == "POST":
             user = request.form.get("fullname")
             email = request.form.get("email")
@@ -204,11 +204,12 @@ class MyFlaskApp:
     def home(self):
         # please put data back in when a little quicker for debugging purposes
         # works just fine
-        print(self.viewWebsiteClass.query1())
+        #print(self.viewWebsiteClass.query1())
         return render_template('homepage.html', email=self.curr_email) #, data=self.viewWebsiteClass.query1()
     
     #FINISHED
     def addPreset(self):
+        self.addPresetClass.getEmail(self.curr_email)
         return render_template('AddPreset.html', masterList=self.addPresetClass.query())
 
     def newAddedPreset(self):
