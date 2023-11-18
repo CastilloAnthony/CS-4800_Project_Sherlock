@@ -465,15 +465,15 @@ class Server(): # The main server handler class
         """
         print('Begin test.')
         predModel = PredictionModel()
-        data = self.requestManyFromDB('pollingData', {'url':'www.google.com'})
+        data = self.requestManyFromDB('pollingData', {'url':'www.google.com', 'timestamp':{'$gte':time.time()-60*60*24}})
         tensorDataTime, tensorDataLatency = [], []
         for i in data:
             tensorDataTime.append(i['timestamp'])
             tensorDataLatency.append(i['latency'])
         tensorData = np.vstack((tensorDataTime, tensorDataLatency))
         print('Data gathered, transferring to PredictionModel...')
-        predicitedData = predModel.predictOnData(tensorData)
-        print('predictiedData =', predicitedData)
+        predicitedData = predModel.predictOnData(tensorData, 'www.google.com')
+        #print('predictiedData:')
         print('length: ', len(predicitedData))
         print('Completed test.')
         
