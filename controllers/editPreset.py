@@ -37,7 +37,7 @@ class EditPreset(): # Controller
     
     def query(self):
         #ASKING
-        print(self.curr_email)
+        # print(self.curr_email)
         userRequest = {
             'id': uuid.uuid4(),
             'request_type': 'request',
@@ -96,7 +96,7 @@ class EditPreset(): # Controller
         
         # print(preset_to_be_changed) #Big Ben: name of one of the presetLists
         preset_to_be_changed = self.parseStringToDict(preset_to_be_changed)
-        print(preset_to_be_changed)
+        # print(preset_to_be_changed)
         self.old.append(preset_to_be_changed)
         #return this and on the next page show this up top as a reference to what it is currently
         
@@ -119,16 +119,16 @@ class EditPreset(): # Controller
         # where the old list lived, I will do the same thing for 
         # name as well
         
-        
+        print('pN: ',preset_to_be_changed['name'])
         
         presetRequest = {
             'id': uuid.uuid4(),
-            'request_type': 'update',
+            'request_type': 'update2',
             'column': 'users', 
             #filter_criteria = {"_id": ObjectId("your-document-id")}
-            'query': {'email':self.curr_email},
-            'old': preset_to_be_changed,
-            'changeTo': newDictionary
+            'query': {'email':self.curr_email}, #the filter
+            'old': {"presets": {"name": preset_to_be_changed['name']}},#what I want to remove
+            'changeTo': {"presets":newDictionary} #what I want the new one to be
         }
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT
         temp = self.requestData(presetRequest)

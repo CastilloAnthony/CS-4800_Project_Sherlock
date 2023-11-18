@@ -238,38 +238,33 @@ class DBConnectionAgent():
             #     }
             # }
             print('hi')
-            return self.__db[column].update_one(query, 
-                                                {"$push":
-                                                    changeTo
-                                                    }).acknowledged
+            return self.__db[column].update_one(
+                query, 
+                {"$push":
+                    changeTo
+                    }).acknowledged
             
             # return self.__db[column].update_one(query, {"$set":changeTo}).acknowledged
         else:
             return False
         
-    def update2(self, column:str, query:dict, old:dict, changeTo:dict):
-        #DOES NOT WORK HOW I WANT IT TO
-        #it does add the things but instead of removing the old things which is what
-        #i thought set did, it just adds a new category outside of presets for no reason
-        # I'm over it, please help me. 
-        new_values = {
-            '$set': {
-                'presets.$[elem].name': changeTo['name'],
-                'presets.$[elem].presetLists': changeTo['presetLists'],
-                'presets.$[elem].timestamp': changeTo['timestamp'],
-                
-                # Add other fields to update as needed
-            }
-        }
-
-        # Define the filter criteria
-        filter_query = {
-            'presets': {
-                '$elemMatch': query
-            }
-        }
-
-        self.__db[column].update_one(filter_query, new_values, array_filters=[{'elem.name': 'existing_name', 'elem.email': 'existing_email'}])
+    def update2InDB(self, column:str, query:dict, old:dict, changeTo:dict):
+        if self.__db != False:
+            #remove old preset
+            self.__db[column].update_one(
+                query,
+                {'$pull': old}
+            )
+            #add new preset
+            return self.__db[column].update_one(
+                query, 
+                {"$push":
+                    changeTo
+                    }).acknowledged
+        else:
+            return False
+        
+        # self.__db[column].update_one(filter_query, new_values, array_filters=[{'elem.name': 'existing_name', 'elem.email': 'existing_email'}])
         
 
 #end DBConnecitonAgent

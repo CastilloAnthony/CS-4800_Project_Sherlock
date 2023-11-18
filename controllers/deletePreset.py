@@ -52,14 +52,15 @@ class DeletePreset(): # Controller
     def deletePreset(self):
         #should return a list of presets wanted to be deleted
         deletedPresets = request.form.getlist('selected_options[]') 
-        print(deletedPresets)
+        
         for preset in deletedPresets:
+            print(preset)# '5' where 5 was the name field in the presets
             deletePresetRequest = {
                 'id': uuid.uuid4(),
                 'request_type': 'remove',
                 'column': 'users',
                 'query': {'email':self.curr_email},
-                'changeTo': {"presets": {"name": preset}}# preset == ca
+                'changeTo': {"presets": {"name": preset}} #what you want to remove: ca
             }
             self.requestData(deletePresetRequest)
 
