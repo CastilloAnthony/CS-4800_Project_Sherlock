@@ -25,7 +25,7 @@ class ViewWebsite():
             newData = self.__dataQ.get()
             if newData['id'] == initialDataID:
                 self.__requestQ.put(request)
-                print(request['id'])
+                #print(request['id'])
                 time.sleep(1) #import time
                 initialDataID = False
             elif initialDataID == False:
@@ -135,14 +135,19 @@ class ViewWebsite():
             'column': 'pollingData',
             'query': {'url':url, 'timestamp':{'$gte':time.time()-60}}
         }
-        temp = self.requestData(pollingDataRequest)
+        data = self.requestData(pollingDataRequest)
+        tensorDataTime, tensorDataLatency = [], []
+        for i in data:
+            tensorDataTime.append(i['timestamp'])
+            tensorDataLatency.append(i['latency'])
+        tensorData = np.vstack((tensorDataTime, tensorDataLatency))
         # constant for now but maybe later make a 
         duration = 300 
         interval = 15
         # gives me graph
-        temp = self.graph_generator.generate_graph(temp, url, duration, interval)
+        temp = self.graph_generator.generate_graph(tensorData, url, duration, interval)
         print(temp)
-        return self.graph_generator.generate_graph(url, duration, interval)
+        return self.graph_generator.generate_graph(tensorData, url, duration, interval)
 
     def generateGraph(self, url, duration, interval):
         self.graph_generator.generate_graph(url, duration, interval)
