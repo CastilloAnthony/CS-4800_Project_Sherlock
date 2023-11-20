@@ -15,25 +15,7 @@
             <h4 style="text-align:center;color:white;">
                 Latency is in milliseconds and is averaged from the 60 insertions that happened in the last minute
             </h4><br>
-            <table style="margin-left: auto; margin-right: auto;color:white;">
-                <thead>
-                    <tr>
-                        <th>URL</th>
-                        <th>....</th>
-                        <th>Latency</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for url, value in data.items() %}
-                    <tr>
-                        <td>{{ url }} </td> 
-                        <td>....</td> 
-
-                        <td>{{ value }} ms</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            
         </div>
         </body>
     </html>
