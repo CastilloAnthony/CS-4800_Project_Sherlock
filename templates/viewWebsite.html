@@ -9,6 +9,39 @@
         </head>
         <body>
             <h1 style="text-align:center;color:white;">View Website</h1><br>
+            <h1 style="color:white">Preset Creation List</h1>
+            <br><br>
+            <!--
+                I am giving the value in the form of: 
+            {'id': UUID('36d8c82d-4a56-4860-8f71-aff5f350f45e'), 
+            'timestamp': 1698420651.296685, 'data': ['www.google.com', 'www.instagram.com', 
+            'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 
+            'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com']}
+
+            id
+            timestamp
+            data
+            -->
+            
+            <form action="viewWebsite/newViewWebsite" style="background-color:white; display:inline-block" method="POST">
+                <!--
+                    Need a name for the respective preset so the user knows what to ask for later
+                    Make it easier to recall for them. 
+                -->
+                <label for="fname">Pick A Website to View:</label><br>
+                {% for url in masterList['data'] %}
+                    <!--
+                        Working on getting this to send more than one stupid value. 
+                        I want it to send a list back to addPreset so I can send it to
+                        the database as a list
+                    -->
+                    <input type="checkbox" name="selected_options[]" value="{{ url }}"> {{ url }}<br>
+                    
+                {% endfor %}
+                <input type="submit" value="Submit">
+            </form>
         </body>
+        {{pic}}
+            
     
 {% endblock %}

@@ -103,14 +103,43 @@ class ViewWebsite():
             temp2[url] = round(np.nanmean(tempNPArray), 4)
             
         return temp2 
+    
+    def query2(self):
+        """_summary_: grab things from master list
 
+        Returns:
+            dict: uuid, id, data
+        """
+        #ASKING
+        masterListRequest = {
+            'id': uuid.uuid4(),
+            'request_type': 'request',
+            'column': 'masterList',
+            'query': {}
+        }
+        temp = self.requestData(masterListRequest)
+        return temp
+        
     def viewWebsite(self):
+<<<<<<< HEAD
         pass
     
     #implemented by Sierra
     def generateGraph(self, url, duration, interval): #peer-coded with Christian
+=======
+        url = request.form['selected_options[]']
+        # constant for now but maybe later make a 
+        duration = 300 
+        interval = 15
+        # gives me graph
+        temp = self.graph_generator.generate_graph(url, duration, interval)
+        print(temp)
+        return self.graph_generator.generate_graph(url, duration, interval)
+
+    def generateGraph(self, url, duration, interval):
+>>>>>>> 032d70414f365dd5c5a263c1dccdda86d3a55f84
         self.graph_generator.generate_graph(url, duration, interval)
 
-        view_graph_instance = ViewWebsite(requestQ, dataQ)
-        view_graph_instance = sendRequest(request)
-        view_graph_instance.generateGraph('https://csustan.edu', 300, 15)
+        # view_graph_instance = ViewWebsite(self.__requestQ, self.__dataQ)
+        # view_graph_instance = sendRequest(request)
+        # view_graph_instance.generateGraph('https://csustan.edu', 300, 15)

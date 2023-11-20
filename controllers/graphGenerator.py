@@ -80,7 +80,14 @@ class GraphGenerator:
         else:
             return True
 
-    def latency(self, dataQ):
+    def latency(self, dataQ, duration, interval):#C.A
+        """_summary_
+
+        Args:
+            dataQ (_type_): _description_
+            duration (_type_): _description_
+            interval (_type_): _description_
+        """
         last_received = psutil.net_io_counters(dataQ).bytes_recv
         last_sent = psutil.net_io_counters(dataQ).bytes_sent
         last_total = last_received + last_sent
@@ -137,5 +144,6 @@ class GraphGenerator:
 
         plt.legend()
         plt.show()
-        #image = plt.show()
+        image = plt.show()
+        return image #C.A
         

@@ -71,6 +71,7 @@ class MyFlaskApp:
         self.app.add_url_rule('/deleteWebsite/newDeletedWebsite', 'newDeletedWebsite', self.newDeletedWebsite, methods=['POST'])
         #VIEWEBSITE
         self.app.add_url_rule('/viewWebsite', 'viewWebsite', self.viewWebsite)
+        self.app.add_url_rule('/viewWebsite/newViewWebsite', '/viewWebsite/newViewWebsite', self.newViewWebsite, methods=['POST'])
         
         
         #CLASS_INITIALIZATION
@@ -205,7 +206,7 @@ class MyFlaskApp:
         # please put data back in when a little quicker for debugging purposes
         # works just fine
         #print(self.viewWebsiteClass.query1())
-        return render_template('homepage.html', email=self.curr_email, data=self.viewWebsiteClass.query1())
+        return render_template('homepage.html', email=self.curr_email) #data=self.viewWebsiteClass.query1())
     
     #FINISHED
     def addPreset(self):
@@ -223,8 +224,16 @@ class MyFlaskApp:
     
     #TODO: grab graphs to put into this
     def viewWebsite(self):
-        return render_template('viewWebsite.html')#,data=self.viewWebsiteClass.query1()
-
+        #buttons to pick the website
+        return render_template('viewWebsite.html', masterList = self.viewWebsiteClass.query2())
+    def newViewWebsite(self):
+        # grab selected website
+        # in viewWebsite class use that and use the 
+        # website as a parameter to generateGraph('https://csustan.edu', 300, 15)
+        # that gives me a picture
+        # print(self.viewWebsiteClass.viewWebsite())
+        return render_template('viewWebsite.html', pic = self.viewWebsiteClass.viewWebsite())
+        
     #FINISHED
     def deletePreset(self):
         self.deletePresetClass.getEmail(self.curr_email)
