@@ -3,7 +3,7 @@ import uuid
 import time
 from flask import Flask, render_template, request
 import numpy as np
-from graphGenerator import GraphGenerator
+from controllers.graphGenerator import GraphGenerator
 
 class ViewWebsite():
     def __init__(self, requestQ, dataQ):
@@ -107,8 +107,7 @@ class ViewWebsite():
     def viewWebsite(self):
         pass
 
-    def generateGraph(self, url, duration, interval): 
-
+    def generateGraph(self, url, duration, interval):
         self.graph_generator.generate_graph(url, duration, interval)
 
         view_graph_instance = ViewWebsite(requestQ, dataQ)
