@@ -121,4 +121,5 @@ class ViewWebsite():
     def viewWebsite(self):
         pass
 
-    ## new function to display graph from graphGenerator
+    def generateGraph(self, url, duration, interval):
+        self.generate_graph.plt.show()
