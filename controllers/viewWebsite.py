@@ -121,6 +121,13 @@ class ViewWebsite():
         return temp
     
     def viewWebsite(self):
+        """_summary_: grabs url from html form then asks for respective data to that url in PollingData 
+        Collection, from that, duration url and interval are given as parameters as well into generate_graph
+        
+
+        Returns:
+            picture: returns picture or plot that will be rendered in client.py
+        """
         url = request.form['selected_options[]']
         pollingDataRequest = {
             'id': uuid.uuid4(),
