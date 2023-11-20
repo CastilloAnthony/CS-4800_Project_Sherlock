@@ -13,9 +13,11 @@ class ViewWebsite():
     def __del__(self):
         del self.__requestQ, self.__dataQ
 
+    '''
     def process_request(self, request):
-        if request['request_type'] == 'request':
-            response_data = self.requestData(request)
+            if request['request_type'] == 'request':
+                response_data = self.requestData(request)
+    '''
 
     def requestData(self, request):
         self.__requestQ.put(request)
@@ -133,10 +135,11 @@ class ViewWebsite():
             'id': uuid.uuid4(),
             'request_type': 'request',
             'column': 'pollingData',
-            'query': {'url':url, 'timestamp':{'$gte':time.time()-60}}
+            'query': {'url':url, 'timestamp':{'$gte':time.time()-60*60}}
         }
-        data = self.requestData(pollingDataRequest)
+        data = self.requestData(pollingDataRequest)["data"] #line implented by Christian
         tensorDataTime, tensorDataLatency = [], []
+        print(data)
         for i in data:
             tensorDataTime.append(i['timestamp'])
             tensorDataLatency.append(i['latency'])
@@ -146,11 +149,12 @@ class ViewWebsite():
         interval = 15
         # gives me graph
         temp = self.graph_generator.generate_graph(tensorData, url, duration, interval)
-        print(temp)
-        return self.graph_generator.generate_graph(tensorData, url, duration, interval)
+        #print(temp)
+        return temp
 
     def generateGraph(self, url, duration, interval):
         self.graph_generator.generate_graph(url, duration, interval)
+        
         # need to pass the tensorData to generateGraph function in both files
 
     

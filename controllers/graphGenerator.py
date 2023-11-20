@@ -12,6 +12,8 @@ from controllers.predictionModel import PredictionModel
 import time
 import uuid
 import psutil
+import io
+import base64
 
 
 class GraphGenerator:
@@ -72,14 +74,15 @@ class GraphGenerator:
        seconds = dataQ.timestamp()
        time_response = time.strftime('%m/%d/%y %H:%M:%S', time.localtime(seconds))
        
-    def monitorWebsite(self): #initially confirms whether the webpage is active or not
-        listOfURLs = self.requestData({'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'masterList', 'query':{}}) #line implemented by Anthony
-        r = requests.get(listOfURLs, timeout = 5)
-        if r.status_code != 200:
-            print ("Error: {} is unavailable".format(listOfURLs))
-        else:
-            return True
+    # def monitorWebsite(self): #initially confirms whether the webpage is active or not
+    #     listOfURLs = self.requestData({'id':uuid.uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'masterList', 'query':{}}) #line implemented by Anthony
+    #     r = requests.get(listOfURLs, timeout = 5)
+    #     if r.status_code != 200:
+    #         print ("Error: {} is unavailable".format(listOfURLs))
+    #     else:
+    #         return True
 
+    '''
     def latency(self, dataQ, duration, interval):#C.A
         """_summary_
 
@@ -116,39 +119,48 @@ class GraphGenerator:
             time.sleep(15) #recounts every 15 seconds
             
             return [bytes_received, bytes_sent, bytes_total]
+    '''
 
     def generate_graph(self, tensorData, url, duration=300, interval=15):
-        time_values, latency_values = self.latency(psutil.net_io_counters(), duration, interval)
+        time_values, latency_values = tensorData[0], tensorData[1] #self.latency(psutil.net_io_counters(), duration, interval) #line implented by Anthony
 
-        website_status = self.monitorWebsite(url)
+        #website_status = self.monitorWebsite(url)
 
         #sending tensorData to the prediction model
-        predictOnData(tensorData)
+        #predictOnData(tensorData)
 
-        time_values = np.array([1,2,3])
-        latency_values = np.array([4,5,6])
+        #time_values = np.array([1,2,3])
+        #latency_values = np.array([4,5,6])
         #foresight = self.predictOnData(tensorData, url= '')
         #foresight = self.predictOnData(tensorData, '', sampleRate='', epochs=[], predictions=[])
         
         plt.figure(figsize=(10, 6))
-        plt.plot(time_values, latency_values, label='Latency (ms)')
+        plt.plot(time_values.astype('datetime64[s]'), latency_values, label='Latency (ms)') #line altered by Anthony
         #plt.plot(foresight[0], foresight[1], label='Prediction (ms)')
         plt.xlabel('Time')
         plt.ylabel('Latency (ms)')
-        plt.title('Latency and Website Monitoring')
+        plt.title('Latency and Website Monitoring '+str(datetime.datetime.now()))
         plt.grid(True)
         plt.legend()
 
-        if website_status:
-            plt.axvline(x=datetime.datetime.now(), color='green', linestyle='--', label='Website UP')
-        else:
-            plt.axvline(x=datetime.datetime.now(), color='red', linestyle='--', label='Website DOWN')
+        # if website_status:
+        #     plt.axvline(x=datetime.datetime.now(), color='green', linestyle='--', label='Website UP')
+        # else:
+        #     plt.axvline(x=datetime.datetime.now(), color='red', linestyle='--', label='Website DOWN')
 
         #plt.text(datetime.datetime.now(), max(latency_values) * 0.9, f'Prediction: {foresight}', fontsize=12)
-        plt.text(datetime.datetime.now(), max(latency_values) * 0.9, fontsize=12)
+        #plt.text(datetime.datetime.now(), max(latency_values) * 0.9, fontsize=12)
 
         plt.legend()
-        plt.show()
-        image = plt.show()
+        #plt.show()
+        img_buffer = io.BytesIO()
+        plt.savefig(img_buffer, format='png')
+
+        img_str = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
+    
+        plt.close()
+        
+        return img_str #line imnplemented by Christian 
+        image = plt #line altered by Anthony and Christian
         return image #line implemented by Christian
         
