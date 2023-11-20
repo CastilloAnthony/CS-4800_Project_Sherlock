@@ -13,7 +13,6 @@ import time
 import uuid
 import psutil
 
-
 class GraphGenerator:
     def __init__(self, requestQ, dataQ):
         self.__requestQ, self.__dataQ = requestQ, dataQ
@@ -40,32 +39,32 @@ class GraphGenerator:
                     return newData
             else:
                 self.__dataQ.put(newData)
-                
-        def sendRequest (self, request):
-            self.ViewWebsite.process_request(request)
     '''
-        def timeConversion():
-            registeredStartDate = datetime()
-            for i in datetime: 
-                dt = datetime.strptime(i,"%d:%m:%Y %H:%M:%S") # Stripped information from each row 
+    def sendRequest (self, request):
+        self.ViewWebsite.process_request(request)
+
+    def timeConversion():
+        registeredStartDate = datetime()
+        for i in datetime: 
+            dt = datetime.strptime(i,"%d:%m:%Y %H:%M:%S") # Stripped information from each row 
                 
-            #PDT_time = []  
-            T = pd.Series(data=GMT) # Inputting GMT_time into a series 
-            # Storing local dates and times into list  
-            PDT_Date_time = []
-            for i in local_Date_time: 
-                dt_objects = i.to_pydatetime() # Turns the timestamps to datetime objects 
-                PDT_Date_time.append(dt_objects)
-            PDT_time = [] # official PDT time 
-            for i in PDT_Date_time: # Takes time in 
-                timediff = i.timestamp() - registeredStartDate.timestamp()
-                PDT_time.append(timediff)
+        #PDT_time = []  
+        T = pd.Series(data=GMT) # Inputting GMT_time into a series 
+        # Storing local dates and times into list  
+        PDT_Date_time = []
+        for i in local_Date_time: 
+            dt_objects = i.to_pydatetime() # Turns the timestamps to datetime objects 
+            PDT_Date_time.append(dt_objects)
+        PDT_time = [] # official PDT time 
+        for i in PDT_Date_time: # Takes time in 
+            timediff = i.timestamp() - registeredStartDate.timestamp()
+            PDT_time.append(timediff)
                 
-            print(PDT_Date_time[0])
-            print(PDT_Date_time[0]- registeredStartDate)
-            print(PDT_time[0])
-            print(abs(df[selectedData].mean())**2)
-            print(abs(np.mean(df[selectedData]))**2)
+        print(PDT_Date_time[0])
+        print(PDT_Date_time[0]- registeredStartDate)
+        print(PDT_time[0])
+        print(abs(df[selectedData].mean())**2)
+        print(abs(np.mean(df[selectedData]))**2)
     '''
 
     def timeConvert(self, dataQ):
@@ -80,7 +79,7 @@ class GraphGenerator:
         else:
             return True
 
-    def latency(self, dataQ, duration, interval):#C.A
+    def latency(self, interface_name, duration, interval):#line altered by Christian
         """_summary_
 
         Args:
@@ -88,6 +87,8 @@ class GraphGenerator:
             duration (_type_): _description_
             interval (_type_): _description_
         """
+
+        '''
         last_received = psutil.net_io_counters(dataQ).bytes_recv
         last_sent = psutil.net_io_counters(dataQ).bytes_sent
         last_total = last_received + last_sent
@@ -95,6 +96,19 @@ class GraphGenerator:
         while True:
             bytes_received = psutil.net_io_counters(dataQ).bytes_recv
             bytes_sent = psutil.net_io_counters(dataQ).bytes_sent
+            bytes_total = bytes_received + bytes_sent
+
+        '''
+        interface_name = self.__dataQ
+        last_counters = psutil.net_io_counters(pernic=True)[interface_name]
+        last_received = last_counters.bytes_recv
+        last_sent = last_counters.bytes_sent
+        last_total = last_received + last_sent
+
+        while True:
+            current_counters = psutil.net_io_counters(pernic=True)[interface_name]
+            bytes_received = current_counters.bytes_recv
+            bytes_sent = current_counters.bytes_sent
             bytes_total = bytes_received + bytes_sent
 
             new_received = bytes_received + last_received
@@ -117,18 +131,19 @@ class GraphGenerator:
             
             return [bytes_received, bytes_sent, bytes_total]
 
-    def generate_graph(self, tensorData, url, duration=300, interval=15):
-        time_values, latency_values = self.latency(psutil.net_io_counters(), duration, interval)
+    def generate_graph(self, tensorData, dataQ, url, duration=300, interval=15):
+        #time_values, latency_values = self.latency(interface_name, duration, interval)
+        time_values, latency_values = self.latency(dataQ, duration, interval)
 
         website_status = self.monitorWebsite(url)
 
         #sending tensorData to the prediction model
-        predictOnData(tensorData)
+        #self.__predict.predictOnData(tensorData)
 
         time_values = np.array([1,2,3])
         latency_values = np.array([4,5,6])
-        #foresight = self.predictOnData(tensorData, url= '')
-        #foresight = self.predictOnData(tensorData, '', sampleRate='', epochs=[], predictions=[])
+        #foresight = self.__predict.predictOnData(tensorData, url= '')
+        #foresight = self.__predict.predictOnData(tensorData, '', sampleRate='', epochs=[], predictions=[])
         
         plt.figure(figsize=(10, 6))
         plt.plot(time_values, latency_values, label='Latency (ms)')

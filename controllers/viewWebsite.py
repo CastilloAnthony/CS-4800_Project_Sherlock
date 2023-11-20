@@ -142,7 +142,8 @@ class ViewWebsite():
         duration = 300 
         interval = 15
         # gives me graph
-        temp = self.graph_generator.generate_graph(temp, url, duration, interval)
+        #temp = self.graph_generator.generate_graph(temp, url, duration, interval)
+        temp = self.graph_generator.generate_graph(self.__dataQ, url, duration, interval)
         print(temp)
         return self.graph_generator.generate_graph(url, duration, interval)
 
