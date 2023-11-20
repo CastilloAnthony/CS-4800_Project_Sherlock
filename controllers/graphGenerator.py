@@ -115,22 +115,24 @@ class GraphGenerator:
 
             time.sleep(15) #recounts every 15 seconds
             
-            #return something
+            return [bytes_received, bytes_sent, bytes_total]
 
-    def generate_graph(tensorData, self, url, duration=300, interval=15):
+    def generate_graph(self, tensorData, url, duration=300, interval=15):
         time_values, latency_values = self.latency(psutil.net_io_counters(), duration, interval)
 
         website_status = self.monitorWebsite(url)
 
-        #sending data to the prediction model
-        
+        #sending tensorData to the prediction model
+        predictOnData(tensorData)
+
         time_values = np.array([1,2,3])
         latency_values = np.array([4,5,6])
-        foresight = self.predictedData(tensorData, '', sampleRate='', epochs=[], predictions=[])
+        #foresight = self.predictOnData(tensorData, url= '')
+        #foresight = self.predictOnData(tensorData, '', sampleRate='', epochs=[], predictions=[])
         
         plt.figure(figsize=(10, 6))
         plt.plot(time_values, latency_values, label='Latency (ms)')
-        plt.plot(foresight[0], foresight[1], label='Prediction (ms)')
+        #plt.plot(foresight[0], foresight[1], label='Prediction (ms)')
         plt.xlabel('Time')
         plt.ylabel('Latency (ms)')
         plt.title('Latency and Website Monitoring')
@@ -142,10 +144,11 @@ class GraphGenerator:
         else:
             plt.axvline(x=datetime.datetime.now(), color='red', linestyle='--', label='Website DOWN')
 
-        plt.text(datetime.datetime.now(), max(latency_values) * 0.9, f'Prediction: {foresight}', fontsize=12)
+        #plt.text(datetime.datetime.now(), max(latency_values) * 0.9, f'Prediction: {foresight}', fontsize=12)
+        plt.text(datetime.datetime.now(), max(latency_values) * 0.9, fontsize=12)
 
         plt.legend()
         plt.show()
         image = plt.show()
-        return image #C.A
+        return image #line implemented by Christian
         

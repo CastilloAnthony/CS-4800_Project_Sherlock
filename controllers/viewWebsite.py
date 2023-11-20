@@ -151,5 +151,6 @@ class ViewWebsite():
 
     def generateGraph(self, url, duration, interval):
         self.graph_generator.generate_graph(url, duration, interval)
+        # need to pass the tensorData to generateGraph function in both files
 
     
