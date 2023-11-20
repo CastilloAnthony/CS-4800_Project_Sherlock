@@ -114,6 +114,8 @@ class GraphGenerator:
             last_total = bytes_total
 
             time.sleep(15) #recounts every 15 seconds
+            
+            #return something
 
     def generate_graph(self, url, duration=300, interval=15):
         time_values, latency_values = self.latency(psutil.net_io_counters(), duration, interval)

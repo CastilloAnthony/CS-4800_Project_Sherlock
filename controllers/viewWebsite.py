@@ -119,20 +119,28 @@ class ViewWebsite():
         }
         temp = self.requestData(masterListRequest)
         return temp
-        
+    
     def viewWebsite(self):
+        """_summary_: takes in a url from html then requests all the poling data from pollingData collection
+        Which is all the documents in a list, plug temp into 
+
+        Returns:
+            picture?: hopefully a plot of the graphs 
+        """
         url = request.form['selected_options[]']
+        pollingDataRequest = {
+            'id': uuid.uuid4(),
+            'request_type': 'request',
+            'column': 'pollingData',
+            'query': {'url':url, 'timestamp':{'$gte':time.time()-60}}
+        }
+        temp = self.requestData(pollingDataRequest)
         # constant for now but maybe later make a 
         duration = 300 
         interval = 15
         # gives me graph
-        temp = self.graph_generator.generate_graph(url, duration, interval)
+        temp = self.graph_generator.generate_graph(temp, url, duration, interval)
         print(temp)
-        return self.graph_generator.generate_graph(url, duration, interval)
+        return temp
 
-    def generateGraph(self, url, duration, interval):
-        self.graph_generator.generate_graph(url, duration, interval)
-
-        # view_graph_instance = ViewWebsite(self.__requestQ, self.__dataQ)
-        # view_graph_instance = sendRequest(request)
-        # view_graph_instance.generateGraph('https://csustan.edu', 300, 15)
+    
