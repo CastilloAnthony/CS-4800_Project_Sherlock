@@ -149,12 +149,12 @@ class ViewWebsite():
         interval = 15
         # gives me graph
         temp = self.graph_generator.generate_graph(tensorData, url, duration, interval)
-        #print(temp)
+        print(temp)
         return temp
 
     def generateGraph(self, url, duration, interval):
         self.graph_generator.generate_graph(url, duration, interval)
-        
+
         # need to pass the tensorData to generateGraph function in both files
 
     

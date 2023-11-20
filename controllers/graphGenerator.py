@@ -14,6 +14,7 @@ import uuid
 import psutil
 import io
 import base64
+import mpld3
 
 
 class GraphGenerator:
@@ -134,12 +135,14 @@ class GraphGenerator:
         #foresight = self.predictOnData(tensorData, url= '')
         #foresight = self.predictOnData(tensorData, '', sampleRate='', epochs=[], predictions=[])
         
-        plt.figure(figsize=(10, 6))
+        #fig, ax = plt.subplots()
+        #fig.autofmt_xdate() #line implemented by Anthony
+        # plt.figure(figsize=(10, 6))
         plt.plot(time_values.astype('datetime64[s]'), latency_values, label='Latency (ms)') #line altered by Anthony
         #plt.plot(foresight[0], foresight[1], label='Prediction (ms)')
         plt.xlabel('Time')
         plt.ylabel('Latency (ms)')
-        plt.title('Latency and Website Monitoring '+str(datetime.datetime.now()))
+        plt.title('Latency and Website Monitoring of ' + str(url) + "     (" + str(datetime.datetime.now()) + ")")
         plt.grid(True)
         plt.legend()
 
@@ -151,16 +154,19 @@ class GraphGenerator:
         #plt.text(datetime.datetime.now(), max(latency_values) * 0.9, f'Prediction: {foresight}', fontsize=12)
         #plt.text(datetime.datetime.now(), max(latency_values) * 0.9, fontsize=12)
 
-        plt.legend()
+        #plt.legend()
         #plt.show()
         img_buffer = io.BytesIO()
         plt.savefig(img_buffer, format='png')
 
         img_str = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
-    
         plt.close()
         
+        #plot_html = mpld3.fig_to_html(fig)
+    
+        #return plot_html
+        
         return img_str #line imnplemented by Christian 
-        image = plt #line altered by Anthony and Christian
-        return image #line implemented by Christian
+        # image = plt #line altered by Anthony and Christian
+        # return image #line implemented by Christian
         

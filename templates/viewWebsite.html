@@ -40,11 +40,13 @@
                 {% endfor %}
                 <input type="submit" value="Submit">
             </form>
+            <img src="data:image/png;base64,{{ plot_html }}" alt="Matplotlib Plot">
+            
+            
         </body>
-        <!--
-            {{pic}}
-        -->
-        <img src="data:image/png;base64,{{ pic }}" alt="Matplotlib Plot">
+        
+        
+        
             
     
 {% endblock %}
