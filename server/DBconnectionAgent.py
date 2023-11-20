@@ -120,7 +120,6 @@ class DBConnectionAgent():
         #     { _id: <ObjectId("your_document_id")> },
         #     { $pull: { 'websiteLists': "<removedWebsite>" } }
         # );
-        print('hi')
         if self.__db != False:
             return self.__db[column].update_one(
                 query,
@@ -239,13 +238,33 @@ class DBConnectionAgent():
             #     }
             # }
             print('hi')
-            return self.__db[column].update_one(query, 
-                                                {"$push":
-                                                    changeTo
-                                                    }).acknowledged
+            return self.__db[column].update_one(
+                query, 
+                {"$push":
+                    changeTo
+                    }).acknowledged
             
             # return self.__db[column].update_one(query, {"$set":changeTo}).acknowledged
         else:
             return False
+        
+    def update2InDB(self, column:str, query:dict, old:dict, changeTo:dict):
+        if self.__db != False:
+            #remove old preset
+            self.__db[column].update_one(
+                query,
+                {'$pull': old}
+            )
+            #add new preset
+            return self.__db[column].update_one(
+                query, 
+                {"$push":
+                    changeTo
+                    }).acknowledged
+        else:
+            return False
+        
+        # self.__db[column].update_one(filter_query, new_values, array_filters=[{'elem.name': 'existing_name', 'elem.email': 'existing_email'}])
+        
 
 #end DBConnecitonAgent

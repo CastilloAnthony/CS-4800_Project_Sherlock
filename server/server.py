@@ -21,8 +21,8 @@ class Server(): # The main server handler class
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
         self.__pollingSpeed = 60/12 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
-        self.__requestsQ = mp.Queue(maxsize=32767) # The request queue, only a clinet will put to this queue
-        self.__dataQ = mp.Queue(maxsize=32767) # The request queue, only the server will put to this queue
+        self.__requestsQ = mp.Queue(maxsize=1000000000) # The request queue, only a clinet will put to this queue
+        self.__dataQ = mp.Queue(maxsize=1000000000) # The request queue, only the server will put to this queue
         self.__processes = {} # Process handles identifiers and handles for all processes created by the server
         self.__adminID = False
         self._setupDBConnection()
@@ -187,6 +187,20 @@ class Server(): # The main server handler class
         """
         if column in self.__columns:
             return self.__DBconneciton.updateInDB(column, content, changeTo)
+        else:
+            return False
+    def update2InDB(self, column:str, content:dict, old:dict, changeTo:dict):#C.A.
+        """Updates a pre-existing document with new information
+
+        Args:
+            column (str): The specific collection to have its contents be updated
+            content (dict): A dictionary containing the query to match with whats already in the database and content to replace the matched query with. FORMAT: {{query}, {modifications}}
+
+        Returns:
+            bool: True/False for success/failure to update data already existing in the database
+        """
+        if column in self.__columns:
+            return self.__DBconneciton.update2InDB(column, content, old, changeTo)
         else:
             return False
 
@@ -375,6 +389,9 @@ class Server(): # The main server handler class
                 self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self._changeSettings(newRequest['column'], newRequest['changeTo'])})
             elif newRequest['request_type'] == 'update':
                 self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.updateInDB(newRequest['column'], newRequest['query'], newRequest['changeTo'])})
+            elif newRequest['request_type'] == 'update2':#Electric boogaloo
+                self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.update2InDB(newRequest['column'], newRequest['query'], newRequest['old'], newRequest['changeTo'])})#C.A.
+            #column:str, query:dict, old:dict, changeTo:dict
             else:
                 self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':'Not Implemented'})
 
@@ -448,15 +465,15 @@ class Server(): # The main server handler class
         """
         print('Begin test.')
         predModel = PredictionModel()
-        data = self.requestManyFromDB('pollingData', {'url':'www.google.com'})
+        data = self.requestManyFromDB('pollingData', {'url':'www.google.com', 'timestamp':{'$gte':time.time()-60*60*24}})
         tensorDataTime, tensorDataLatency = [], []
         for i in data:
             tensorDataTime.append(i['timestamp'])
             tensorDataLatency.append(i['latency'])
         tensorData = np.vstack((tensorDataTime, tensorDataLatency))
         print('Data gathered, transferring to PredictionModel...')
-        predicitedData = predModel.predictOnData(tensorData)
-        print('predictiedData =', predicitedData)
+        predicitedData = predModel.predictOnData(tensorData, 'www.google.com')
+        #print('predictiedData:')
         print('length: ', len(predicitedData))
         print('Completed test.')
         

@@ -7,16 +7,28 @@
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style1.css') }}">
     </head>
     <body>
+
         <ul>
-            <li><a class="current" href="/home">Home</a></li>
-            <li><a href="addWebsite">Add Website</a></li>
-            <li><a href="deleteWebsite">Delete Website</a></li>
-            <li><a href="addPreset">Add Preset</a></li>
-            <li><a href="editPreset">Edit Preset</a></li>
-            <li><a href="deletePreset">Delete Preset</a></li>
-            
-            <li><a href="viewPreset">View Preset</a></li>
-            <li><a href="viewWebsite">View Website</a></li>
+            <li><a class="home-link" href="/home">Home</a></li>
+        
+            <li class="dropdown">
+                <a href="#">Websites</a>
+                <div class="dropdown-content">
+                    <a href="addWebsite">Add Website</a>
+                    <a href="deleteWebsite">Delete Website</a>
+                    <a href="viewWebsite">View Website</a>
+                </div>
+            </li>
+        
+            <li class="dropdown">
+                <a href="#">Presets</a>
+                <div class="dropdown-content">
+                    <a href="addPreset">Add Preset</a>
+                    <a href="editPreset">Edit Preset</a>
+                    <a href="deletePreset">Delete Preset</a>
+                    <a href="viewPreset">View Preset</a>
+                </div>
+            </li>
         </ul>
         <br>
         <br>

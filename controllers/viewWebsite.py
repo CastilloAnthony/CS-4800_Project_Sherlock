@@ -2,6 +2,7 @@
 import uuid
 import time
 from flask import Flask, render_template, request
+import numpy as np
 
 class ViewWebsite():
     def __init__(self, requestQ, dataQ):
@@ -30,7 +31,15 @@ class ViewWebsite():
                 self.__dataQ.put(newData)
 
     def query1(self):
+        #Modified by Anthony Castillo
         #ASKING
+        """_summary_: essentially taking a bit of polled data and giving it in a formattable way 
+
+        Returns:
+            dict: dictionary 
+                that contains each of the websites we have in 
+                masterlist and trying to see the average latency over about a minute 
+        """
         Request1 = {
             'id': uuid.uuid4(),
             'request_type': 'request',
@@ -52,8 +61,13 @@ class ViewWebsite():
         # 'timestamp': 1698420651.296685, 'data': ['www.google.com', 'www.instagram.com', 
         # 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 
         # 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com']}
+        
+        
+        
+        # ANTHONY CODE
         temp2 = {}
         for url in temp1['data']:
+            tempNPArray = np.empty(1)
             Request2 = {
                 'id': uuid.uuid4(),
                 'request_type': 'request',
@@ -65,7 +79,6 @@ class ViewWebsite():
             # 'www.bbc.co.uk': 0.04925578832626343, 
             # 'www.reddit.com': 0.05298107862472534, 'www.wikipedia.org': 0.024207770824432373, 'www.amazon.com': 0.037099480628967285}
             tempUrl = self.requestData(Request2)
-            #tempUrl = self.requestData(Request1)
             while tempUrl == None:
                 tempData = self.requestData(Request2)
                 if tempData == None:
@@ -74,49 +87,13 @@ class ViewWebsite():
                     tempData = self.requestData(Request2)
                 else:
                     tempUrl = tempData
-            x = 0
-            y = len(tempUrl['data'])
-            nanCount = 0
-            for doc in tempUrl['data']:
-                if isinstance(doc['latency'], float) or isinstance(doc['latency'], int):
-                    x += doc['latency']
-                else:
-                    nanCount += 1
-            try:
-                averageLatencyOfUrl = (x/(y-nanCount)) * 1000
-            except ZeroDivisionError:
-                if y != 0:
-                    averageLatencyOfUrl = x/y * 1000
-                else:
-                    averageLatencyOfUrl = x *1000
-            temp2[url] = round(averageLatencyOfUrl,4)
-        
             
-        print(temp2)
-        return temp2 #got rid temp1
-    
-    def query2(self):
-        #ASKING
-        # Request = {
-        #     'id': uuid.uuid4(),
-        #     'request_type': 'request',
-        #     'column': 'pollingData',
-        #     'query':{'url':'wwww.google.com', 'timestamp':{'$gte':time.time()-60}}
-        # }
-        # temp = self.requestData(masterListRequest)
-        # return temp
-        pass
-    def query3(self):
-        #ASKING
-        # Request = {
-        #     'id': uuid.uuid4(),
-        #     'request_type': 'request',
-        #     'column': 'masterList',
-        #     'query': {}
-        # }
-        # temp = self.requestData(masterListRequest)
-        # return temp
-        pass
+            for doc in tempUrl['data']:
+                tempNPArray = np.append(tempNPArray, doc['latency'])
+            
+            temp2[url] = round(np.nanmean(tempNPArray), 4)
+            
+        return temp2 
 
     def viewWebsite(self):
         pass

@@ -25,6 +25,7 @@ import datetime
 import tensorflow as tf
 import pandas as pd
 import numpy as np
+import matplotlib as plt
 class PredictionModel():
     """_summary_
     """
@@ -33,13 +34,16 @@ class PredictionModel():
         self.__val_data = False
         self.__test_data = False
         self.__model = False
-        self.__modelFilename = 'predictionModel.keras'
         self.__size = 0
+        self.__train_ds = False
+        self.__val_ds = False
+        self.__test_ds = False
+        self.__modelFilename = 'predictionModel.keras'
 
     def __del__(self):
         """_summary_
         """
-        del self.__timestampData, self.__latencyData, self.__model, self.__modelFilename, self.__size
+        del self.__train_data, self.__val_data, self.__test_data, self.__model, self.__modelFilename, self.__size, self.__train_ds, self.__val_ds, self.__test_ds
 
     def requestData(self, request): # Not Used, data should be passed to this class instead
         """_summary_
@@ -72,20 +76,33 @@ class PredictionModel():
         """WIP
         """
         self.__model = tf.keras.Sequential([
-            #tf.keras.layers.Lambda(lambda x: x[:, -11:, :]),
+            #tf.keras.layers.Lambda(lambda x: x[:, -2:, :]),
             #tf.keras.Input(shape=(int(self.__size*0.7))), #, int(self.__size*0.7))),
-            tf.keras.layers.Reshape((int(self.__size*0.7*0.5), 2), input_shape=(int(self.__size*0.7),)),# dtype=tf.float32), # int(int(self.__size*0.7)//(self.__size*0.7*0.5))
-            tf.keras.layers.Dense(8, activation='relu'),# input_shape=(32,)),#(self.__size*0.7), 2)),
-            tf.keras.layers.Dense(4, activation='relu'), #input_shape=(int(self.__size*0.7), 2)),
-            tf.keras.layers.Dense(1, activation='relu')#, input_shape=(int(self.__size*0.7), 2))
+            #tf.keras.layers.Reshape((int(self.__size*0.7*0.5), 2), input_shape=(int(self.__size*0.7),)),# dtype=tf.float32), # int(int(self.__size*0.7)//(self.__size*0.7*0.5))
+            tf.keras.layers.Dense(256, activation='LeakyReLU'),# input_shape=(32,)),#(self.__size*0.7), 2)),
+            tf.keras.layers.Reshape((16, 16)),#, input_shape=(128, 256,)),
+            tf.keras.layers.Conv1D(32, 3, activation='relu'),
+            #tf.keras.layers.Conv2D(256 activation='LeakyReLU')
+            tf.keras.layers.Dropout(0.2),
+            tf.keras.layers.Dense(128, activation='gelu'), #input_shape=(int(self.__size*0.7), 2)),
+            #tf.keras.layers.Dense(128),
+            tf.keras.layers.Dropout(0.2),
+            tf.keras.layers.Dense(2, activation='softmax'),# input_shape=(int(self.__size*0.7), 2))
+            tf.keras.layers.Dropout(0.2),
+            tf.keras.layers.Dense(1)
         ])
         #loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)
-        self.__model.compile(optimizer='adam', loss='mse')#'sparse_categorical_crossentropy')#'mse')#loss_fn,)
+        
+        self.__model.compile(
+            optimizer='sgd',#tf.keras.optimizers.Adam(learning_rate=0.001), 
+            loss=tf.keras.losses.Huber(),#tf.keras.losses.LogCosh(),#'mse', 
+            metrics=['accuracy']
+            )#'sparse_categorical_crossentropy')#'mse')#loss_fn,)
         #print(len(self.__model.weights))
-        print(self.__model.get_config())
-        self.__model.build()
+        #print(self.__model.get_config())
+        self.__model.build(input_shape=(128, 1,))
         self.__model.summary()
-        print("Model Input Shape:", self.__model.input_shape)
+        #print("Model Input Shape:", self.__model.input_shape)
         '''
         Image Model Example
         self.__model = tf.keras.Sequential([
@@ -114,7 +131,7 @@ class PredictionModel():
         """
         try:
             self.__model.summary()
-            self.__modle.save(self.__modelFilename)
+            self.__model.save(self.__modelFilename)
         except:
             print('Could not save prediction model.')
 
@@ -133,9 +150,9 @@ class PredictionModel():
         Args:
             name (str): The name to change the model's file
         """
-        self.__modelFilename = name
-        self.createModel()
-        self.saveModel()
+        self.__modelFilename = 'predictionModels/'+name+'.keras'
+        #self.createModel()
+        #self.saveModel()
 
     def getFilename(self):
         """Returns the name of the file that the model is saved in
@@ -152,23 +169,35 @@ class PredictionModel():
             data (list): A list of dictionaries to work with (i.e., [{data0}, {data1}, {data2}])
         """
         self.clearData()
-
         tempDataX = data[0] # Timestamp
-        tempDataY = data[1] # Latency
+        tempDataY = data[1]*100 # Latency
+        #tempMean = 
+        #print(tempMean, tempMean**2)
+        print(len(tempDataX))
+        #for i, v in enumerate(tempDataX):
+        i=0
+        while i < len(tempDataX):
+            if np.isnan(tempDataX[i]) or np.isnan(tempDataY[i]):
+                tempDataX = np.delete(tempDataX, i)
+                tempDataY = np.delete(tempDataY, i)
+            elif tempDataY[i] == 0:
+                tempDataX = np.delete(tempDataX, i)
+                tempDataY = np.delete(tempDataY, i)
+            elif tempDataY[i] > np.nanmean(tempDataY)**2:
+                tempDataX = np.delete(tempDataX, i)
+                tempDataY = np.delete(tempDataY, i)
+            i += 1
+        print(np.nanmean(tempDataY), np.nanmean(tempDataY)**2)
 
         self.__size = len(tempDataX)
-        print('Starting Size: ', self.__size, int(self.__size*0.7))
-        while self.isOdd(int(self.__size*0.7)):
+        #print('Starting Size: ', self.__size, int(self.__size*0.7))
+        while int(self.__size*0.7)%2 != 0:#self.isOdd(int(self.__size*0.7)): # 
             tempDataX = np.delete(tempDataX, 0, None)
             tempDataY = np.delete(tempDataY, 0, None)
             self.__size = len(tempDataX)
             print(self.__size, int(self.__size*0.7))
-        print('Ending Size: ', self.__size, int(self.__size*0.7))
+        #print('Ending Size: ', self.__size, int(self.__size*0.7))
         #tempData = np.vstack((tempDataX, tempDataY))
-        for i in tempDataY:
-            #print(i)
-            if i == np.nan:
-                print(i)
         #print(tempDataY*100)
         #print(np.nanmean(tempDataY), np.nanstd(tempDataY))
         #print(tempDataY.mean(), tempDataY.std())
@@ -192,42 +221,63 @@ class PredictionModel():
         self.__val_data = np.vstack((val_dataX, val_dataY))
         self.__test_data = np.vstack((test_dataX, test_dataY))
         
-        print('Training Data:\n', self.__train_data)
-        print('Validation Data:\n', self.__val_data)
-        print('Test Data:\n', self.__test_data)
-        print('Length: ', self.__size, '70%: ', int(self.__size*0.7), ' ', 'Mean: ', train_mean, ' ', 'STD: ', train_std)
+        # print('Training Data:\n', self.__train_data)
+        # print('Validation Data:\n', self.__val_data)
+        # print('Test Data:\n', self.__test_data)
+        # print('Length: ', self.__size, '70%: ', int(self.__size*0.7), ' ', 'Mean: ', train_mean, ' ', 'STD: ', train_std)
 
-        self.__train_data[1] = (self.__train_data[1] - train_mean) / train_std
-        self.__val_data[1] = (self.__val_data[1] - train_mean) / train_std
-        self.__test_data[1] = (self.__test_data[1] - train_mean) / train_std
+        # Normalizing data
+        #self.__train_data[1] = (self.__train_data[1] - train_mean) / train_std
+        #self.__val_data[1] = (self.__val_data[1] - train_mean) / train_std
+        #self.__test_data[1] = (self.__test_data[1] - train_mean) / train_std
+
+        #print(self.__train_data[0][0])
+        #print(self.__train_data[0][1])
+        #print(self.__train_data[0][-1])
+
+        temptemptemp = np.empty(1)
+        #print(self.__size, len(train_dataX)-1)
+        for i in range(0, len(train_dataX)-2):
+            temptemptemp = np.append(temptemptemp, train_dataX[i+1]-train_dataX[i])
+        self.__avgDist = np.average(temptemptemp)
+        #print(np.average(temptemptemp))
         # print('Training Data:\n', train_data)
         # print('Validation Data:\n', val_data)
         # print('Test Data:\n', test_data)
-        print(tf.shape(self.__train_data[0]))
-        '''
-        self.__train_ds = tf.keras.utils.timeseries_dataset_from_array(
-            data=train_data[1],
-            targets=train_data[0],
-            sequence_length=train_data.size+60*3,
-            sequence_stride=1,
-            shuffle=False,
-            batch_size=32
-        )
-        self.__val_ds = tf.keras.utils.timeseries_dataset_from_array(
-            data=val_data[1],
-            targets=val_data[0],
-            sequence_length=val_data.size+60*3,
-            sequence_stride=1,
-            shuffle=False,
-            batch_size=32
-        )
-        '''
-        #print(train_ds)
-        print('Shape of train_data:', tf.shape(self.__train_data))
+        #print(tf.shape(self.__train_data[0]))
+        
+        # self.__train_ds = tf.keras.utils.timeseries_dataset_from_array(
+        #     data=self.__train_data[1],
+        #     targets=self.__train_data[0],
+        #     sequence_length=int(self.__train_data.size*0.7),
+        #     sequence_stride=1,
+        #     shuffle=False,
+        #     batch_size=32
+        # )
+        # self.__val_ds = tf.keras.utils.timeseries_dataset_from_array(
+        #     data=self.__val_data[1],
+        #     targets=self.__val_data[0],
+        #     sequence_length=int(self.__val_data.size*0.9-self.__val_ds*0.7),
+        #     sequence_stride=1,
+        #     shuffle=False,
+        #     batch_size=32
+        # )
+
+        # self.__train_ds = tf.data.Dataset.from_tensor_slices((self.__train_data[1], self.__train_data[0]))
+        # self.__val_ds = tf.data.Dataset.from_tensor_slices((self.__val_data[1], self.__val_data[0]))
+
+        #self.__train_ds = tf.data.Dataset.from_tensor_slices((self.__train_data[1], self.__train_data[0]))
+        #self.__val_ds = tf.data.Dataset.from_tensor_slices((self.__val_data[1], self.__val_data[0]))
+        #self.__test_ds = tf.data.Dataset.from_tensor_slices((self.__test_data[1], self.__test_data[0]))
+        
+        #print('Shape of train_data:', tf.shape(self.__train_data))
+        #print('Cardinality of Train_ds:', tf.data.experimental.cardinality(self.__train_ds))
+        
+        #print('Shape of train_ds:', tf.shape(self.__train_ds))
         #print(train_ds, val_ds)
         #train_latency = self.__data['latency'] - train_mean / train_std
         #val_latency = tf.keras.utils.timeseries_dataset_from_array()
-        print(len(self.__train_data), len(self.__train_data[0]), len(self.__train_data[1]))
+        #print(len(self.__train_data), len(self.__train_data[0]), len(self.__train_data[1]))
 
     def clearData(self):
         """Empties the data that is currently stored by the model
@@ -242,7 +292,7 @@ class PredictionModel():
         self.__model = False
         self.createModel()
     
-    def predict(self, quantity:int=60*3):
+    def predict(self, quantity:int=60*60*24):
         """Projects the future for the current data using the fitted model.
 
         Args:
@@ -253,12 +303,29 @@ class PredictionModel():
         """
         # https://www.tensorflow.org/tutorials/structured_data/time_series#data_windowing
         
-        predictions = self.__model.predict([np.arange(0, quantity)])#tf.expand_dims(self.__data, axis=0))
+        temp = np.arange(self.__train_data[0][-1], self.__train_data[0][-1]+quantity, self.__avgDist**2)
+        #print(temp)
+        predictions = self.__model.predict(temp)#tf.expand_dims(self.__data, axis=0))
         outputDF = pd.DataFrame(predictions) # [{'data0'}, {'data1'}, {'data2'}, {'etc.'}, {'data#quantity-1#'}]
         #outputDF.add()
-        return outputDF
+        test = []
+        for i in predictions:
+            test.append(i)
+        #plt.pyplot.plot(data[0], data[1], 'o', label='Original Data')
+        
+        tempY = outputDF[0].to_numpy()
+        #print(outputDF)
+        
+        plt.pyplot.plot(self.__train_data[0], self.__train_data[1], 'o', alpha=1.0, label='Normalized Data')
+        plt.pyplot.plot(temp, tempY, 'o', alpha=0.5, label='Predictions')
+        plt.pyplot.legend()
+        plt.pyplot.show()
+        
+        #plt.pyplot.plot(self.__model)
+        #plt.pyplot.show()
+        return np.vstack((temp, tempY))
 
-    def trainModel(self, iterations:int = 3):
+    def trainModel(self, epochs:int = 3):
         """Trians the model on the data given using the 
 
         Args:
@@ -266,20 +333,44 @@ class PredictionModel():
         """
         #https://www.tensorflow.org/tutorials/structured_data/time_series
 
-        for i in range(iterations):
-            self.__model.fit(
-                self.__train_data[1],
-                self.__train_data[0],
-                #self.__train_ds,
-                validation_data=(self.__val_data[0], self.__val_data[1]),
-                #validation_data=self.__val_ds,
-                batch_size=32,
-                epochs=1
+        #print('Training Data:', self.__train_data[1], self.__train_data[0])
+        print('Training:')
+        evaluation = [np.nan, 0.0, np.nan]
+        count = 0
+        while (np.isnan(evaluation[0]) or evaluation[0] > 0.001) and count < 10:
+            print(count)
+            for i in range(epochs):
+                result = self.__model.fit(
+                    #self.__train_ds,
+                    self.__train_data[0],
+                    self.__train_data[1],
+                    #self.__train_data,
+                    #self.__train_ds,
+                    validation_data=(self.__val_data[0], self.__val_data[1]),
+                    #validation_data=self.__val_ds,
+                    batch_size=128,
+                    epochs=1
                 )
-            #self.__model.fit(self.__data['latency'], self.__data['timestamp'], batch_size=32)
+            print('Evaluating:')
+            evaluation = self.__model.evaluate(
+                self.__test_data[0],
+                self.__test_data[1],
+                batch_size=32
+            )
+            print(evaluation)
+            count += 1
+            self.__model.save(self.__modelFilename)
+        print('Prediction:')
+        predicted = self.__model.predict(
+            self.__test_data[0][:3]
+        )
+        print(predicted)
+        print('Acutal:')
+        print(self.__test_data[0][:3])
+        print(self.__test_data[1][:3])
         self.saveModel()
 
-    def predictOnData(self, data:np.array, iterations:int=3, predictions:int=180):
+    def predictOnData(self, data:np.array, name:str='Unknown', epochs:int=3, predictions:int=60*60*6):
         """An all in one simplified function for giving the prediciton model data, training the model, and then makeing predictions.
 
         Args:
@@ -302,18 +393,19 @@ class PredictionModel():
             self.__size = len(tempData[0])
         print(self.__size, self.isOdd(self.__size))
         '''
+        self.setFilename(name)
         self.setData(data)
         self.readModel()
-        self.trainModel(iterations)
+        self.trainModel(epochs)
         return self.predict(predictions)
 
-    def isOdd(self, number):
-        k = 0
-        while k<number:
-            if 2*k+1 == number:
-                return True
-            elif 2*k == number:
-                return False
-            else:
-                k +=1
-        return None
+    # def isOdd(self, number):
+    #     k = 0
+    #     while k<number:
+    #         if 2*k+1 == number:
+    #             return True
+    #         elif 2*k == number:
+    #             return False
+    #         else:
+    #             k +=1
+    #     return None

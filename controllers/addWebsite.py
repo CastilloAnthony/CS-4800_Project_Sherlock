@@ -18,7 +18,6 @@ class AddWebsite(): # Controller
         initialDataID = False
         while self.__dataQ.empty() != True:
             newData = self.__dataQ.get()
-            print(newData)
             if newData['id'] == initialDataID:
                 self.__requestQ.put(request)
                 time.sleep(0.1) #import time
@@ -66,6 +65,8 @@ class AddWebsite(): # Controller
         return temp
         
     def addWebsite(self):
+        """_summary_: inputting the url into the masterlist collection as well as inputing the url into the users collection
+        """
         identifier = self.query()['data']['id']
         url = request.form['url']
         oneWebsite = {
@@ -84,7 +85,5 @@ class AddWebsite(): # Controller
             'changeTo':  {'websitesList':url} #GOOD?
         }
         self.__requestQ.put(oneWebsite)
-        
-
-    
+            
 #end AddPreset
