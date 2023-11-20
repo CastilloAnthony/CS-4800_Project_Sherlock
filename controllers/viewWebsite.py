@@ -95,6 +95,9 @@ class ViewWebsite():
             
         return temp2 
 
+    def query2(self):
+        pass
+    
     def viewWebsite(self):
         pass
 
