@@ -117,7 +117,7 @@ class GraphGenerator:
             
             #return something
 
-    def generate_graph(self, url, duration=300, interval=15):
+    def generate_graph(tensorData, self, url, duration=300, interval=15):
         time_values, latency_values = self.latency(psutil.net_io_counters(), duration, interval)
 
         website_status = self.monitorWebsite(url)
