@@ -4,6 +4,7 @@ import time
 from flask import Flask, render_template, request
 import numpy as np
 from controllers.graphGenerator import GraphGenerator
+from controllers.predictionModel import PredictionModel
 
 class ViewWebsite():
     def __init__(self, requestQ, dataQ):
@@ -13,10 +14,11 @@ class ViewWebsite():
     def __del__(self):
         del self.__requestQ, self.__dataQ
 
-    def process_request(self, request):
-        if request['request_type'] == 'request':
-            response_data = self.requestData(request)
-
+    '''
+        def process_request(self, request):
+                if request['request_type'] == 'request':
+                    response_data = self.requestData(request)
+    '''
     def requestData(self, request):
         self.__requestQ.put(request)
         time.sleep(1)
@@ -144,8 +146,10 @@ class ViewWebsite():
         print(temp)
         return self.graph_generator.generate_graph(url, duration, interval)
 
-    def generateGraph(self, url, duration, interval):
-        self.graph_generator.generate_graph(url, duration, interval)
+    def generateGraph(self, tensorData, url, duration, interval):
+        self.graph_generator.generate_graph(tensorData)
+        self.graph_generator.generate_graph(tensorData, url, duration, interval)
         # need to pass the tensorData to generateGraph function in both files
+        
 
     
