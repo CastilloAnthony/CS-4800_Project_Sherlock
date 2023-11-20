@@ -3,13 +3,19 @@ import uuid
 import time
 from flask import Flask, render_template, request
 import numpy as np
+from controllers.graphGenerator import GraphGenerator
 
 class ViewWebsite():
     def __init__(self, requestQ, dataQ):
         self.__requestQ, self.__dataQ = requestQ, dataQ
+        self.graph_generator = GraphGenerator(requestQ, dataQ)
 
     def __del__(self):
         del self.__requestQ, self.__dataQ
+
+    def process_request(self, request):
+        if request['request_type'] == 'request':
+            response_data = self.requestData(request)
 
     def requestData(self, request):
         self.__requestQ.put(request)
@@ -29,6 +35,9 @@ class ViewWebsite():
                     return newData
             else:
                 self.__dataQ.put(newData)
+
+        def sendData(self, data):
+            print(f"Received Data: {data}")
 
     def query1(self):
         #Modified by Anthony Castillo
@@ -95,8 +104,15 @@ class ViewWebsite():
             
         return temp2 
 
+    def query2(self):
+        pass
+    
     def viewWebsite(self):
         pass
 
     def generateGraph(self, url, duration, interval):
-        self.generate_graph.plt.show()
+        self.graph_generator.generate_graph(url, duration, interval)
+
+        view_graph_instance = ViewWebsite(requestQ, dataQ)
+        view_graph_instance = sendRequest(request)
+        view_graph_instance.generateGraph('https://csustan.edu', 300, 15)
