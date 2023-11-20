@@ -345,7 +345,7 @@ class PredictionModel():
         self.__model = False
         self.createModel()
     
-    def predict(self, quantity:int=60*60*24):
+    def predict(self, quantity:int=60*60*12):
         """Projects the future for the current data using the fitted model.
 
         Args:
@@ -367,7 +367,7 @@ class PredictionModel():
             predictions = np.append(predictions, self.__model.predict([v]).flatten())
             temptemp = np.append(temptemp, temp[i])
             #print(temptemp, predictions)
-            self.trainModel(data=np.vstack((temptemp, predictions)))
+            self.trainModel(data=np.vstack((temptemp, predictions)), patience=25)
         #predictions = self.__model.predict(temp).flatten()#tf.expand_dims(self.__data, axis=0))
         
         #print('Precitions Output: ',len(predictions), 'Shape:', print(predictions.shape), print(predictions))
@@ -401,8 +401,6 @@ class PredictionModel():
         '''
         #print(tempDF.head())
         #self.graph(tempDF)
-        #plt.pyplot.plot(self.__model)
-        #plt.pyplot.show()
         return np.vstack((temp, tempY))
 
     def graph(self, tempDF):
@@ -429,7 +427,7 @@ class PredictionModel():
         plt.tight_layout()
         plt.show()
 
-    def trainModel(self, epochs:int = 10, data=None):
+    def trainModel(self, epochs:int=10*10**2, data=None, patience:int=10):
         """Trians the model on the data given using the 
 
         Args:
@@ -438,7 +436,7 @@ class PredictionModel():
         #https://www.tensorflow.org/tutorials/structured_data/time_series
 
         #print('Training Data:', self.__train_data[1], self.__train_data[0])
-        print('Training:')
+        #print('Training:')
         #print(np.average(self.__train_data[1]))
         evaluation = [np.nan, 0.0]
         previous = 10**9999
@@ -456,7 +454,7 @@ class PredictionModel():
                 #validation_data=self.__val_ds,
                 batch_size=32,
                 epochs=epochs,
-                callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True, verbose=1, min_delta=0.0001,),
+                callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience, restore_best_weights=True, verbose=1, min_delta=0.0001,),
                         #tf.keras.callbacks.EarlyStopping(monitor='val_mae', patience=5, restore_best_weights=True, verbose=1, min_delta=0.0001,),
                         ],
                 use_multiprocessing=True,
@@ -472,13 +470,13 @@ class PredictionModel():
                 #validation_data=self.__val_ds,
                 batch_size=32,
                 epochs=epochs,
-                callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True, verbose=1, min_delta=0.0001,),
+                callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience, restore_best_weights=True, verbose=1, min_delta=0.0001,),
                         #tf.keras.callbacks.EarlyStopping(monitor='val_mae', patience=5, restore_best_weights=True, verbose=1, min_delta=0.0001,),
                         ],
                 use_multiprocessing=True,
             )
             #print(result['val_loss'])
-        print('Evaluating:')
+        #print('Evaluating:')
         evaluation = self.__model.evaluate(
             self.__test_data[0],
             self.__test_data[1],
@@ -513,7 +511,7 @@ class PredictionModel():
         '''
         #self.saveModel()
 
-    def predictOnData(self, data:np.array, name:str='Unknown', sampleRate:str='30T', predictions:int=60*60*6, epochs:int=10):
+    def predictOnData(self, data:np.array, name:str='Unknown', sampleRate:str='15T', predictions:int=60*60*12, epochs:int=10*10**2):
         """An all in one simplified function for giving the prediciton model data, training the model, and then makeing predictions.
 
         Args:
@@ -541,6 +539,7 @@ class PredictionModel():
         self.setData(data)
         self.readModel()
         timerStart = time.time()
+        print('Training...')
         predicted = self.trainModel(epochs)
         while not (np.average(self.__train_data[1])-np.std(self.__train_data[1])*2 <= predicted[0] <= np.average(self.__train_data[1])+np.std(self.__train_data[1])*2):
             self.trainModel(epochs)
@@ -549,6 +548,7 @@ class PredictionModel():
                     self.trainModel(epochs)
                     break
         self.saveModel()
+        print('Predicting...')
         prediction = self.predict(predictions)
         print('Training and Predicting completed in ', time.time()-timerStart, ' seconds.')
         return prediction
