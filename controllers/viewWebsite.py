@@ -121,12 +121,6 @@ class ViewWebsite():
         return temp
     
     def viewWebsite(self):
-        """_summary_: takes in a url from html then requests all the poling data from pollingData collection
-        Which is all the documents in a list, plug temp into 
-
-        Returns:
-            picture?: hopefully a plot of the graphs 
-        """
         url = request.form['selected_options[]']
         pollingDataRequest = {
             'id': uuid.uuid4(),
@@ -141,6 +135,9 @@ class ViewWebsite():
         # gives me graph
         temp = self.graph_generator.generate_graph(temp, url, duration, interval)
         print(temp)
-        return temp
+        return self.graph_generator.generate_graph(url, duration, interval)
+
+    def generateGraph(self, url, duration, interval):
+        self.graph_generator.generate_graph(url, duration, interval)
 
     
