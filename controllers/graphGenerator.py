@@ -40,6 +40,9 @@ class GraphGenerator:
                     return newData
             else:
                 self.__dataQ.put(newData)
+                
+        def sendRequest (self, request):
+            self.ViewWebsite.process_request(request)
     '''
         def timeConversion():
             registeredStartDate = datetime()
@@ -111,15 +114,14 @@ class GraphGenerator:
         website_status = self.monitorWebsite(url)
 
         #sending data to the prediction model
-        '''
+        
         time_values = np.array([1,2,3])
         latency_values = np.array([4,5,6])
-        predictions = self.__predict.predictOnData(time_values, latency_values)
-        '''
+        foresight = self.predictedData(tensorData, '', sampleRate='', epochs=[], predictions=[])
         
         plt.figure(figsize=(10, 6))
         plt.plot(time_values, latency_values, label='Latency (ms)')
-        #plt.plot(predictions[0], predictions[1], label='Prediction (ms)')
+        plt.plot(foresight[0], foresight[1], label='Prediction (ms)')
         plt.xlabel('Time')
         plt.ylabel('Latency (ms)')
         plt.title('Latency and Website Monitoring')
@@ -131,12 +133,9 @@ class GraphGenerator:
         else:
             plt.axvline(x=datetime.datetime.now(), color='red', linestyle='--', label='Website DOWN')
 
-        #plt.text(datetime.datetime.now(), max(latency_values) * 0.9, f'Prediction: {predictions}', fontsize=12)
+        plt.text(datetime.datetime.now(), max(latency_values) * 0.9, f'Prediction: {foresight}', fontsize=12)
 
         plt.legend()
         plt.show()
-        #image = plt.show() -> return image in server.py?
-
-
-## needs to be able to accept data from ViewWebsite
+        #image = plt.show()
         

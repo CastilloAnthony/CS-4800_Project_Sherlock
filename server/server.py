@@ -472,9 +472,9 @@ class Server(): # The main server handler class
             tensorDataLatency.append(i['latency'])
         tensorData = np.vstack((tensorDataTime, tensorDataLatency))
         print('Data gathered, transferring to PredictionModel...')
-        predicitedData = predModel.predictOnData(tensorData, 'www.google.com')
+        predicitedData = predModel.predictOnData(tensorData, 'www.google.com', sampleRate='1h', epochs=10*10**2, predictions=60*60*24)
         #print('predictiedData:')
-        print('length: ', len(predicitedData))
+        print('length: ', len(predicitedData[0]), len(predicitedData[1]))
         print('Completed test.')
         
     def test2(self):
