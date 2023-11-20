@@ -131,12 +131,12 @@ class GraphGenerator:
         else:
             plt.axvline(x=datetime.datetime.now(), color='red', linestyle='--', label='Website DOWN')
 
-        #plt.text(datetime.datetime.now(), max(latency_values) * 0.9, f'Prediction: {predictions}', fontsize=12)
+        plt.text(datetime.datetime.now(), max(latency_values) * 0.9, '''f'Prediction: {predictions}''', fontsize=12)
 
         plt.legend()
         plt.show()
-        #image = plt.show() -> return image in server.py?
+        #image = plt.show()
 
 
-## needs to be able to accept data from ViewWebsite
+## needs to be able to accept data from ViewWebsite -> will get a dictionary/URL w/ the associated np array
         
