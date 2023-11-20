@@ -106,8 +106,9 @@ class ViewWebsite():
 
     def viewWebsite(self):
         pass
-
-    def generateGraph(self, url, duration, interval):
+    
+    #implemented by Sierra
+    def generateGraph(self, url, duration, interval): #peer-coded with Christian
         self.graph_generator.generate_graph(url, duration, interval)
 
         view_graph_instance = ViewWebsite(requestQ, dataQ)
