@@ -147,5 +147,5 @@ class GraphGenerator:
         plt.legend()
         plt.show()
         image = plt.show()
-        return image #C.A
+        return image #line implemented by Christian
         
