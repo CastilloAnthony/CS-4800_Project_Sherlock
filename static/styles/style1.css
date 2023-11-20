@@ -60,3 +60,7 @@ li a:hover {
 .home-link {
     background-color: #4CAF50; /* Green */
 }
+
+h1.Welcome{
+    background-color: rgba(52, 169, 67, 50%);
+}
