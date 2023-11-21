@@ -138,16 +138,18 @@ class GraphGenerator:
         
         #fig, ax = plt.subplots()
         #fig.autofmt_xdate() #line implemented by Anthony
-        # plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(16*0.65, 9*0.65))
         plt.plot(time_values.astype('datetime64[s]'), latency_values * 100, label='Latency (ms)') #line altered by Anthony
         #plt.plot(foresight[0], foresight[1], label='Prediction (ms)')
-        plt.xlabel('Time')
         plt.ylabel('Latency (ms)')
+        plt.gcf().axes[0].xaxis.set_major_locator(mdates.HourLocator(interval=6,tz='US/Pacific'))
+        plt.gcf().axes[0].xaxis.set_minor_locator(mdates.HourLocator(interval=1,tz='US/Pacific'))
         plt.gcf().axes[0].xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H:%M')) #line implemented by Anthony
         plt.gcf().autofmt_xdate()
         plt.title('Latency and Website Monitoring of\n' + str(url) + "     (" + str(datetime.datetime.now()) + ")")
         plt.grid(True)
         plt.legend()
+        plt.tight_layout()
 
         # if website_status:
         #     plt.axvline(x=datetime.datetime.now(), color='green', linestyle='--', label='Website UP')
