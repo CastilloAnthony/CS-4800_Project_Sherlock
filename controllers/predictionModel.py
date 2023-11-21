@@ -556,7 +556,9 @@ class PredictionModel():
                 validation_data=(self.__val_data[0], self.__val_data[1]),
                 batch_size=32,
                 epochs=epochs,
-                callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience, restore_best_weights=True, verbose=1),],# min_delta=0.0001,),],
+                callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience, restore_best_weights=True, verbose=1,),#, min_delta=0.0001,),
+                           tf.keras.callbacks.ModelCheckpoint(filepath=self.__modelFilename, monitor='val_loss', verbose=1, save_best_only=True,), # self.__modelFilename
+                           ],
                 use_multiprocessing=self.__multiprocess,
                 verbose=0,
         )
@@ -573,14 +575,14 @@ class PredictionModel():
             verbose=0,
             use_multiprocessing=self.__multiprocess,
         )
-        #for i, v in enumerate(evaluation)
         history2 = {}
         for i, v in enumerate(self.__model.metrics_names):
             history2[v] = evaluation[i]
         print(str(time.ctime())+' - Evaluation for '+self.__name+' '+str(history2))#result.history['val_loss'])
+        self.saveModel()
         with open('gallery/'+self.__name+'.txt', 'a') as file:
             file.writelines('Evaluation Results:\t'+'\t|\t'+str(time.ctime())+'\t|\t'+str(history2)+'\n')
-        self.saveModel()
+            file.writelines(str(time.ctime())+' - Training for '+self.__name+'_Predictor'+' completed in '+str(time.time()-timerStart)+' seconds.')
         print(str(time.ctime())+' - Training for '+self.__name+'_Predictor'+' completed in '+str(time.time()-timerStart)+' seconds.')
         return [history, history2]
     
