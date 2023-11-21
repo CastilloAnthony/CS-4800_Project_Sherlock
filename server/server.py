@@ -5,7 +5,7 @@ import socket
 import numpy as np
 from server.DBconnectionAgent import DBConnectionAgent
 import client.client 
-from controllers.predictionModel import PredictionModel # Temporary, testing
+from controllers.predictionModel import PredictionModel, startPrediction # Temporary, testing
 from controllers.graphGenerator import GraphGenerator
 from uuid import uuid4
 import bcrypt
@@ -25,6 +25,7 @@ class Server(): # The main server handler class
         self.__dataQ = mp.Queue(maxsize=1000000000) # The request queue, only the server will put to this queue
         self.__processes = {} # Process handles identifiers and handles for all processes created by the server
         self.__adminID = False
+        self.__predictiors = {}
         self._setupDBConnection()
 
     def __del__(self): # WIP
@@ -50,7 +51,7 @@ class Server(): # The main server handler class
         print('Queue: Data')
         print('\tClosed: '+str(self.__dataQ.close()==None))
         print('\tJoined: '+str(self.__dataQ.join_thread()==None))
-        del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes, self.__adminID
+        del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes, self.__adminID, self.__predictiors
     
     def _checkForPresets(self):
         """Checks for the existence of the preset collection within the database and creates a default one if the collection could not be verified.
@@ -435,27 +436,58 @@ class Server(): # The main server handler class
                 except:
                     self.sendToDB('pollingData', {'url':object['url'], 'port':port, 'timestamp':time.time(), 'up':False, 'latency':np.nan})
     
+    def _CheckPredictions(self):
+        """Manages, queues, and starts up new processes for running prediction model training in separate processes.
+        """
+        masterList = self.requestManyFromDB('masterList', {})
+        for object in masterList:
+            if not object['url']+'_Predictor' in self.__processes:
+                data = self.requestManyFromDB('pollingData', {'url':object['url']})#, 'timestamp':{'$gte':time.time()-60*60*24*30000000}}) # The more data the better
+                tensorDataTime, tensorDataLatency = [], []
+                for i in data:
+                    tensorDataTime.append(i['timestamp'])
+                    tensorDataLatency.append(i['latency'])
+                tensorData = np.vstack((tensorDataTime, tensorDataLatency))
+                self.__processes[object['url']+'_Predictor'] = mp.Process(name=str(object['url']+'_Predictor'), target=startPrediction, args=(tensorData, object['url'],))
+                self.__predictiors[object['url']+'_Predictor'] = False
+        for i, name in enumerate(self.__predictiors): 
+            status = self.__predictiors[name]
+            if status == False:
+                for processName in enumerate(self.__processes):
+                    if '_Predictor' in processName[1]:
+                        if self.__processes[processName[1]].is_alive():
+                            return
+                self.__processes[name].start()
+                self.__predictiors[name] = True
+                print(str(time.ctime())+' - Started training for '+name)
+                break
+
     def _mainLoop(self):
-        """The primary loop for the server, calls checkForRequests and pollWebsites.
+        """The primary loop for the server, calls checkForRequests, checkPredictions and pollWebsites.
         """
         #self.test()
         #self.test2()
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
         dataQTimerStart = time.time()
+        predictionModelTrainingTimerStart = time.time()
         while True:
             self._checkForRequests()
             mainLoopTimerEnd = time.time()
             dataQTimerEnd = time.time()
+            predictionModelTrainingTimerEnd = time.time()
             if (mainLoopTimerEnd-mainLoopTimerStart) >= self.__pollingSpeed:
                 mainLoopTimerStart = time.time()
                 self._pollWebsites()
             if (dataQTimerEnd-dataQTimerStart) >= 60:
                 dataQTimerStart = time.time()
                 self._clearDataQ()
+            if (predictionModelTrainingTimerEnd-predictionModelTrainingTimerStart) >= 60*5:#60*5 # 5 minutes
+                self._CheckPredictions()
 
     def startServer(self):
         """Creates the flask app in a separate processes, starts that process, and then intiates the mainloop. 
         """
+        #self.test()
         self.__processes['app'] = mp.Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'].start()
         self._mainLoop()
@@ -463,19 +495,26 @@ class Server(): # The main server handler class
     def test(self):
         """Used for testing things at the start of the program
         """
-        print('Begin test.')
-        predModel = PredictionModel()
-        data = self.requestManyFromDB('pollingData', {'url':'www.google.com', 'timestamp':{'$gte':time.time()-60*60*24*1}})
-        tensorDataTime, tensorDataLatency = [], []
-        for i in data:
-            tensorDataTime.append(i['timestamp'])
-            tensorDataLatency.append(i['latency'])
-        tensorData = np.vstack((tensorDataTime, tensorDataLatency))
-        print('Data gathered, transferring to PredictionModel...')
-        predicitedData = predModel.predictOnData(tensorData, 'www.google.com', sampleRate='15T', epochs=10*10**2, predictions=60*60*12)
-        #print('predictiedData:')
-        print('length: ', len(predicitedData[0]), len(predicitedData[1]))
-        print('Completed test.')
+        #print('Begin test.')
+        
+        masterList = self.requestManyFromDB('masterList', {})
+        for object in masterList:
+            data = self.requestManyFromDB('pollingData', {'url':object['url'], 'timestamp':{'$gte':time.time()-60*60*24*30000000}})
+            tensorDataTime, tensorDataLatency = [], []
+            for i in data:
+                tensorDataTime.append(i['timestamp'])
+                tensorDataLatency.append(i['latency'])
+            tensorData = np.vstack((tensorDataTime, tensorDataLatency))
+            #print('Data gathered, transferring to PredictionModel...')
+            self.__processes[object['url']+'_Predicter'] = mp.Process(name=str(object['url']+'_Predicter'), target=startPrediction, args=(tensorData, object['url'], '15T'))
+            self.__processes[object['url']+'_Predicter'].start()
+            break
+            #predModel = PredictionModel()
+            #predicitedData = predModel.predictOnData(tensorData, object['url'], sampleRate='15T', eposch=10*10**2, predictions=60*60*6)
+            #print('predictiedData:')
+            #print('length: ', len(predicitedData[0]), len(predicitedData[1]))
+            #print('Completed test.')
+        print('All models are processing.')
         
     def test2(self):
         graph = GraphGenerator()

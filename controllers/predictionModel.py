@@ -1,36 +1,18 @@
 # Created by Anthony Castillo
 
-#TENSORFLOW INSTALL 
-"""
-FOR WINDOWS: powershell => run as administer => run this command
-___________________________________________________________________
-New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
--Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
-___________________________________________________________________
-After that go back to terminal:
-___________________________________________________________________
-pip show tensorflow
-pip install --upgrade tensorflow
-___________________________________________________________________
-"""
-#PSUTIL Install
-"""
-pip install psutil
-"""
-
-
-
 import time
-import datetime
 import tensorflow as tf
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 class PredictionModel():
-    """_summary_
+    """This class is designed to create a model, train the model on data, make future predictions on data, generate (temporary) graphs on and return those predictions. NOTE: This is still a WIP and is subject to change. In fact, a lot of this will be removed and possibly refactored.
+    Created by Anthony Castillo.
     """
     def __init__(self):
+        """Initializes most variables to False
+        """
         self.__train_data = False
         self.__val_data = False
         self.__test_data = False
@@ -39,45 +21,20 @@ class PredictionModel():
         self.__train_ds = False
         self.__val_ds = False
         self.__test_ds = False
-        self.__modelFilename = 'predictionModel.keras'
+        self.__modelFilename = 'Unknown.keras'
         self.__avgDist = 1
         self.__sampleRate = '30T'
         self.__name = False
+        self.__originalDataCleaned = False
+        self.__multiprocess = True
 
     def __del__(self):
-        """_summary_
+        """Deletes variables
         """
-        del self.__train_data, self.__val_data, self.__test_data, self.__model, self.__modelFilename, self.__size, self.__train_ds, self.__val_ds, self.__test_ds
-
-    def requestData(self, request): # Not Used, data should be passed to this class instead
-        """_summary_
-
-        Args:
-            request (_type_): _description_
-
-        Returns:
-            _type_: _description_
-        """
-        self.__requestQ.put(request)
-        time.sleep(0.1)
-        initialDataID = False
-        while self.__dataQ.empty() != True:
-            newData = self.__dataQ.get()
-            #print(newData)
-            if newData['id'] == initialDataID:
-                self.__requestQ.put(request)
-                time.sleep(0.1) #import time
-                initialDataID = False
-            elif initialDataID == False:
-                initialDataID = newData['id']
-            if newData['id'] == request['id']:
-                if newData['data'] is not False:
-                    return newData
-            else:
-                self.__dataQ.put(newData)
+        del self.__train_data, self.__val_data, self.__test_data, self.__model, self.__modelFilename, self.__size, self.__train_ds, self.__val_ds, self.__test_ds, self.__avgDist, self.__sampleRate, self.__name, self.__originalDataCleaned, self.__multiprocess
 
     def createModel(self):
-        """WIP
+        """Creates, builds, and assigns a new model for this class to use.
         """
         self.__model = tf.keras.Sequential([
             #tf.keras.layers.Lambda(lambda x: x[:, -2:, :]),
@@ -125,7 +82,7 @@ class PredictionModel():
         #print(len(self.__model.weights))
         #print(self.__model.get_config())
         self.__model.build(input_shape=(32, 1,))
-        self.__model.summary()
+        #self.__model.summary()
         #print("Model Input Shape:", self.__model.input_shape)
         '''
         Image Model Example
@@ -154,7 +111,7 @@ class PredictionModel():
         """Saves the model to a file using the name provided in self.__modelFilename
         """
         try:
-            self.__model.summary()
+            #self.__model.summary()
             self.__model.save(self.__modelFilename)
         except:
             print('Could not save prediction model.')
@@ -164,7 +121,7 @@ class PredictionModel():
         """
         try:
             self.__model = tf.keras.models.load_model(self.__modelFilename)
-            self.__model.summary()
+            #self.__model.summary()
         except:
             self.createModel()
 
@@ -176,6 +133,8 @@ class PredictionModel():
         """
         self.__name = name
         self.__modelFilename = 'predictionModels/'+name+'.keras'
+        #self.__modelFilename = 'predictionModels/'+name+'_'+self.__sampleRate+'.keras'
+        #self.__modelFilename = 'predictionModels/'+'mainModel'+'.keras'
         #self.createModel()
         #self.saveModel()
 
@@ -186,7 +145,7 @@ class PredictionModel():
             str: The name of the file the model is saved to
         """
         return self.__modelFilename
-    
+
     def setData(self, data:np.array):
         """Clears out the old data and then sets the new data in the class.
 
@@ -229,7 +188,9 @@ class PredictionModel():
         #print(tempDataY.mean(), tempDataY.std())
         #test = np.vstack((tempDataX, tempDataY,))
         #print(test)
-        tempDF = pd.DataFrame({'timestamp':tempDataX, 'latency':tempDataY,}, index=pd.to_datetime(tempDataX, unit='s')).resample(self.__sampleRate).mean()
+        # \/ Modify this \/
+        tempDF = pd.DataFrame({'timestamp':tempDataX, 'latency':tempDataY,}, index=pd.to_datetime(tempDataX, unit='s'))#.resample(self.__sampleRate).mean()
+        self.__originalDataCleaned = tempDF
         # for i, v in enumerate(tempDF['timestamp']):
         #     if np.isnan(v):
         #         tempDF['timestamp'].drop(index=i, inplace=True)
@@ -276,9 +237,9 @@ class PredictionModel():
         # print('Length: ', self.__size, '70%: ', int(self.__size*0.7), ' ', 'Mean: ', train_mean, ' ', 'STD: ', train_std)
 
         # Normalizing data
-        #self.__train_data[1] = (self.__train_data[1] - train_mean) / train_std
-        #self.__val_data[1] = (self.__val_data[1] - train_mean) / train_std
-        #self.__test_data[1] = (self.__test_data[1] - train_mean) / train_std
+        #self.__train_data[1] = abs((self.__train_data[1] - train_mean) / train_std)
+        #self.__val_data[1] = abs((self.__val_data[1] - train_mean) / train_std)
+        #self.__test_data[1] = abs((self.__test_data[1] - train_mean) / train_std)
 
         #print(self.__train_data[0][0])
         #print(self.__train_data[0][1])
@@ -338,6 +299,7 @@ class PredictionModel():
         self.__train_data = False
         self.__val_data = False
         self.__test_data = False
+        self.__originalDataCleaned = False
 
     def clearModel(self):
         """Resets the model back to a skeleton model (i.e., no training.)
@@ -346,7 +308,7 @@ class PredictionModel():
         self.createModel()
     
     def predict(self, quantity:int=60*60*12):
-        """Projects the future for the current data using the fitted model.
+        """DEPRECATED, Projects the future for the current data using the fitted model.
 
         Args:
             quantity (int, optional): The number of minutes to project over. Defaults to 60*3.
@@ -367,7 +329,7 @@ class PredictionModel():
             predictions = np.append(predictions, self.__model.predict([v]).flatten())
             temptemp = np.append(temptemp, temp[i])
             #print(temptemp, predictions)
-            self.trainModel(data=np.vstack((temptemp, predictions)), patience=25)
+            #self.trainModel(data=np.vstack((temptemp, predictions)), patience=10)
         #predictions = self.__model.predict(temp).flatten()#tf.expand_dims(self.__data, axis=0))
         
         #print('Precitions Output: ',len(predictions), 'Shape:', print(predictions.shape), print(predictions))
@@ -400,11 +362,20 @@ class PredictionModel():
                 file.writelines(str(i)+'\t|\t'+str(v)+'\t|\t'+str(tempDF['latency'][i])+'\n')
         '''
         #print(tempDF.head())
-        #self.graph(tempDF)
+        self.graph(tempDF)
         return np.vstack((temp, tempY))
 
-    def graph(self, tempDF):
-        fig, axes = plt.subplots(1,1, figsize=(16*.65,9*.65)) # plt.subplots(nrows, ncolumns, *args) # axs will be either an individual plot or an array of axes
+    def graph(self, tempDF, secondData=None, sampleRate='5T'):
+        """Generates and saves a graph
+
+        Args:
+            tempDF (np.array): A two dimensional array containing timestamps on the first axis and latency values on the second axis.
+            secondData (np.array, optional): Similar to above, but optional. Defaults to None.
+            sampleRate (str, optional): The rate for which data is resampled to, this cleans up the graphs and makes them look less cluttered. Defaults to '5T'.
+        """
+        if secondData != None:
+            tempXData = self.__originalDataCleaned.resample(sampleRate).mean()
+        fig, axes = plt.subplots(1,1, figsize=(16*1.0,9*1.0)) # plt.subplots(nrows, ncolumns, *args) # axs will be either an individual plot or an array of axes
         try:
             ax = axes[0,0] # If axes is a 2D array of axes, then we'll use the first axis for this drawing.
         except:
@@ -418,17 +389,24 @@ class PredictionModel():
         ax.xaxis.set_minor_locator(mdates.HourLocator(interval=1, tz='US/Pacific'))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
         ax.set_ylabel('Latency (ms)')
-        ax.set_title('Average Latency of '+self.__name)
-        plot1, = ax.plot(self.__train_data[0].astype('datetime64[s]'), self.__train_data[1], 'o-', alpha=1.0, label='Normalized Data')
+        ax.set_title('Average ('+self.__sampleRate+') Latency of '+self.__name)
+        if secondData != None:
+            plot1, = ax.plot(tempXData[0].astype('datetime64[s]'), tempXData[1], 'o-', alpha=1.0, label='Normalized Data')
         plot2, = ax.plot(pd.to_datetime(tempDF['timestamp'], unit='s'), tempDF['latency'], 'o-', alpha=0.5, label='Predictions')
         #ax.fmt_xdata = plt.dates.DateFormatter('%Y-%m-%d')
         #plt.pyplot.plot(temp.astype('datetime64[s]'), tempY, 'o', alpha=0.5, label='Predictions')
-        plt.legend(handles=[plot1, plot2], loc='best')
+        if secondData !=None:
+            plt.legend(handles=[plot1, plot2], loc='best')
+        else:
+            plt.legend(handles=[plot2], loc='best')
         plt.tight_layout()
-        plt.show()
+        plt.savefig('gallery/'+self.__name+'_'+self.__sampleRate+'_'+str(time.time())+'.png')
+        plt.clf()
+        print(str(time.ctime())+' - A new graph for '+self.__name+' has been generated...')
+        #plt.show()
 
-    def trainModel(self, epochs:int=10*10**2, data=None, patience:int=10):
-        """Trians the model on the data given using the 
+    def trainModel(self, epochs:int=10*10**2, data=None, patience:int=25):
+        """DEPRECATED, Trians the model on the data given using the 
 
         Args:
             iterations (int, optional): The number of time the model will be fitted to the data. Defaults to 3.
@@ -454,10 +432,11 @@ class PredictionModel():
                 #validation_data=self.__val_ds,
                 batch_size=32,
                 epochs=epochs,
-                callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience, restore_best_weights=True, verbose=1, min_delta=0.0001,),
+                callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience, restore_best_weights=True, verbose=1),# min_delta=0.0001,),
                         #tf.keras.callbacks.EarlyStopping(monitor='val_mae', patience=5, restore_best_weights=True, verbose=1, min_delta=0.0001,),
                         ],
-                use_multiprocessing=True,
+                use_multiprocessing=self.__multiprocess,
+                verbose=1,
             )
         else:
             result = self.__model.fit(
@@ -470,17 +449,20 @@ class PredictionModel():
                 #validation_data=self.__val_ds,
                 batch_size=32,
                 epochs=epochs,
-                callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience, restore_best_weights=True, verbose=1, min_delta=0.0001,),
+                callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience, restore_best_weights=True, verbose=1),# min_delta=0.0001,),
                         #tf.keras.callbacks.EarlyStopping(monitor='val_mae', patience=5, restore_best_weights=True, verbose=1, min_delta=0.0001,),
                         ],
-                use_multiprocessing=True,
+                use_multiprocessing=self.__multiprocess,
+                verbose=1,
             )
             #print(result['val_loss'])
         #print('Evaluating:')
+        print('Evalutating '+self.__name+'...')
         evaluation = self.__model.evaluate(
             self.__test_data[0],
             self.__test_data[1],
-            batch_size=32
+            batch_size=32,
+            verbose=1,
         )
         #print(evaluation, evaluation[0] > 0.1)
         count += 1
@@ -490,16 +472,19 @@ class PredictionModel():
         #     previous = evaluation[0]
         #self.__model.save(self.__modelFilename)
         #print('Predicting:')
+        '''
         predicted = self.__model.predict(
-            self.__test_data[0][:3]
+            self.__test_data[0][:3],
+            verbose=0,
         )
+        '''
         #print(predicted.shape)
         #print(predicted[0])
         #print(np.average(self.__train_data[1]), np.std(self.__train_data[1]))
         #print('Acutal:')
         #print(self.__test_data[0][:3])
         #print(self.__test_data[1][:3])
-        return predicted
+        #return predicted
         '''
         if not (np.average(self.__train_data[1])-np.std(self.__train_data[1])*2*2 <= predicted[0] <= np.average(self.__train_data[1])+np.std(self.__train_data[1])*2*2):
             self.trainModel(epochs)
@@ -511,8 +496,96 @@ class PredictionModel():
         '''
         #self.saveModel()
 
-    def predictOnData(self, data:np.array, name:str='Unknown', sampleRate:str='15T', predictions:int=60*60*12, epochs:int=10*10**2):
-        """An all in one simplified function for giving the prediciton model data, training the model, and then makeing predictions.
+    def makePredictions(self, url:str, startingPoint:float=time.time(), avgDist:int=60, quantity:int=60*60*12):
+        """Generates predictions using a model.
+
+        Args:
+            url (str): The name of the URL and model to use.
+            startingPoint (float, optional): The starting point, in seconds, for which the model should begin predicitng at. Defaults to time.time().
+            avgDist (int, optional): The amount of time, in seconds, to exist between each point to predict over. Defaults to 60.
+            quantity (int, optional): The ending point, in seconds, in time for which to stop predicting. Defaults to 60*60*12.
+
+        Returns:
+            np.array: A two dimensional numpy array containing the timestamp on the first axis and the predictions on the second axis.
+        """
+        self.setFilename(url)
+        self.readModel()
+        # https://www.tensorflow.org/tutorials/structured_data/time_series#data_windowing
+        tempX = np.arange(startingPoint+avgDist, startingPoint+quantity, avgDist)
+        timestamps, predictions = [], []
+        print(str(time.ctime())+' - Predicting '+str(len(tempX))+' for '+self.__name+'...')
+        for i, v in enumerate(tempX):
+            predictions = np.append(predictions, self.__model.predict(
+                [v],
+                use_multiprocessing=self.__multiprocess,
+                verbose=0
+                ).flatten())
+            timestamps = np.append(timestamps, v)
+        #tempDF = pd.DataFrame({'timestamp':timestamps, 'latency':predictions,}, index=pd.to_datetime(timestamps, unit='s')).resample(self.__sampleRate).mean()
+        #tempDF = tempDF.dropna(subset=['timestamp'])
+        #tempDF = tempDF.dropna(subset=['latency'])
+        #timestamps = tempDF[0].to_numpy()
+        #predictions = tempDF[1].to_numpy()
+        #self.graph(tempDF)
+        print(str(time.ctime())+' - Completed predicting of '+str(len(tempX))+' units for '+self.__name+'...')
+        return np.vstack((timestamps, predictions))
+
+    def trainOnData(self, data:np.array, name:str='Unknown', sampleRate:str='15T', predictions:int=60*60*6, epochs:int=10*10**2, patience:int=100):
+        """Trains the model using the data bgiven to it.
+
+        Args:
+            data (np.array): The data for which to train on.
+            name (str, optional): The name of the model to use or create. Defaults to 'Unknown'.
+            sampleRate (str, optional): The rate for which resampling will occur. Defaults to '15T'.
+            predictions (int, optional): DEPRECATED The number of predictions to create. Defaults to 60*60*6.
+            epochs (int, optional): The number of epochs to run the training for. Defaults to 10*10**2.
+            patience (int, optional): The amount of patience to have during the training of the model. Defaults to 100.
+
+        Returns:
+            list[history]: DEPRECATED, A list contiaining the fit results and the evaluations results.
+        """
+        self.__sampleRate = sampleRate
+        self.setFilename(name)
+        self.setData(data)
+        self.readModel()
+        timerStart = time.time()
+        print(str(time.ctime())+' - Training on '+self.__name+'...')
+        result = self.__model.fit(
+                self.__train_data[0],
+                self.__train_data[1],
+                validation_data=(self.__val_data[0], self.__val_data[1]),
+                batch_size=32,
+                epochs=epochs,
+                callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience, restore_best_weights=True, verbose=1),],# min_delta=0.0001,),],
+                use_multiprocessing=self.__multiprocess,
+                verbose=0,
+        )
+        history = {}
+        for i, v in enumerate(result.history):
+            history[v] = np.min(result.history[v])
+        print(str(time.ctime())+' - Results for '+self.__name+' '+str(history))#result.history['val_loss'])
+        with open('gallery/'+self.__name+'.txt', 'a') as file:
+            file.writelines('Training Results:\t'+'\t|\t'+str(time.ctime())+'\t|\t'+str(history)+'\n')
+        evaluation = self.__model.evaluate(
+            self.__test_data[0],
+            self.__test_data[1],
+            batch_size=32,
+            verbose=0,
+            use_multiprocessing=self.__multiprocess,
+        )
+        #for i, v in enumerate(evaluation)
+        history2 = {}
+        for i, v in enumerate(self.__model.metrics_names):
+            history2[v] = evaluation[i]
+        print(str(time.ctime())+' - Evaluation for '+self.__name+' '+str(history2))#result.history['val_loss'])
+        with open('gallery/'+self.__name+'.txt', 'a') as file:
+            file.writelines('Evaluation Results:\t'+'\t|\t'+str(time.ctime())+'\t|\t'+str(history2)+'\n')
+        self.saveModel()
+        print(str(time.ctime())+' - Training for '+self.__name+'_Predictor'+' completed in '+str(time.time()-timerStart)+' seconds.')
+        return [history, history2]
+    
+    def predictOnData(self, data:np.array, name:str='Unknown', sampleRate:str='15T', predictions:int=60*60*6, epochs:int=10*10**2):
+        """DEPRECATED, An all in one simplified function for giving the prediciton model data, training the model, and then makeing predictions.
 
         Args:
             data (list): The data to train and predict over.
@@ -534,23 +607,25 @@ class PredictionModel():
             self.__size = len(tempData[0])
         print(self.__size, self.isOdd(self.__size))
         '''
-        self.setFilename(name)
         self.__sampleRate = sampleRate
+        self.setFilename(name)
         self.setData(data)
         self.readModel()
         timerStart = time.time()
-        print('Training...')
+        print('Training on '+self.__name+'...')
         predicted = self.trainModel(epochs)
+        '''
         while not (np.average(self.__train_data[1])-np.std(self.__train_data[1])*2 <= predicted[0] <= np.average(self.__train_data[1])+np.std(self.__train_data[1])*2):
-            self.trainModel(epochs)
+            predicted = self.trainModel(epochs)
             for i in predicted:
                 if i < 0:
                     self.trainModel(epochs)
                     break
+        '''
         self.saveModel()
-        print('Predicting...')
+        print('Predicting on '+self.__name+'...')
         prediction = self.predict(predictions)
-        print('Training and Predicting completed in ', time.time()-timerStart, ' seconds.')
+        print('Training and Predicting for '+self.__name+' completed in '+str(time.time()-timerStart)+' seconds.')
         return prediction
 
     # def isOdd(self, number):
@@ -563,3 +638,20 @@ class PredictionModel():
     #         else:
     #             k +=1
     #     return None
+
+def startPrediction(data:np.array, name:str='Unknown', sampleRate:str='15T', predictions:int=60*60*6, epochs:int=10*10**2):
+    """The function to be called for training and generating sample predictions and graphs. Note: This is called as part of the multiprocessing seqeuence.
+
+    Args:
+        data (np.array): The data to train the model on.
+        name (str, optional): The URL . Defaults to 'Unknown'.
+        sampleRate (str, optional): _description_. Defaults to '15T'.
+        predictions (int, optional): _description_. Defaults to 60*60*6.
+        epochs (int, optional): _description_. Defaults to 10*10**2.
+    """
+    newPred = PredictionModel()
+    #newPred.predictOnData(data, name, sampleRate, predictions, epochs)
+    newPred.trainOnData(data=data, name=name, sampleRate=sampleRate, predictions=predictions, epochs=epochs, patience=epochs)
+    temp = newPred.makePredictions(name)
+    tempDF = pd.DataFrame({'timestamp':temp[0], 'latency':temp[1],}, index=pd.to_datetime(temp[0], unit='s')).resample(sampleRate).mean()
+    newPred.graph(tempDF)
