@@ -27,11 +27,11 @@ li a {
 li a:hover {
     background-color: #555;
 }
-
+/*centering forms wrapped in div*/
 div {
     text-align: center;
 }
-
+/*forms styling*/
 form {
     color: white;
     background-color: rgba(52, 169, 67, 50%);
@@ -88,7 +88,7 @@ form {
 }
 
 /*add website styling*/
-.AddWebPg {
+.form {
     text-align: center;
     padding: 10px;
 }
