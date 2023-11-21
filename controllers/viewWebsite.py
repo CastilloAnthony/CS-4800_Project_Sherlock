@@ -150,7 +150,7 @@ class ViewWebsite():
         # gives me graph
         temp = self.graph_generator.generate_graph(tensorData, url, duration, interval)
         print(temp)
-        return temp
+        return temp, url
 
     def generateGraph(self, url, duration, interval):
         self.graph_generator.generate_graph(url, duration, interval)
