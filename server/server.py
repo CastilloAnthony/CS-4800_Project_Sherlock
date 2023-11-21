@@ -21,8 +21,8 @@ class Server(): # The main server handler class
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
         self.__pollingSpeed = 60/12 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
-        self.__requestsQ = mp.Queue(maxsize=1000000000) # The request queue, only a clinet will put to this queue
-        self.__dataQ = mp.Queue(maxsize=1000000000) # The request queue, only the server will put to this queue
+        self.__requestsQ = mp.Queue(maxsize=32767) # The request queue, only a clinet will put to this queue
+        self.__dataQ = mp.Queue(maxsize=32767) # The request queue, only the server will put to this queue
         self.__processes = {} # Process handles identifiers and handles for all processes created by the server
         self.__adminID = False
         self.__predictiors = {}
