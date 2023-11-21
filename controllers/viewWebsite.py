@@ -135,7 +135,7 @@ class ViewWebsite():
             'id': uuid.uuid4(),
             'request_type': 'request',
             'column': 'pollingData',
-            'query': {'url':url, 'timestamp':{'$gte':time.time()-60*60}}
+            'query': {'url':url, 'timestamp':{'$gte':time.time()-60*60*24}}
         }
         data = self.requestData(pollingDataRequest)["data"] #line implented by Christian
         tensorDataTime, tensorDataLatency = [], []

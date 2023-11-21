@@ -3,6 +3,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import seaborn as sns
 import datetime
 import pytz
@@ -138,11 +139,13 @@ class GraphGenerator:
         #fig, ax = plt.subplots()
         #fig.autofmt_xdate() #line implemented by Anthony
         # plt.figure(figsize=(10, 6))
-        plt.plot(time_values.astype('datetime64[s]'), latency_values, label='Latency (ms)') #line altered by Anthony
+        plt.plot(time_values.astype('datetime64[s]'), latency_values * 100, label='Latency (ms)') #line altered by Anthony
         #plt.plot(foresight[0], foresight[1], label='Prediction (ms)')
         plt.xlabel('Time')
         plt.ylabel('Latency (ms)')
-        plt.title('Latency and Website Monitoring of ' + str(url) + "     (" + str(datetime.datetime.now()) + ")")
+        plt.gcf().axes[0].xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H:%M')) #line implemented by Anthony
+        plt.gcf().autofmt_xdate()
+        plt.title('Latency and Website Monitoring of\n' + str(url) + "     (" + str(datetime.datetime.now()) + ")")
         plt.grid(True)
         plt.legend()
 
