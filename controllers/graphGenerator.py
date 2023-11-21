@@ -32,7 +32,6 @@ class GraphGenerator:
         selectedData = []
         while self.__dataQ.empty() != True:
             newData = self.__dataQ.get()
-            print(newData)
             if newData['id'] == initialDataID:
                 self.__requestQ.put(request)
                 time.sleep(0.1) #import time

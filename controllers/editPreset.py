@@ -44,7 +44,6 @@ class EditPreset(): # Controller
             dict: contains either none if the thing is faulty for whatever reason or will return the data which is name, email, id, websites, presets
         """
         #ASKING
-        # print(self.curr_email)
         userRequest = {
             'id': uuid.uuid4(),
             'request_type': 'request',
@@ -56,7 +55,6 @@ class EditPreset(): # Controller
         if temp == None:
             return None
         else:
-            # print(temp)
             return temp['data']
     
     def query1(self):
@@ -128,7 +126,6 @@ class EditPreset(): # Controller
         #should return a list of presets
         preset_to_be_changed = request.form['selected_option[]']
         
-        # print(preset_to_be_changed) #Big Ben: name of one of the presetLists
         preset_to_be_changed = self.parseStringToDict(preset_to_be_changed)
         
         self.old.append(preset_to_be_changed)
@@ -154,9 +151,7 @@ class EditPreset(): # Controller
         # list, grab the new list, and insert the new list in for 
         # where the old list lived, I will do the same thing for 
         # name as well
-        
-        print('pN: ',preset_to_be_changed['name'])
-        
+                
         presetRequest = {
             'id': uuid.uuid4(),
             'request_type': 'update2',

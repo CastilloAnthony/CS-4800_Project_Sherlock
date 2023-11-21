@@ -27,7 +27,6 @@ class ViewWebsite():
             newData = self.__dataQ.get()
             if newData['id'] == initialDataID:
                 self.__requestQ.put(request)
-                #print(request['id'])
                 time.sleep(1) #import time
                 initialDataID = False
             elif initialDataID == False:
@@ -139,7 +138,6 @@ class ViewWebsite():
         }
         data = self.requestData(pollingDataRequest)["data"] #line implented by Christian
         tensorDataTime, tensorDataLatency = [], []
-        #print(data)
         for i in data:
             tensorDataTime.append(i['timestamp'])
             tensorDataLatency.append(i['latency'])
@@ -149,7 +147,6 @@ class ViewWebsite():
         interval = 15
         # gives me graph
         temp = self.graph_generator.generate_graph(tensorData, url, duration, interval)
-        #print(temp)
         return temp, url
 
     def generateGraph(self, url, duration, interval):
