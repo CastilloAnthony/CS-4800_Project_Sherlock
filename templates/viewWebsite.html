@@ -9,7 +9,7 @@
         </head>
         <body>
             <h1 style="text-align:center;color:white;">View Website</h1><br>
-            <h1 style="color:white">Preset Creation List</h1>
+            <h1 style="color:white">Global List</h1>
             <br><br>
             <!--
                 I am giving the value in the form of: 
@@ -31,9 +31,8 @@
                 <label for="fname">Pick A Website to View:</label><br>
                 {% for url in masterList['data'] %}
                     <!--
-                        Working on getting this to send more than one stupid value. 
-                        I want it to send a list back to addPreset so I can send it to
-                        the database as a list
+                        will change to only be able to accept one value at time:
+                        either through uncheck if more than one checkbox is chosen or to single choice.
                     -->
                     <input type="checkbox" name="selected_options[]" value="{{ url }}"> {{ url }}<br>
                     
