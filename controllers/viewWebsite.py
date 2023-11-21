@@ -13,7 +13,7 @@ class ViewWebsite():
     def __del__(self):
         del self.__requestQ, self.__dataQ
 
-    '''
+    ''' #process_request implented by Sierra
     def process_request(self, request):
             if request['request_type'] == 'request':
                 response_data = self.requestData(request)
@@ -38,8 +38,8 @@ class ViewWebsite():
             else:
                 self.__dataQ.put(newData)
 
-        def sendData(self, data):
-            print(f"Received Data: {data}")
+    #def sendData(self, data): #line implemented by Sierra
+        #print(f"Received Data: {data}")
 
     def query1(self):
         #Modified by Anthony Castillo
@@ -139,7 +139,7 @@ class ViewWebsite():
         }
         data = self.requestData(pollingDataRequest)["data"] #line implented by Christian
         tensorDataTime, tensorDataLatency = [], []
-        print(data)
+        #print(data)
         for i in data:
             tensorDataTime.append(i['timestamp'])
             tensorDataLatency.append(i['latency'])
@@ -149,7 +149,7 @@ class ViewWebsite():
         interval = 15
         # gives me graph
         temp = self.graph_generator.generate_graph(tensorData, url, duration, interval)
-        print(temp)
+        #print(temp)
         return temp, url
 
     def generateGraph(self, url, duration, interval):
