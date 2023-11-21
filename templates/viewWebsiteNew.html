@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+    <!--CHRISTIAN-->
+    
+        <head>
+            <meta charset="UTF-8">
+            <title>View Websites</title>
+            <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style1.css') }}">
+            <style>
+                .header{
+                    text-align:center;
+                    color:white;
+                    font-family: 'Arial', sans-serif;
+                    font-size: 16px; 
+                }
+                .taco{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 70vh; 
+                }
+            </style>
+        </head>
+        <body>
+            <h1 style="text-align:center;color:white;">View Website</h1><br>
+            <div class='header'>{{url}}</div>
+            <div class="taco">
+                <img src="data:image/png;base64,{{ plot_html }}" alt="Matplotlib Plot">
+            </div>
+            
+        </body>
+        
+{% endblock %}

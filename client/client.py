@@ -232,7 +232,7 @@ class MyFlaskApp:
         # website as a parameter to generateGraph('https://csustan.edu', 300, 15)
         # that gives me a picture
         # print(self.viewWebsiteClass.viewWebsite())
-        return render_template('viewWebsite.html', masterList = self.viewWebsiteClass.query2(), plot_html = self.viewWebsiteClass.viewWebsite())
+        return render_template('viewWebsiteNew.html', plot_html = self.viewWebsiteClass.viewWebsite()[0], url=self.viewWebsiteClass.viewWebsite()[1])
         
     #FINISHED
     def deletePreset(self):
