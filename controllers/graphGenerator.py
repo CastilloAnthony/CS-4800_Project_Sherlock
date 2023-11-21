@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import seaborn as sns
 import datetime
+from tzlocal import get_localzone  # Added import statement for tzlocal
 import pytz
 import requests
 #from predictionModel import PredictionModel
@@ -16,7 +17,6 @@ import psutil
 import io
 import base64
 import mpld3
-
 
 class GraphGenerator:
     def __init__(self, requestQ, dataQ):
@@ -126,6 +126,7 @@ class GraphGenerator:
     def generate_graph(self, tensorData, url, duration=300, interval=15):
         time_values, latency_values = tensorData[0], tensorData[1] #self.latency(psutil.net_io_counters(), duration, interval) #line implented by Anthony
 
+        local_tz = get_localzone()
         #website_status = self.monitorWebsite(url)
 
         #sending tensorData to the prediction model
@@ -142,8 +143,8 @@ class GraphGenerator:
         plt.plot(time_values.astype('datetime64[s]')-np.timedelta64(8, 'h'), latency_values * 100, label='Latency (ms)') #line altered by Anthony # WARNING: Hardcoded timedelta to be PST
         #plt.plot(foresight[0], foresight[1], label='Prediction (ms)')
         plt.ylabel('Latency (ms)')
-        plt.gcf().axes[0].xaxis.set_major_locator(mdates.HourLocator(interval=6,tz='US/Pacific'))
-        plt.gcf().axes[0].xaxis.set_minor_locator(mdates.HourLocator(interval=1,tz='US/Pacific'))
+        plt.gcf().axes[0].xaxis.set_major_locator(mdates.HourLocator(interval=6, tz=local_tz))
+        plt.gcf().axes[0].xaxis.set_minor_locator(mdates.HourLocator(interval=1, tz=local_tz))
         plt.gcf().axes[0].xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H:%M')) #line implemented by Anthony
         plt.gcf().autofmt_xdate()
         plt.title('Latency and Website Monitoring of\n' + str(url) + "     (" + str(datetime.datetime.now()) + ")")
