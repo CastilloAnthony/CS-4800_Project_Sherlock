@@ -149,6 +149,7 @@ class GraphGenerator:
         plt.title('Latency and Website Monitoring of\n' + str(url) + "     (" + str(datetime.datetime.now()) + ")")
         plt.grid(True)
         plt.legend()
+        #plt.legend(loc="best") #line implemented by Anthony
         plt.tight_layout()
 
         # if website_status:
