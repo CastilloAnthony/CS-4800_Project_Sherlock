@@ -481,7 +481,7 @@ class Server(): # The main server handler class
             if (dataQTimerEnd-dataQTimerStart) >= 60:
                 dataQTimerStart = time.time()
                 self._clearDataQ()
-            if (predictionModelTrainingTimerEnd-predictionModelTrainingTimerStart) >= 2*5:#60*5 # 5 minutes
+            if (predictionModelTrainingTimerEnd-predictionModelTrainingTimerStart) >= 60*5:#60*5 # 5 minutes
                 self._CheckPredictions()
 
     def startServer(self):
