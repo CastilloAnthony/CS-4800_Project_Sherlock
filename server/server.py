@@ -400,7 +400,7 @@ class Server(): # The main server handler class
         initial = None
         while not self.__dataQ.empty():
             tempData = self.__dataQ.get()
-            print(tempData)
+            print(str(time.ctime())+' - Deleted data from '+str(time.ctime(tempData['timestamp']))+' with id: '+str(tempData['id']))
         '''
         while not self.__dataQ.empty():
             if initial == None:
@@ -481,7 +481,7 @@ class Server(): # The main server handler class
             if (dataQTimerEnd-dataQTimerStart) >= 60:
                 dataQTimerStart = time.time()
                 self._clearDataQ()
-            if (predictionModelTrainingTimerEnd-predictionModelTrainingTimerStart) >= 60*5:#60*5 # 5 minutes
+            if (predictionModelTrainingTimerEnd-predictionModelTrainingTimerStart) >= 60*15:#60*5 # 5 minutes
                 self._CheckPredictions()
 
     def startServer(self):
