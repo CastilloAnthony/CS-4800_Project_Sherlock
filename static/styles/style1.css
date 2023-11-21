@@ -28,6 +28,22 @@ li a:hover {
     background-color: #555;
 }
 
+div {
+    text-align: center;
+}
+
+form {
+    color: white;
+    background-color: rgba(52, 169, 67, 50%);
+    border-radius: 10px;
+
+    margin: auto;
+    width: 70%;
+    height: auto;
+    text-align: justify;
+    padding: 10px
+}
+
 .dropdown {
     display: inline-block;
 }
@@ -71,13 +87,8 @@ li a:hover {
     text-align: center;
 }
 
-.center {
-    background-color: rgba(52, 169, 67, 50%);
-    border-radius: 10px;
-
-    margin: auto;
-    width: 70%;
-    height: 110px;
+/*add website styling*/
+.AddWebPg {
     text-align: center;
     padding: 10px;
 }

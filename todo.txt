@@ -1,6 +1,7 @@
 ---TODO----
 1. Change checkbox form to only accept one value at time (change to multiple choice form and populate)
 2. View Preset... bunch of graphs.
+3. editPresetHTML Div.
 ---SUGGESTIONS----
 1. Make sure add preset checks for empty names.. set default to "PresetX" 
 -   where x is the number preset, ie. Preset1, Preset2, Preset3...

@@ -9,7 +9,7 @@
         </head>
 
         <body>
-            <h1 style="color:white">Preset Creation List</h1>
+            <h1 style="text-align: center; color:white">Preset Creation List</h1>
             <br><br>
             <!--
                 I am giving the value in the form of: 
@@ -22,8 +22,9 @@
             timestamp
             data
             -->
-            
-            <form action="addPreset/newAddedPreset" style="background-color:white; display:inline-block" method="POST">
+            <div class="presetCreation">
+            <!--form action="addPreset/newAddedPreset" style="display:inline-block" method="POST"-->
+            <form action="addPreset/newAddedPreset" method="POST">
                 <!--
                     Need a name for the respective preset so the user knows what to ask for later
                     Make it easier to recall for them. 
@@ -42,5 +43,6 @@
                 {% endfor %}
                 <input type="submit" value="Submit">
             </form>
+            </div>
         </body>
 {% endblock %}

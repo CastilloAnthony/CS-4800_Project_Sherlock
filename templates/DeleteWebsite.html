@@ -9,13 +9,14 @@
         </head>
         <body>
             <h1  style="text-align:center;color:white;">Delete Website</h1><br>
-
-            <form action="deleteWebsite/newDeletedWebsite" style="background-color:white; display:inline-block" method="POST">
+            
+            <div>
+            <form action="deleteWebsite/newDeletedWebsite" style="display:inline-block" method="POST">
                 <!--
                     Need a name for the respective preset so the user knows what to ask for later
                     Make it easier to recall for them. 
                 -->
-                <div style="background:black;color:white;">FROM THIS LIST PICK WHICH ONES YOU WOULD LIKE TO DELETE</div>
+                <div style="color:white;">FROM THIS LIST PICK WHICH ONES YOU WOULD LIKE TO DELETE</div>
                 <br><br>
                 <!--
                     [ 
@@ -50,6 +51,7 @@
                 {% endfor %}
                 <input type="submit" value="Submit">
             </form>
+            </div>
         </body>
     
 {% endblock %}
