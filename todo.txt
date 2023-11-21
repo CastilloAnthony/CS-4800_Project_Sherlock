@@ -1,3 +1,8 @@
-not allow duplicates
-auth.py for authorization at login page 
-graphs (data vis for single website to start)
+---TODO----
+1. Change checkbox form to only accept one value at time (change to multiple choice form and populate)
+2. View Preset... bunch of graphs.
+---SUGGESTIONS----
+1. Make sure add preset checks for empty names.. set default to "PresetX" 
+-   where x is the number preset, ie. Preset1, Preset2, Preset3...
+2. Change edit preset(?)- works well. Might be more intiutive to pass old preset back
+- into form and edit old preset instead of creating new preset altogether..
