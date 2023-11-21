@@ -61,6 +61,23 @@ li a:hover {
     background-color: #4CAF50; /* Green */
 }
 
-h1.Welcome{
+/*homepage styling*/
+.home {
+    background: rgba(52, 169, 67, 50%);
+    border-radius: 10px;
+
+    margin: auto;
+    width: 70%;
+    text-align: center;
+}
+
+.center {
     background-color: rgba(52, 169, 67, 50%);
+    border-radius: 10px;
+
+    margin: auto;
+    width: 70%;
+    height: 110px;
+    text-align: center;
+    padding: 10px;
 }

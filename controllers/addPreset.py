@@ -79,8 +79,7 @@ class AddPreset(): # Controller
                 'presetLists':presetLists,
                 'timestamp':time.time()
             }
-        print(addition)
-        print(self.curr_email)
+        
         presetUpdate = {
             #CHANGE WILL NEED TO BE INSERTED TO USERS
             #users {

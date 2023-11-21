@@ -79,11 +79,11 @@ class PredictionModel():
             loss=tf.keras.losses.MeanSquaredError(),#tf.keras.losses.Huber(),#tf.keras.losses.LogCosh(),#'mse', 
             metrics=['mae', 'mse',]#['accuracy']
             )#'sparse_categorical_crossentropy')#'mse')#loss_fn,)
-        #print(len(self.__model.weights))
-        #print(self.__model.get_config())
+        ##print(len(self.__model.weights))
+        ##print(self.__model.get_config())
         self.__model.build(input_shape=(32, 1,))
         #self.__model.summary()
-        #print("Model Input Shape:", self.__model.input_shape)
+        ##print("Model Input Shape:", self.__model.input_shape)
         '''
         Image Model Example
         self.__model = tf.keras.Sequential([
@@ -155,10 +155,10 @@ class PredictionModel():
         self.clearData()
         tempDataX = data[0] # Timestamp
         tempDataY = data[1]*100 # Latency
-        #print(tempDataY[0], tempDataY[-1])
+        ##print(tempDataY[0], tempDataY[-1])
         #tempMean = 
-        #print(tempMean, tempMean**2)
-        #print(len(tempDataX))
+        ##print(tempMean, tempMean**2)
+        ##print(len(tempDataX))
         #for i, v in enumerate(tempDataX):
         i=0
         while i < len(tempDataX):
@@ -172,22 +172,22 @@ class PredictionModel():
                 tempDataX = np.delete(tempDataX, i)
                 tempDataY = np.delete(tempDataY, i)
             i += 1
-        #print(np.nanmean(tempDataY), np.nanmean(tempDataY)**2)
+        ##print(np.nanmean(tempDataY), np.nanmean(tempDataY)**2)
 
         self.__size = len(tempDataX)
-        #print('Starting Size: ', self.__size, int(self.__size*0.7))
+        ##print('Starting Size: ', self.__size, int(self.__size*0.7))
         while int(self.__size*0.7)%2 != 0:#self.isOdd(int(self.__size*0.7)): # 
             tempDataX = np.delete(tempDataX, 0, None)
             tempDataY = np.delete(tempDataY, 0, None)
             self.__size = len(tempDataX)
-            #print(self.__size, int(self.__size*0.7))
-        #print('Ending Size: ', self.__size, int(self.__size*0.7))
+            ##print(self.__size, int(self.__size*0.7))
+        ##print('Ending Size: ', self.__size, int(self.__size*0.7))
         #tempData = np.vstack((tempDataX, tempDataY))
-        #print(tempDataY*100)
-        #print(np.nanmean(tempDataY), np.nanstd(tempDataY))
-        #print(tempDataY.mean(), tempDataY.std())
+        ##print(tempDataY*100)
+        ##print(np.nanmean(tempDataY), np.nanstd(tempDataY))
+        ##print(tempDataY.mean(), tempDataY.std())
         #test = np.vstack((tempDataX, tempDataY,))
-        #print(test)
+        ##print(test)
         # \/ Modify this \/
         tempDF = pd.DataFrame({'timestamp':tempDataX, 'latency':tempDataY,}, index=pd.to_datetime(tempDataX, unit='s'))#.resample(self.__sampleRate).mean()
         self.__originalDataCleaned = tempDF
@@ -196,13 +196,13 @@ class PredictionModel():
         #         tempDF['timestamp'].drop(index=i, inplace=True)
         #     #tempDF['latency'][i].replace(tempDF['latency'].mean(), np.nan, inplace = True)
         tempDF = tempDF.dropna(subset=['latency'])
-        #print(tempDF.head())
+        ##print(tempDF.head())
         self.__size = len(tempDF['latency'])
-        #print(tempDF['timestamp'])
-        #print(tempDF['latency'])
-        #print(tempDF[0], tempDF[1])
-        #print(tempDF.index)
-        #print(tempDF[0])
+        ##print(tempDF['timestamp'])
+        ##print(tempDF['latency'])
+        ##print(tempDF[0], tempDF[1])
+        ##print(tempDF.index)
+        ##print(tempDF[0])
 
         timestampData = tempDF['timestamp'].to_numpy()#tempDataX
         latencyData = tempDF['latency'].to_numpy()#tempDataY
@@ -230,35 +230,35 @@ class PredictionModel():
         self.__val_data = np.vstack((tempDF['timestamp'][int(self.__size*0.7):int(self.__size*0.9)], tempDF['latency'][int(self.__size*0.7):int(self.__size*0.9)]))
         self.__test_data = np.vstack((tempDF['timestamp'][int(self.__size*0.9):], tempDF['latency'][int(self.__size*0.9):]))
         
-        #print(self.__train_data)
-        # print('Training Data:\n', self.__train_data)
-        # print('Validation Data:\n', self.__val_data)
-        # print('Test Data:\n', self.__test_data)
-        # print('Length: ', self.__size, '70%: ', int(self.__size*0.7), ' ', 'Mean: ', train_mean, ' ', 'STD: ', train_std)
+        ##print(self.__train_data)
+        # #print('Training Data:\n', self.__train_data)
+        # #print('Validation Data:\n', self.__val_data)
+        # #print('Test Data:\n', self.__test_data)
+        # #print('Length: ', self.__size, '70%: ', int(self.__size*0.7), ' ', 'Mean: ', train_mean, ' ', 'STD: ', train_std)
 
         # Normalizing data
         #self.__train_data[1] = abs((self.__train_data[1] - train_mean) / train_std)
         #self.__val_data[1] = abs((self.__val_data[1] - train_mean) / train_std)
         #self.__test_data[1] = abs((self.__test_data[1] - train_mean) / train_std)
 
-        #print(self.__train_data[0][0])
-        #print(self.__train_data[0][1])
-        #print(self.__train_data[0][-1])
+        ##print(self.__train_data[0][0])
+        ##print(self.__train_data[0][1])
+        ##print(self.__train_data[0][-1])
         temptemptemp = np.empty(1)
-        #print(self.__size, len(train_dataX)-1)
-        #print('Length of Training Data:', len(self.__train_data[0]), int(self.__size*0.7), self.__train_data[0][0+1]-self.__train_data[0][0])
-        #print(range(0, int(self.__size*0.7)-2))
+        ##print(self.__size, len(train_dataX)-1)
+        ##print('Length of Training Data:', len(self.__train_data[0]), int(self.__size*0.7), self.__train_data[0][0+1]-self.__train_data[0][0])
+        ##print(range(0, int(self.__size*0.7)-2))
         for i in range(0, int(self.__size*0.7)-2):
-            #print('Calculating ', i, self.__train_data[0][i])
+            ##print('Calculating ', i, self.__train_data[0][i])
             temptemptemp = np.append(temptemptemp, self.__train_data[0][i+1]-self.__train_data[0][i])
         temptemptemp =temptemptemp[~np.isnan(temptemptemp)]
-        #print('temptemptemp:', len(temptemptemp), np.average(temptemptemp), temptemptemp,)
+        ##print('temptemptemp:', len(temptemptemp), np.average(temptemptemp), temptemptemp,)
         self.__avgDist = np.average(temptemptemp)
-        #print(np.average(temptemptemp))
-        # print('Training Data:\n', train_data)
-        # print('Validation Data:\n', val_data)
-        # print('Test Data:\n', test_data)
-        #print(tf.shape(self.__train_data[0]))
+        ##print(np.average(temptemptemp))
+        # #print('Training Data:\n', train_data)
+        # #print('Validation Data:\n', val_data)
+        # #print('Test Data:\n', test_data)
+        ##print(tf.shape(self.__train_data[0]))
         
         # self.__train_ds = tf.keras.utils.timeseries_dataset_from_array(
         #     data=self.__train_data[1],
@@ -284,14 +284,14 @@ class PredictionModel():
         #self.__val_ds = tf.data.Dataset.from_tensor_slices((self.__val_data[1], self.__val_data[0]))
         #self.__test_ds = tf.data.Dataset.from_tensor_slices((self.__test_data[1], self.__test_data[0]))
         
-        #print('Shape of train_data:', tf.shape(self.__train_data))
-        #print('Cardinality of Train_ds:', tf.data.experimental.cardinality(self.__train_ds))
+        ##print('Shape of train_data:', tf.shape(self.__train_data))
+        ##print('Cardinality of Train_ds:', tf.data.experimental.cardinality(self.__train_ds))
         
-        #print('Shape of train_ds:', tf.shape(self.__train_ds))
-        #print(train_ds, val_ds)
+        ##print('Shape of train_ds:', tf.shape(self.__train_ds))
+        ##print(train_ds, val_ds)
         #train_latency = self.__data['latency'] - train_mean / train_std
         #val_latency = tf.keras.utils.timeseries_dataset_from_array()
-        #print(len(self.__train_data), len(self.__train_data[0]), len(self.__train_data[1]))
+        ##print(len(self.__train_data), len(self.__train_data[0]), len(self.__train_data[1]))
 
     def clearData(self):
         """Empties the data that is currently stored by the model
@@ -317,22 +317,22 @@ class PredictionModel():
             list: A list of all the predictions
         """
         # https://www.tensorflow.org/tutorials/structured_data/time_series#data_windowing
-        #print(self.__train_data[0], self.__train_data[0][0], self.__train_data[0][1])
-        #print(self.__train_data[0][-1], self.__train_data[0][-1]+quantity, self.__avgDist, self.__train_data[0][-1]+quantity-self.__train_data[0][-1])
+        ##print(self.__train_data[0], self.__train_data[0][0], self.__train_data[0][1])
+        ##print(self.__train_data[0][-1], self.__train_data[0][-1]+quantity, self.__avgDist, self.__train_data[0][-1]+quantity-self.__train_data[0][-1])
         temp = np.arange(self.__train_data[0][-1]+self.__avgDist, self.__train_data[0][-1]+quantity, self.__avgDist)
-        #print(temp)
+        ##print(temp)
         temptemp = []
         predictions = []
-        #print(len(temp), temp)
+        ##print(len(temp), temp)
         for i, v in enumerate(temp):
-            #print(i, v)
+            ##print(i, v)
             predictions = np.append(predictions, self.__model.predict([v]).flatten())
             temptemp = np.append(temptemp, temp[i])
-            #print(temptemp, predictions)
+            ##print(temptemp, predictions)
             #self.trainModel(data=np.vstack((temptemp, predictions)), patience=10)
         #predictions = self.__model.predict(temp).flatten()#tf.expand_dims(self.__data, axis=0))
         
-        #print('Precitions Output: ',len(predictions), 'Shape:', print(predictions.shape), print(predictions))
+        ##print('Precitions Output: ',len(predictions), 'Shape:', #print(predictions.shape), #print(predictions))
         
         #outputDF = pd.DataFrame(predictions) # [{'data0'}, {'data1'}, {'data2'}, {'etc.'}, {'data#quantity-1#'}]
         #outputDF.add()
@@ -340,17 +340,17 @@ class PredictionModel():
         #for i in predictions[0]:
             #test.append(i[0])
         #plt.pyplot.plot(data[0], data[1], 'o', label='Original Data')
-        #print(predictions[0][1])
+        ##print(predictions[0][1])
 
         #tempY = outputDF[0].to_numpy()
         tempY = predictions
         tempDF = pd.DataFrame({'timestamp':temp, 'latency':tempY,}, index=pd.to_datetime(temp, unit='s')).resample(self.__sampleRate).mean()
         tempDF = tempDF.dropna(subset=['timestamp'])
         tempDF = tempDF.dropna(subset=['latency'])
-        #print(temp)
-        #print(predictions)
-        #print(tempY)
-        #print(outputDF)
+        ##print(temp)
+        ##print(predictions)
+        ##print(tempY)
+        ##print(outputDF)
         ''''
         with open('temp.txt', 'w') as file:
             file.writelines('Training Data:\n')
@@ -361,7 +361,7 @@ class PredictionModel():
             for i, v in enumerate(tempDF['timestamp']):
                 file.writelines(str(i)+'\t|\t'+str(v)+'\t|\t'+str(tempDF['latency'][i])+'\n')
         '''
-        #print(tempDF.head())
+        ##print(tempDF.head())
         self.graph(tempDF)
         return np.vstack((temp, tempY))
 
@@ -402,7 +402,7 @@ class PredictionModel():
         plt.tight_layout()
         plt.savefig('gallery/'+self.__name+'_'+self.__sampleRate+'_'+str(time.time())+'.png')
         plt.clf()
-        print(str(time.ctime())+' - A new graph for '+self.__name+' has been generated...')
+        #print(str(time.ctime())+' - A new graph for '+self.__name+' has been generated...')
         #plt.show()
 
     def trainModel(self, epochs:int=10*10**2, data=None, patience:int=25):
@@ -413,14 +413,14 @@ class PredictionModel():
         """
         #https://www.tensorflow.org/tutorials/structured_data/time_series
 
-        #print('Training Data:', self.__train_data[1], self.__train_data[0])
-        #print('Training:')
-        #print(np.average(self.__train_data[1]))
+        ##print('Training Data:', self.__train_data[1], self.__train_data[0])
+        ##print('Training:')
+        ##print(np.average(self.__train_data[1]))
         evaluation = [np.nan, 0.0]
         previous = 10**9999
         count = 0
         #while (np.isnan(evaluation[0]) or evaluation[0] > 0.1) and (count < 1000):# and count < 10:
-        #print('Iteration:', count, evaluation)
+        ##print('Iteration:', count, evaluation)
         if data is not None:
             result = self.__model.fit(
                 #self.__train_ds,
@@ -455,35 +455,35 @@ class PredictionModel():
                 use_multiprocessing=self.__multiprocess,
                 verbose=1,
             )
-            #print(result['val_loss'])
-        #print('Evaluating:')
-        print('Evalutating '+self.__name+'...')
+            ##print(result['val_loss'])
+        ##print('Evaluating:')
+        #print('Evalutating '+self.__name+'...')
         evaluation = self.__model.evaluate(
             self.__test_data[0],
             self.__test_data[1],
             batch_size=32,
             verbose=1,
         )
-        #print(evaluation, evaluation[0] > 0.1)
+        ##print(evaluation, evaluation[0] > 0.1)
         count += 1
         # if previous < evaluation[0]:
         #     break
         # else:
         #     previous = evaluation[0]
         #self.__model.save(self.__modelFilename)
-        #print('Predicting:')
+        ##print('Predicting:')
         '''
         predicted = self.__model.predict(
             self.__test_data[0][:3],
             verbose=0,
         )
         '''
-        #print(predicted.shape)
-        #print(predicted[0])
-        #print(np.average(self.__train_data[1]), np.std(self.__train_data[1]))
-        #print('Acutal:')
-        #print(self.__test_data[0][:3])
-        #print(self.__test_data[1][:3])
+        ##print(predicted.shape)
+        ##print(predicted[0])
+        ##print(np.average(self.__train_data[1]), np.std(self.__train_data[1]))
+        ##print('Acutal:')
+        ##print(self.__test_data[0][:3])
+        ##print(self.__test_data[1][:3])
         #return predicted
         '''
         if not (np.average(self.__train_data[1])-np.std(self.__train_data[1])*2*2 <= predicted[0] <= np.average(self.__train_data[1])+np.std(self.__train_data[1])*2*2):
@@ -513,7 +513,7 @@ class PredictionModel():
         # https://www.tensorflow.org/tutorials/structured_data/time_series#data_windowing
         tempX = np.arange(startingPoint+avgDist, startingPoint+quantity, avgDist)
         timestamps, predictions = [], []
-        print(str(time.ctime())+' - Predicting '+str(len(tempX))+' for '+self.__name+'...')
+        #print(str(time.ctime())+' - Predicting '+str(len(tempX))+' for '+self.__name+'...')
         for i, v in enumerate(tempX):
             predictions = np.append(predictions, self.__model.predict(
                 [v],
@@ -527,7 +527,7 @@ class PredictionModel():
         #timestamps = tempDF[0].to_numpy()
         #predictions = tempDF[1].to_numpy()
         #self.graph(tempDF)
-        print(str(time.ctime())+' - Completed predicting of '+str(len(tempX))+' units for '+self.__name+'...')
+        #print(str(time.ctime())+' - Completed predicting of '+str(len(tempX))+' units for '+self.__name+'...')
         return np.vstack((timestamps, predictions))
 
     def trainOnData(self, data:np.array, name:str='Unknown', sampleRate:str='15T', predictions:int=60*60*6, epochs:int=10*10**2, patience:int=100):
@@ -549,7 +549,7 @@ class PredictionModel():
         self.setData(data)
         self.readModel()
         timerStart = time.time()
-        print(str(time.ctime())+' - Training on '+self.__name+'...')
+        #print(str(time.ctime())+' - Training on '+self.__name+'...')
         result = self.__model.fit(
                 self.__train_data[0],
                 self.__train_data[1],
@@ -565,7 +565,7 @@ class PredictionModel():
         history = {}
         for i, v in enumerate(result.history):
             history[v] = np.min(result.history[v])
-        print(str(time.ctime())+' - Results for '+self.__name+' '+str(history))#result.history['val_loss'])
+        #print(str(time.ctime())+' - Results for '+self.__name+' '+str(history))#result.history['val_loss'])
         with open('gallery/'+self.__name+'.txt', 'a') as file:
             file.writelines('Training Results:\t'+'\t|\t'+str(time.ctime())+'\t|\t'+str(history)+'\n')
         evaluation = self.__model.evaluate(
@@ -578,12 +578,12 @@ class PredictionModel():
         history2 = {}
         for i, v in enumerate(self.__model.metrics_names):
             history2[v] = evaluation[i]
-        print(str(time.ctime())+' - Evaluation for '+self.__name+' '+str(history2))#result.history['val_loss'])
+        #print(str(time.ctime())+' - Evaluation for '+self.__name+' '+str(history2))#result.history['val_loss'])
         self.saveModel()
         with open('gallery/'+self.__name+'.txt', 'a') as file:
             file.writelines('Evaluation Results:\t'+'\t|\t'+str(time.ctime())+'\t|\t'+str(history2)+'\n')
             file.writelines(str(time.ctime())+' - Training for '+self.__name+'_Predictor'+' completed in '+str(time.time()-timerStart)+' seconds.')
-        print(str(time.ctime())+' - Training for '+self.__name+'_Predictor'+' completed in '+str(time.time()-timerStart)+' seconds.')
+        #print(str(time.ctime())+' - Training for '+self.__name+'_Predictor'+' completed in '+str(time.time()-timerStart)+' seconds.')
         return [history, history2]
     
     def predictOnData(self, data:np.array, name:str='Unknown', sampleRate:str='15T', predictions:int=60*60*6, epochs:int=10*10**2):
@@ -598,7 +598,7 @@ class PredictionModel():
         """
         '''
         tempData = False
-        print(len(data[0]))
+        #print(len(data[0]))
         if self.isOdd(len(data[0])):
             tempDataX = np.delete(data[0], 0, None)
             tempDataY = np.delete(data[1], 0, None)
@@ -607,14 +607,14 @@ class PredictionModel():
         else:
             tempData = data
             self.__size = len(tempData[0])
-        print(self.__size, self.isOdd(self.__size))
+        #print(self.__size, self.isOdd(self.__size))
         '''
         self.__sampleRate = sampleRate
         self.setFilename(name)
         self.setData(data)
         self.readModel()
         timerStart = time.time()
-        print('Training on '+self.__name+'...')
+        #print('Training on '+self.__name+'...')
         predicted = self.trainModel(epochs)
         '''
         while not (np.average(self.__train_data[1])-np.std(self.__train_data[1])*2 <= predicted[0] <= np.average(self.__train_data[1])+np.std(self.__train_data[1])*2):
@@ -625,9 +625,9 @@ class PredictionModel():
                     break
         '''
         self.saveModel()
-        print('Predicting on '+self.__name+'...')
+        #print('Predicting on '+self.__name+'...')
         prediction = self.predict(predictions)
-        print('Training and Predicting for '+self.__name+' completed in '+str(time.time()-timerStart)+' seconds.')
+        #print('Training and Predicting for '+self.__name+' completed in '+str(time.time()-timerStart)+' seconds.')
         return prediction
 
     # def isOdd(self, number):

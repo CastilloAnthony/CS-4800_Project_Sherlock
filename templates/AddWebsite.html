@@ -9,6 +9,7 @@
         </head>
         <body>
             <h1  style="text-align:center;color:white;">Add Website</h1>
+            <div class="center">
             <form action="addWebsite/newAddedWebsite" method="POST">
                 <!--
                     GET: unsafe way to send info,
@@ -17,10 +18,11 @@
                             in the other php file,
                 -->
                 <h4 style="color:white;">Please add a website if you so desire so that we can keep track of it madam or monsier</h4>
-                <label style="color:white;" for="fname">url:</label>
+                <label style="color:white;" for="fname">URL:</label>
                 <input type="text" name="url">
-                <button type="submit">Click Me!!!</button>
+                <button type="submit">Enter</button>
             </form>
+            </div>
         </body>
     
 {% endblock%}

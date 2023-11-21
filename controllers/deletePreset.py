@@ -45,7 +45,6 @@ class DeletePreset(): # Controller
             'column': 'users',#masterList
             'query': {"email":self.curr_email}
         }
-        #print('something who cares')
         temp = self.requestData(masterListRequest)
         if temp == None:
             return None
@@ -64,7 +63,6 @@ class DeletePreset(): # Controller
         deletedPresets = request.form.getlist('selected_options[]') 
         
         for preset in deletedPresets:
-            print(preset)# '5' where 5 was the name field in the presets
             deletePresetRequest = {
                 'id': uuid.uuid4(),
                 'request_type': 'remove',
