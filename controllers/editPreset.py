@@ -165,7 +165,8 @@ class EditPreset(): # Controller
             'changeTo': {"presets":newDictionary} #what I want the new one to be
         }
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT
-        requestData(presetRequest, self.__reqeustQ, self.__dataQ)
+        requestData(presetRequest, self.__requestQ, self.__dataQ)
+        
         #reassigning self.old so that it will be fresh for next edit
         self.old = []
         
