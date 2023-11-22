@@ -4,6 +4,7 @@ import time
 import requests
 from flask import Flask, render_template, request
 from bson import ObjectId
+from controllers.queueManager import requestData
 
 class AddPreset(): # Controller
     def __init__(self, requestQ, dataQ):
@@ -12,7 +13,8 @@ class AddPreset(): # Controller
 
     def __del__(self):
         pass
-
+    
+    '''
     def requestData(self, request):
         """_summary_: in order to get the correct data and check for wrong insertions
 
@@ -38,6 +40,7 @@ class AddPreset(): # Controller
                     return newData
             else:
                 self.__dataQ.put(newData)
+    '''
 
     def query(self):
         """_summary_: grab things from master list
@@ -52,7 +55,7 @@ class AddPreset(): # Controller
             'column': 'masterList',
             'query': {}
         }
-        temp = self.requestData(masterListRequest)
+        temp = requestData(masterListRequest, self.__requestQ, self.__dataQ)
         return temp
         #requestQ.put(masterListRequest)
         #time.sleep(1) 
@@ -98,7 +101,7 @@ class AddPreset(): # Controller
             'query': {'email': self.curr_email},#GOOD
             'changeTo':  {'presets':addition} #GOOD?
         }
-        self.requestData(presetUpdate)
+        requestData(presetUpdate, self.__requestQ, self.__dataQ)
         # {'id': UUID('a846930f-60ab-40fd-adc0-9f1b5b6ece98'), 
         # 'timestamp': 1700172860.6941326, 
         # 'data': True}

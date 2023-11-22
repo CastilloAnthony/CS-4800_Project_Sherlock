@@ -3,6 +3,7 @@ import uuid
 import time
 import requests
 from flask import Flask, render_template, request
+from controllers.queueManager import requestData
 
 class AddWebsite(): # Controller
     def __init__(self, requestQ, dataQ):
@@ -11,7 +12,8 @@ class AddWebsite(): # Controller
 
     def __del__(self):
         pass
-
+    
+    '''
     def requestData(self, request):
         self.__requestQ.put(request)
         time.sleep(0.1)
@@ -29,6 +31,7 @@ class AddWebsite(): # Controller
                     return newData
             else:
                 self.__dataQ.put(newData)
+    '''
 
     def getEmail(self, email):
         self.curr_email = email
@@ -52,7 +55,7 @@ class AddWebsite(): # Controller
             'column': 'auth',
             'query': {"email":self.curr_email}
         }
-        temp = self.requestData(grabAuthThroughEmail)
+        temp = requestData(grabAuthThroughEmail, self.__requestQ, self.__dataQ)
         #temp = 
         # {'id': UUID('18938276-4528-4865-922d-d6f0673adab9'), 
         # 'timestamp': 1700172860.5806377, 

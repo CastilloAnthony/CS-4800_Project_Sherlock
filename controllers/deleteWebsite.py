@@ -3,6 +3,7 @@ import uuid
 import time
 import requests
 from flask import Flask, render_template, request
+from controllers.queueManager import requestData
 
 class DeleteWebsite(): # Controller
     def __init__(self, requestQ, dataQ):
@@ -11,7 +12,8 @@ class DeleteWebsite(): # Controller
 
     def __del__(self):
         pass
-
+    
+    '''
     def requestData(self, request):
         self.__requestQ.put(request)
         time.sleep(0.1)
@@ -29,6 +31,7 @@ class DeleteWebsite(): # Controller
                     return newData
             else:
                 self.__dataQ.put(newData)
+    '''
 
     def getEmail(self, email):
         self.curr_email = email
@@ -46,7 +49,7 @@ class DeleteWebsite(): # Controller
             'column': 'users',#masterList
             'query': {"email":self.curr_email}
         }
-        temp = self.requestData(masterListRequest)
+        temp = requestData(masterListRequest, self.__requestQ, self.__dataQ)
         return temp
         
     def deleteWebsite(self):
@@ -66,4 +69,4 @@ class DeleteWebsite(): # Controller
             }
             #WE ARE SENDING IN AN INSERT REQUEST AFTER THIS WE WILL BE DONE
             #SIMPLY GIVE THEM A "YOUR THING HAS DELETED CORRECTLY AND BE ON WITH YOUR WAY"
-            self.requestData(removeWebsites)
+            requestData(removeWebsites, self.__requestQ, self.__dataQ)

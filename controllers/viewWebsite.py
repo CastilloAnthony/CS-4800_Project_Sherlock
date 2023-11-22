@@ -4,6 +4,7 @@ import time
 from flask import Flask, render_template, request
 import numpy as np
 from controllers.graphGenerator import GraphGenerator
+from controllers.queueManager import requestData
 
 class ViewWebsite():
     def __init__(self, requestQ, dataQ):
@@ -18,7 +19,7 @@ class ViewWebsite():
             if request['request_type'] == 'request':
                 response_data = self.requestData(request)
     '''
-
+    '''
     def requestData(self, request):
         self.__requestQ.put(request)
         time.sleep(1)
@@ -36,6 +37,7 @@ class ViewWebsite():
                     return newData
             else:
                 self.__dataQ.put(newData)
+    '''
 
     #def sendData(self, data): #line implemented by Sierra
         #print(f"Received Data: {data}")
@@ -56,13 +58,13 @@ class ViewWebsite():
             'column': 'masterList',
             'query': {}
         }
-        temp1 = self.requestData(Request1)
+        temp1 = requestData(Request1, self.__requestQ, self.__dataQ)
         while temp1 == None:
-            tempData = self.requestData(Request1)
+            tempData = requestData(Request1, self.__requestQ, self.__dataQ)
             if tempData == None:
-                tempData = self.requestData(Request1)
+                tempData = requestData(Request1, self.__requestQ, self.__dataQ)
             elif tempData['data'] == None:
-                tempData = self.requestData(Request1)
+                tempData = requestData(Request1, self.__requestQ, self.__dataQ)
             else:
                 temp1 = tempData
         
@@ -88,13 +90,13 @@ class ViewWebsite():
             # 'www.microsoft.com': 0.04232287406921387, 'www.nasa.gov': 0.02367687225341797, 'chat.openai.com': 0.034199535846710205, 
             # 'www.bbc.co.uk': 0.04925578832626343, 
             # 'www.reddit.com': 0.05298107862472534, 'www.wikipedia.org': 0.024207770824432373, 'www.amazon.com': 0.037099480628967285}
-            tempUrl = self.requestData(Request2)
+            tempUrl = requestData(Request2, self.__requestQ, self.__dataQ)
             while tempUrl == None:
-                tempData = self.requestData(Request2)
+                tempData = requestData(Request2, self.__requestQ, self.__dataQ)
                 if tempData == None:
-                    tempData = self.requestData(Request2)
+                    tempData = requestData(Request2, self.__requestQ, self.__dataQ)
                 elif tempData['data'] == None:
-                    tempData = self.requestData(Request2)
+                    tempData = requestData(Request2, self.__requestQ, self.__dataQ)
                 else:
                     tempUrl = tempData
             
@@ -118,7 +120,7 @@ class ViewWebsite():
             'column': 'masterList',
             'query': {}
         }
-        temp = self.requestData(masterListRequest)
+        temp = requestData(masterListRequest, self.__requestQ, self.__dataQ)
         return temp
     
     def viewWebsite(self):
@@ -136,7 +138,7 @@ class ViewWebsite():
             'column': 'pollingData',
             'query': {'url':url, 'timestamp':{'$gte':time.time()-60*60*24}}
         }
-        data = self.requestData(pollingDataRequest)["data"] #line implented by Christian
+        data = requestData(pollingDataRequest, self.__requestQ, self.__dataQ)["data"] #line implented by Christian
         tensorDataTime, tensorDataLatency = [], []
         for i in data:
             tensorDataTime.append(i['timestamp'])

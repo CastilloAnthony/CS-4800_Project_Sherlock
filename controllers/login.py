@@ -1,10 +1,11 @@
 import uuid
 import time
-
+from controllers.queueManager import requestData
 class Login:
     def __init__(self, requestQ, dataQ):
         self.__requestQ, self.__dataQ = requestQ, dataQ
     
+    '''
     def requestData(self, request):
         """_summary_: returns data or returns a not good query message
 
@@ -30,7 +31,8 @@ class Login:
                     return newData
             else:
                 self.__dataQ.put(newData)
-    
+    '''
+
     #HELPER FUNCTIONS
     def find_user_by_name(self, name): #Should this work?
         """_summary_: find out if name is in dictionary
@@ -48,7 +50,7 @@ class Login:
             'column': 'auth',
             'query': {"name":name}
         }
-        temp = self.requestData(nameRequest)['data']
+        temp = requestData(nameRequest, self.__requestQ, self.__dataQ)['data']
         return temp
 
     def find_user_by_email(self, email):
@@ -67,7 +69,7 @@ class Login:
             'column': 'auth',
             'query': {"email":email}
         }
-        temp = self.requestData(emailRequest)['data']
+        temp = requestData(emailRequest, self.__requestQ, self.__dataQ)['data']
         return temp
 
     def insert_user(self, auth_data):
@@ -83,7 +85,7 @@ class Login:
             'column': 'auth',
             'query': auth_data
         }
-        self.requestData(insertAuthRequest)
+        requestData(insertAuthRequest, self.__requestQ, self.__dataQ)
         
         #ADDING IN A USER DOCUMENT Should be like:
         #users {
@@ -115,7 +117,7 @@ class Login:
             'column': 'users',
             'query': user_document
         }
-        self.requestData(insertUserRequest)
+        requestData(insertUserRequest, self.__requestQ, self.__dataQ)
         
 
         
