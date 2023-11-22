@@ -92,3 +92,14 @@ form {
     text-align: center;
     padding: 10px;
 }
+
+/*button styling*/
+button {
+    background-color: gray;
+    color: black;
+}
+
+ button:hover {
+    background-color: #4CAF50;
+    color: black;
+ }
