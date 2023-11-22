@@ -8,3 +8,4 @@
 2. Change edit preset(?)- works well. Might be more intiutive to pass old preset back
 - into form and edit old preset instead of creating new preset altogether..
 3. Add an "About" page (use coding/binary font?)
+4. Code Named S.H.E.R.L.O.C.K.-- transformation JS
