@@ -136,7 +136,7 @@ class GraphGenerator:
         #foresight = self.predictOnData(tensorData, url= '')
         #foresight = self.predictOnData(tensorData, '', sampleRate='', epochs=[], predictions=[])
         
-        #fig, ax = plt.subplots()
+        fig, ax = plt.subplots()
         #fig.autofmt_xdate() #line implemented by Anthony
         plt.figure(figsize=(16*0.65, 9*0.65))
         plt.plot(time_values.astype('datetime64[s]')-np.timedelta64(8, 'h'), latency_values * 100, label='Latency (ms)') #line altered by Anthony # WARNING: Hardcoded timedelta to be PST
