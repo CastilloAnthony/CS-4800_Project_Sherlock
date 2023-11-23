@@ -138,16 +138,22 @@ class GraphGenerator:
         
         fig, ax = plt.subplots()
         #fig.autofmt_xdate() #line implemented by Anthony
-        plt.figure(figsize=(16*0.65, 9*0.65))
-        plt.plot(time_values.astype('datetime64[s]')-np.timedelta64(8, 'h'), latency_values * 100, label='Latency (ms)') #line altered by Anthony # WARNING: Hardcoded timedelta to be PST
+        ax.figure(figsize=(16*0.65, 9*0.65))
+        ax.plot(time_values.astype('datetime64[s]')-np.timedelta64(8, 'h'), latency_values * 100, label='Latency (ms)') #line altered by Anthony # WARNING: Hardcoded timedelta to be PST
         #plt.plot(foresight[0], foresight[1], label='Prediction (ms)')
-        plt.ylabel('Latency (ms)')
-        plt.gcf().axes[0].xaxis.set_major_locator(mdates.HourLocator(interval=6, tz=local_tz))
-        plt.gcf().axes[0].xaxis.set_minor_locator(mdates.HourLocator(interval=1, tz=local_tz))
-        plt.gcf().axes[0].xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H:%M')) #line implemented by Anthony
-        plt.gcf().autofmt_xdate()
-        plt.title('Latency and Website Monitoring of\n' + str(url) + "     (" + str(datetime.datetime.now()) + ")")
-        plt.grid(True)
+        ax.set_ylabel('Latency (ms)')
+        '''
+        ax.gcf().axes[0].xaxis.set_major_locator(mdates.HourLocator(interval=6, tz=local_tz))
+        ax.gcf().axes[0].xaxis.set_minor_locator(mdates.HourLocator(interval=1, tz=local_tz))
+        ax.gcf().axes[0].xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H:%M')) #line implemented by Anthony
+        '''
+        ax.xaxis.set_major_locator(mdates.HourLocator(interval=6, tz=local_tz))
+        ax.xaxis.set_minor_locator(mdates.HourLocator(interval=1, tz=local_tz))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H:%M')) #line implemented by Anthony
+        #ax.gcf().autofmt_xdate()
+        fig.autofmt_xdate()
+        ax.set_title('Latency and Website Monitoring of\n' + str(url) + "     (" + str(datetime.datetime.now()) + ")")
+        ax.grid(True)
         plt.legend()
         #plt.legend(loc="best") #line implemented by Anthony
         plt.tight_layout()
