@@ -17,20 +17,10 @@ def requestData(request, requestQ:mpQ, dataQ:mpQ):
         time.sleep(0.1)
     while True:
         newData = dataQ.get()
-        '''
-        if newData['id'] == initialDataID:
-            #requestQ.put(request)
-            time.sleep(0.1) #import time
-            initialDataID = False
-        elif initialDataID == False:
-            initialDataID = newData['id']
-        '''
         if newData['id'] == request['id']:
             if newData['data'] is None:
                 print(str(time.time())+' - Recieved Nonetype response using this request: '+str(request))
                 requestQ.put(request)
-            #elif newData['data'] is False:
-            #    return newData
             else:
                 return newData
         else:

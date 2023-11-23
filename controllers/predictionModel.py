@@ -47,19 +47,19 @@ class PredictionModel():
             #tf.keras.layers.Dropout(0.1),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Reshape((1, 1,)),# input_shape=(32,)),
-            tf.keras.layers.LSTM(1024, return_sequences=True), # Recurrent Neural 
-            tf.keras.layers.LSTM(512, return_sequences=True),
-            tf.keras.layers.LSTM(256, return_sequences=True),
+            #tf.keras.layers.LSTM(1024, return_sequences=True), # Recurrent Neural 
+            #tf.keras.layers.LSTM(512, return_sequences=True),
+            #tf.keras.layers.LSTM(256, return_sequences=True),
             tf.keras.layers.LSTM(128, return_sequences=True),
             tf.keras.layers.LSTM(64, return_sequences=True),
-            tf.keras.layers.Dropout(0.2),
+            #tf.keras.layers.Dropout(0.2),
             tf.keras.layers.LSTM(32, activation='tanh', return_sequences=True, kernel_regularizer=tf.keras.regularizers.l2(0.01)),
             tf.keras.layers.LSTM(16, return_sequences=True),
             tf.keras.layers.LSTM(8, return_sequences=True),
             tf.keras.layers.LSTM(4, return_sequences=True),
-            tf.keras.layers.LSTM(2, return_sequences=True),
-            tf.keras.layers.Dropout(0.2),
-            tf.keras.layers.LSTM(1, return_sequences=True),
+            #tf.keras.layers.LSTM(2, return_sequences=True),
+            #tf.keras.layers.Dropout(0.2),
+            #tf.keras.layers.LSTM(1, return_sequences=True),
             #tf.keras.layers.LSTM(512, return_sequences=True),
             #tf.keras.layers.RNN(tf.keras.layers.LSTMCell(256), return_state=True),
             #tf.keras.layers.Conv2D(256 activation='LeakyReLU')
@@ -389,7 +389,7 @@ class PredictionModel():
         ax.xaxis.set_minor_locator(mdates.HourLocator(interval=1, tz='US/Pacific'))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
         ax.set_ylabel('Latency (ms)')
-        ax.set_title('Average ('+self.__sampleRate+') Latency of '+self.__name)
+        ax.set_title('Predicted Latency of '+self.__name+' '+str(time.strftime('%Y_%m_%d_%H%M%S', time.localtime())))
         if secondData != None:
             plot1, = ax.plot(tempXData[0].astype('datetime64[s]'), tempXData[1], 'o-', alpha=1.0, label='Normalized Data')
         plot2, = ax.plot(pd.to_datetime(tempDF['timestamp'], unit='s'), tempDF['latency'], 'o-', alpha=0.5, label='Predictions')
@@ -400,7 +400,7 @@ class PredictionModel():
         else:
             plt.legend(handles=[plot2], loc='best')
         plt.tight_layout()
-        plt.savefig('gallery/'+self.__name+'_'+self.__sampleRate+'_'+str(time.time())+'.png')
+        plt.savefig('predictionModels/gallery/'+self.__name+'_'+str(time.strftime('%Y_%m_%d_%H%M%S', time.localtime()))+'.png')#+self.__sampleRate+'_'
         plt.clf()
         print(str(time.ctime())+' - A new graph for '+self.__name+' has been generated...')
         #plt.show()
@@ -556,7 +556,7 @@ class PredictionModel():
                 validation_data=(self.__val_data[0], self.__val_data[1]),
                 batch_size=32,
                 epochs=epochs,
-                callbacks=[tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience, restore_best_weights=True, verbose=1,),#, min_delta=0.0001,),
+                callbacks=[#tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=patience, restore_best_weights=True, verbose=1,),#, min_delta=0.0001,),
                            tf.keras.callbacks.ModelCheckpoint(filepath=self.__modelFilename, monitor='val_loss', verbose=1, save_best_only=True,), # self.__modelFilename
                            ],
                 use_multiprocessing=self.__multiprocess,
@@ -566,8 +566,6 @@ class PredictionModel():
         for i, v in enumerate(result.history):
             history[v] = np.min(result.history[v])
         print(str(time.ctime())+' - Results for '+self.__name+' '+str(history))#result.history['val_loss'])
-        with open('gallery/'+self.__name+'.txt', 'a') as file:
-            file.writelines('Training Results:\t'+'\t|\t'+str(time.ctime())+'\t|\t'+str(history)+'\n')
         evaluation = self.__model.evaluate(
             self.__test_data[0],
             self.__test_data[1],
@@ -580,9 +578,11 @@ class PredictionModel():
             history2[v] = evaluation[i]
         print(str(time.ctime())+' - Evaluation for '+self.__name+' '+str(history2))#result.history['val_loss'])
         self.saveModel()
-        with open('gallery/'+self.__name+'.txt', 'a') as file:
+        with open('predictionModels/logs/'+self.__name+'.txt', 'a') as file:
+            file.writelines(str(time.ctime())+' - Training for '+self.__name+'_Predictor'+' completed in '+str(time.time()-timerStart)+' seconds.\n')
+            file.writelines('Training Results:\t'+'\t|\t'+str(time.ctime())+'\t|\t'+str(history)+'\n')
             file.writelines('Evaluation Results:\t'+'\t|\t'+str(time.ctime())+'\t|\t'+str(history2)+'\n')
-            file.writelines(str(time.ctime())+' - Training for '+self.__name+'_Predictor'+' completed in '+str(time.time()-timerStart)+' seconds.')
+            file.writelines('____________________________________________________________________________________________________\n')
         print(str(time.ctime())+' - Training for '+self.__name+'_Predictor'+' completed in '+str(time.time()-timerStart)+' seconds.')
         return [history, history2]
     
@@ -641,7 +641,7 @@ class PredictionModel():
     #             k +=1
     #     return None
 
-def startPrediction(data:np.array, name:str='Unknown', sampleRate:str='15T', predictions:int=60*60*6, epochs:int=10*10**2):
+def startPrediction(data:np.array, name:str='Unknown', epochs:int=10*10**2, sampleRate:str='15T', predictions:int=60*60*6, ):
     """The function to be called for training and generating sample predictions and graphs. Note: This is called as part of the multiprocessing seqeuence.
 
     Args:

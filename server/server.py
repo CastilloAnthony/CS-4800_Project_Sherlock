@@ -25,7 +25,7 @@ class Server(): # The main server handler class
         self.__dataQ = mp.Queue(maxsize=32767) # The request queue, only the server will put to this queue
         self.__processes = {} # Process handles identifiers and handles for all processes created by the server
         self.__adminID = False
-        self.__predictiors = {}
+        self.__predictors = {}
         self._setupDBConnection()
 
     def __del__(self): # WIP
@@ -51,7 +51,7 @@ class Server(): # The main server handler class
         print('Queue: Data')
         print('\tClosed: '+str(self.__dataQ.close()==None))
         print('\tJoined: '+str(self.__dataQ.join_thread()==None))
-        del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes, self.__adminID, self.__predictiors
+        del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes, self.__adminID, self.__predictors
     
     def _checkForPresets(self):
         """Checks for the existence of the preset collection within the database and creates a default one if the collection could not be verified.
@@ -439,6 +439,7 @@ class Server(): # The main server handler class
     def _CheckPredictions(self):
         """Manages, queues, and starts up new processes for running prediction model training in separate processes.
         """
+        epochs = 100
         masterList = self.requestManyFromDB('masterList', {})
         for object in masterList:
             if not object['url']+'_Predictor' in self.__processes:
@@ -448,19 +449,44 @@ class Server(): # The main server handler class
                     tensorDataTime.append(i['timestamp'])
                     tensorDataLatency.append(i['latency'])
                 tensorData = np.vstack((tensorDataTime, tensorDataLatency))
-                self.__processes[object['url']+'_Predictor'] = mp.Process(name=str(object['url']+'_Predictor'), target=startPrediction, args=(tensorData, object['url'],))
-                self.__predictiors[object['url']+'_Predictor'] = False
-        for i, name in enumerate(self.__predictiors): 
-            status = self.__predictiors[name]
-            if status == False:
+                self.__processes[object['url']+'_Predictor'] = mp.Process(name=str(object['url']+'_Predictor'), target=startPrediction, args=(tensorData, object['url'], epochs,))
+                self.__predictors[object['url']+'_Predictor'] = False
+        for i, name in enumerate(self.__predictors): 
+            if self.__predictors[name] == False:
                 for processName in enumerate(self.__processes):
                     if '_Predictor' in processName[1]:
                         if self.__processes[processName[1]].is_alive():
                             return
                 self.__processes[name].start()
-                self.__predictiors[name] = True
+                self.__predictors[name] = True
                 print(str(time.ctime())+' - Started training for '+name)
                 break
+        if all(self.__predictors.values()):
+            print(str(time.ctime())+' - Retraining all prediction models...')
+            for i, v in enumerate(self.__processes):
+                if  '_Predictor' in v and self.__processes[v].is_alive():
+                    return
+            while len(self.__processes) > 1:
+                for i in list(self.__processes):
+                    if '_Predictor' in i and not self.__processes[i].is_alive():
+                        print('Process: '+i)
+                        print('\tIs Alive: '+str(self.__processes[i].is_alive()))
+                        if self.__processes[i].is_alive():
+                            print('\tJoined: '+str(self.__processes[i].join(timeout=3)==None))
+                            print('\tTerminated: '+str(self.__processes[i].terminate()==None))
+                            print('\tClosed: '+str(self.__processes[i].close()==None))
+                        else:
+                            try:
+                                print('\tJoined: '+str(self.__processes[i].join(timeout=3)==None))
+                                print('\tTerminated: '+str(self.__processes[i].terminate()==None))
+                                print('\tClosed: '+str(self.__processes[i].close()==None))
+                            except:
+                                print('\tClosed: '+str(self.__processes[i].close()==None))
+                        del self.__processes[i]
+                        for v in list(self.__predictors):
+                            if v == i:
+                                del self.__predictors[v]
+            self._CheckPredictions()
 
     def _mainLoop(self):
         """The primary loop for the server, calls checkForRequests, checkPredictions and pollWebsites.
