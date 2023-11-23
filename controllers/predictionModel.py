@@ -114,7 +114,7 @@ class PredictionModel():
             #self.__model.summary()
             self.__model.save(self.__modelFilename)
         except:
-            print('Could not save prediction model.')
+            print(str(time.ctime())+' - Could not save '+self.__modelFilename)
 
     def readModel(self):
         """Reads a model from file using the name provided in self.__modelFilename
@@ -402,7 +402,7 @@ class PredictionModel():
         plt.tight_layout()
         plt.savefig('gallery/'+self.__name+'_'+self.__sampleRate+'_'+str(time.time())+'.png')
         plt.clf()
-        #print(str(time.ctime())+' - A new graph for '+self.__name+' has been generated...')
+        print(str(time.ctime())+' - A new graph for '+self.__name+' has been generated...')
         #plt.show()
 
     def trainModel(self, epochs:int=10*10**2, data=None, patience:int=25):
@@ -513,7 +513,7 @@ class PredictionModel():
         # https://www.tensorflow.org/tutorials/structured_data/time_series#data_windowing
         tempX = np.arange(startingPoint+avgDist, startingPoint+quantity, avgDist)
         timestamps, predictions = [], []
-        #print(str(time.ctime())+' - Predicting '+str(len(tempX))+' for '+self.__name+'...')
+        print(str(time.ctime())+' - Predicting '+str(len(tempX))+' for '+self.__name+'...')
         for i, v in enumerate(tempX):
             predictions = np.append(predictions, self.__model.predict(
                 [v],
@@ -527,7 +527,7 @@ class PredictionModel():
         #timestamps = tempDF[0].to_numpy()
         #predictions = tempDF[1].to_numpy()
         #self.graph(tempDF)
-        #print(str(time.ctime())+' - Completed predicting of '+str(len(tempX))+' units for '+self.__name+'...')
+        print(str(time.ctime())+' - Completed predicting of '+str(len(tempX))+' units for '+self.__name+'...')
         return np.vstack((timestamps, predictions))
 
     def trainOnData(self, data:np.array, name:str='Unknown', sampleRate:str='15T', predictions:int=60*60*6, epochs:int=10*10**2, patience:int=100):
@@ -549,7 +549,7 @@ class PredictionModel():
         self.setData(data)
         self.readModel()
         timerStart = time.time()
-        #print(str(time.ctime())+' - Training on '+self.__name+'...')
+        print(str(time.ctime())+' - Training on '+self.__name+'...')
         result = self.__model.fit(
                 self.__train_data[0],
                 self.__train_data[1],
@@ -565,7 +565,7 @@ class PredictionModel():
         history = {}
         for i, v in enumerate(result.history):
             history[v] = np.min(result.history[v])
-        #print(str(time.ctime())+' - Results for '+self.__name+' '+str(history))#result.history['val_loss'])
+        print(str(time.ctime())+' - Results for '+self.__name+' '+str(history))#result.history['val_loss'])
         with open('gallery/'+self.__name+'.txt', 'a') as file:
             file.writelines('Training Results:\t'+'\t|\t'+str(time.ctime())+'\t|\t'+str(history)+'\n')
         evaluation = self.__model.evaluate(
@@ -578,12 +578,12 @@ class PredictionModel():
         history2 = {}
         for i, v in enumerate(self.__model.metrics_names):
             history2[v] = evaluation[i]
-        #print(str(time.ctime())+' - Evaluation for '+self.__name+' '+str(history2))#result.history['val_loss'])
+        print(str(time.ctime())+' - Evaluation for '+self.__name+' '+str(history2))#result.history['val_loss'])
         self.saveModel()
         with open('gallery/'+self.__name+'.txt', 'a') as file:
             file.writelines('Evaluation Results:\t'+'\t|\t'+str(time.ctime())+'\t|\t'+str(history2)+'\n')
             file.writelines(str(time.ctime())+' - Training for '+self.__name+'_Predictor'+' completed in '+str(time.time()-timerStart)+' seconds.')
-        #print(str(time.ctime())+' - Training for '+self.__name+'_Predictor'+' completed in '+str(time.time()-timerStart)+' seconds.')
+        print(str(time.ctime())+' - Training for '+self.__name+'_Predictor'+' completed in '+str(time.time()-timerStart)+' seconds.')
         return [history, history2]
     
     def predictOnData(self, data:np.array, name:str='Unknown', sampleRate:str='15T', predictions:int=60*60*6, epochs:int=10*10**2):

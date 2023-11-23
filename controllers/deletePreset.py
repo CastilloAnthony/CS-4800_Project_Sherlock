@@ -3,6 +3,7 @@ import uuid
 import time
 import requests
 from flask import Flask, render_template, request
+from controllers.queueManager import requestData
 
 class DeletePreset(): # Controller
     def __init__(self, requestQ, dataQ):
@@ -10,7 +11,8 @@ class DeletePreset(): # Controller
         self.curr_email = ''
     def __del__(self):
         pass
-
+    
+    '''
     def requestData(self, request):
         self.__requestQ.put(request)
         time.sleep(0.1)
@@ -28,7 +30,8 @@ class DeletePreset(): # Controller
                     return newData
             else:
                 self.__dataQ.put(newData)
-    
+    '''
+
     def getEmail(self, email):
         self.curr_email = email
         
@@ -45,7 +48,7 @@ class DeletePreset(): # Controller
             'column': 'users',#masterList
             'query': {"email":self.curr_email}
         }
-        temp = self.requestData(masterListRequest)
+        temp = requestData(masterListRequest, self.__requestQ, self.__dataQ)
         if temp == None:
             return None
         else: return temp['data']
@@ -70,7 +73,7 @@ class DeletePreset(): # Controller
                 'query': {'email':self.curr_email},
                 'changeTo': {"presets": {"name": preset}} #what you want to remove: ca
             }
-            self.requestData(deletePresetRequest)
+            requestData(deletePresetRequest, self.__requestQ, self.__dataQ)
 
     
 #end AddPreset

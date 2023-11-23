@@ -1,5 +1,6 @@
 #ANTHONY
 import time
+from controllers.queueManager import requestData
 
 class ViewPreset():
     def __init__(self, requestQ, dataQ):
@@ -8,6 +9,7 @@ class ViewPreset():
     def __del__(self):
         del self.__requestQ, self.__dataQ
 
+    '''
     def requestData(self, request):
         self.__requestQ.put(request)
         time.sleep(0.1)
@@ -25,6 +27,7 @@ class ViewPreset():
                     return newData
             else:
                 self.__dataQ.put(newData)
+    '''
 
     def query(self):
         pass

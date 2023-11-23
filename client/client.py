@@ -260,7 +260,11 @@ class MyFlaskApp:
         return render_template('EditPreset.html', presets=self.editPresetClass.query())
     
     def newEditedPreset(self):
-        return render_template('EditPresetNew.html', oldPreset=self.editPresetClass.editPreset(),masterList=self.editPresetClass.query1())
+        oldPreset=self.editPresetClass.editPreset()
+        #turn timestamp that is in form: 1700691121.3678615
+        #into a date
+        timestamp = str(time.ctime(oldPreset['timestamp']))
+        return render_template('EditPresetNew.html', oldPreset=oldPreset,masterList=self.editPresetClass.query1(), timestamp=timestamp)
     
     def edit(self):
         self.editPresetClass.editPreset1()

@@ -4,6 +4,7 @@ import time
 from flask import Flask, render_template, request
 from bson import ObjectId
 import re
+from controllers.queueManager import requestData
 
 class EditPreset(): # Controller
     def __init__(self, requestQ, dataQ):
@@ -14,6 +15,7 @@ class EditPreset(): # Controller
     def __del__(self):
         pass
 
+    '''
     def requestData(self, request):
         self.__requestQ.put(request)
         time.sleep(0.1)
@@ -31,6 +33,7 @@ class EditPreset(): # Controller
                     return newData
             else:
                 self.__dataQ.put(newData)
+    '''
 
     def getEmail(self, email):
         self.curr_email = email
@@ -51,7 +54,7 @@ class EditPreset(): # Controller
             'query': {"email":self.curr_email}
         }
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT
-        temp = self.requestData(userRequest)
+        temp = requestData(userRequest, self.__requestQ, self.__dataQ)
         if temp == None:
             return None
         else:
@@ -70,7 +73,7 @@ class EditPreset(): # Controller
             'column': 'masterList',
             'query': {}
         }
-        temp = self.requestData(masterListRequest)
+        temp = requestData(masterListRequest, self.__requestQ, self.__dataQ)
         return temp
         
     def parseStringToDict(self, stringedDictionary:str):
@@ -162,7 +165,8 @@ class EditPreset(): # Controller
             'changeTo': {"presets":newDictionary} #what I want the new one to be
         }
         #SEND THIS OVER TO ALLOW USERS TO CHOOSE A PRESET TO BE ABLE TO EDIT IT
-        self.requestData(presetRequest)
+        requestData(presetRequest, self.__requestQ, self.__dataQ)
+        
         #reassigning self.old so that it will be fresh for next edit
         self.old = []
         

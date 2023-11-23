@@ -6,6 +6,25 @@
             <meta charset="UTF-8">
             <title>Edit Preset</title>
             <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style1.css') }}">
+            <style>
+                .collection{
+                    color:black;
+                    display:inline-block;
+                    background:white;
+                    display: inline-block;
+                    justify-content: center;
+                    align-items: center;
+                }
+                .info{
+                    color:rgb(52, 169, 67);
+                    background:black;
+                }
+                .titles{
+                    color:black;
+                    background-color: rgb(52, 169, 67);
+                }
+            </style>
+        
         </head>
         <body>
             <!--
@@ -19,9 +38,23 @@
             timestamp
             data
             -->
-            <h1 style="color: white;">NEW EDITED PRESET</h1>
-            <p style="color:white">{{oldPreset}}</p>
             <form action="newEditedPreset/edit" style="display:inline-block" method="POST">
+                <div class="collection"> OLD PRESET
+                    <div class="titles">NAME</div>
+                    <div class="info">
+                        {{oldPreset['name']}}
+                    </div>
+                    <div class="titles">PRESET LIST</div>
+                    {%for i in oldPreset['presetLists']%}
+                        <div class="info">
+                            {{i}}<br> 
+                        </div>
+                    {%endfor%}  
+                    <div class="titles">TIMESTAMP</div>
+                    <div class="info">
+                        {{timestamp}}
+                    </div>
+                </div><br>
                 <!--
                     Need a name for the respective preset so the user knows what to ask for later
                     Make it easier to recall for them. 

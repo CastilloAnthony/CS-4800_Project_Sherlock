@@ -237,7 +237,6 @@ class DBConnectionAgent():
             #         'timestamp': 1698890950.1513646
             #     }
             # }
-            print('hi')
             return self.__db[column].update_one(
                 query, 
                 {"$push":
