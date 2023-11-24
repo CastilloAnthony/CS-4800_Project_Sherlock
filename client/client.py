@@ -97,7 +97,12 @@ class MyFlaskApp:
     ################################
     #FINISHED
     def index(self):
-        #FOR FIRST TIME LOGGIN IN
+        """_summary_: first page that user will see, if signed in already skip to login, if they haven't fill information and get in database
+
+        Returns:
+            html: send them to logged_in.html to back to here so that they can redo their passwords or because they already signed in with those credentials 
+        """
+        #FOR FIRST TIME LOGGING IN
         message = ''
         # if "email" in session:
         #     self.curr_email = session["email"]
@@ -120,6 +125,12 @@ class MyFlaskApp:
         return render_template('auth/index.html')
     #FINISHED
     def login(self):
+        """_summary_: we check for email and password, first email if email is found then check for email and 
+                        password password is done using bcrypt and seeing if password is similar enough
+
+        Returns:
+            url or html: depending we send them to homepage or back to the login because they messed up
+        """
         message = 'Please login to your account'
         # if "email" in session:
         #     return redirect(url_for("logged_in"))
@@ -149,6 +160,11 @@ class MyFlaskApp:
         return render_template('auth/login.html', message=message)
     #FINISHED
     def logged_in(self):
+        """_summary_: if logged in we just want to send them into their application so go to the homepage.html different then index
+
+        Returns:
+            html or url: depending, we will usually send to homepage tho
+        """
         if "email" in session:
             email = session["email"]
             self.curr_email = email
@@ -158,6 +174,17 @@ class MyFlaskApp:
             return redirect(url_for("login"))
     #FINISHED
     def register_user(self, user, email, password1, password2):
+        """_summary_: for checking whether this user with all this information is in our system as well as inserting them into our system if not
+
+        Args:
+            user (str): users chosen username usually first name
+            email (str): any strinng we are not checking for valid emails yet
+            password1 (str): string of letters numbers and symbols users puts in
+            password2 (str): hopefully same letters numbers and symbols might not be we need to check
+
+        Returns:
+            str: email that is actually taken from the database so that we know that an insertion occured and that we are now on that document in auth
+        """
         # don't have user_database will need to to a query and find_user_by_email as well as name
         user_found = self.loginClass.find_user_by_name(user) 
         email_found = self.loginClass.find_user_by_email(email) 
@@ -187,6 +214,11 @@ class MyFlaskApp:
     
     #NOT REALLY USING THIS: #FINISHED
     def logout(self):
+        """_summary_: users will have ability to unsign from their account, this really only happens after a user registers
+
+        Returns:
+            html or back to home/registration: either shows the signout page or the homepage 
+        """
         if "email" in session:
             session.pop("email", None)
             return render_template("auth/signout.html")
@@ -203,27 +235,51 @@ class MyFlaskApp:
     
     #TODO: get numpy in in the query1() so it isn't as slow
     def home(self):
-        # please put data back in when a little quicker for debugging purposes
+        """_summary_: first thing after being logged in, gives buttons for users to press, this function just renders templates and sends in the email
+
+        Returns:
+            html: homepage.html
+        """
         # works just fine
         #print(self.viewWebsiteClass.query1())
         return render_template('homepage.html', email=self.curr_email) #data=self.viewWebsiteClass.query1())
     
     #FINISHED
     def addPreset(self):
+        """_summary_: grab the email and send it in so that that class can know who is signed in also render html as well as send in every url we have
+
+        Returns:
+            html: AddPreset.html
+        """
         self.addPresetClass.getEmail(self.curr_email)
         return render_template('AddPreset.html', masterList=self.addPresetClass.query())
 
     def newAddedPreset(self):
+        """_summary_: simply takes what user gave us in addPreset and updates users info 
+
+        Returns:
+            url: go back home
+        """
         self.addPresetClass.addPreset()
         # Redirect to the /home route and render the home.html template
         return redirect(url_for('home'))
 
     #TODO: grab graphs to put into this
     def viewPreset(self):
+        """_summary_: send in list of presets and let user choose
+
+        Returns:
+            html: viewPreset.html
+        """
         return render_template('viewPreset.html')
     
     #TODO: grab graphs to put into this
     def viewWebsite(self):
+        """_summary_: grab all urls and let user choose which one
+
+        Returns:
+            html: viewWebsite.html and list of urls in dictionary format
+        """
         #buttons to pick the website
         return render_template('viewWebsite.html', masterList = self.viewWebsiteClass.query2())
     def newViewWebsite(self):
@@ -236,30 +292,60 @@ class MyFlaskApp:
         
     #FINISHED
     def deletePreset(self):
+        """_summary_: give email then send in list of presets as well as html
+
+        Returns:
+            html: html and dict
+        """
         self.deletePresetClass.getEmail(self.curr_email)
         return render_template('DeletePreset.html', presets=self.deletePresetClass.query())
 
     def newDeletedPreset(self):
+        """_summary_: from user selection we make a deletion or update in documents
+
+        Returns:
+            url: go back home
+        """
         self.deletePresetClass.deletePreset()
         # Redirect to the /home route and render the home.html template
         return redirect(url_for('home'))
 
     #FINISHED
     def deleteWebsite(self):
+        """_summary_: grab email list of websites from users document
+
+        Returns:
+            html: send in html, list
+        """
         self.deleteWebsiteClass.getEmail(self.curr_email)
         return render_template('DeleteWebsite.html', masterList = self.deleteWebsiteClass.query())
     
     def newDeletedWebsite(self):
+        """_summary_: just delete what was given
+
+        Returns:
+            url: go back home
+        """
         self.deleteWebsiteClass.deleteWebsite()
         # Redirect to the /home route and render the home.html template
         return redirect(url_for('home'))
 
     #FINISHED
     def editPreset(self):
+        """_summary_: show html and give presets to be chosen and changed
+
+        Returns:
+            html: html and list
+        """
         self.editPresetClass.getEmail(self.curr_email)
         return render_template('EditPreset.html', presets=self.editPresetClass.query())
     
     def newEditedPreset(self):
+        """_summary_: user selected a preset to change, give them the one they changed so they know how to correctly reformat their new one
+
+        Returns:
+            html:old preset as well as a new list of websites to choose to make a preset, as well as timestamp 
+        """
         oldPreset=self.editPresetClass.editPreset()
         #turn timestamp that is in form: 1700691121.3678615
         #into a date
@@ -267,15 +353,30 @@ class MyFlaskApp:
         return render_template('EditPresetNew.html', oldPreset=oldPreset,masterList=self.editPresetClass.query1(), timestamp=timestamp)
     
     def edit(self):
+        """_summary_: edit is now changed in documents and can go back home
+
+        Returns:
+            url: go back home
+        """
         self.editPresetClass.editPreset1()
         return redirect(url_for('home'))
 
     #FINISHED
     def addWebsite(self):
+        """_summary_: send email as well as render the template
+
+        Returns:
+            html: addWebsite
+        """
         self.addWebsiteClass.getEmail(self.curr_email)
         return render_template('AddWebsite.html')
     
     def newAddedWebsite(self):
+        """_summary_: just added whatever was in the textbox when they submitted
+
+        Returns:
+            url: go back home
+        """
         self.addWebsiteClass.addWebsite()
         # Redirect to the /home route and render the home.html template
         return redirect(url_for('home'))
