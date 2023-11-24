@@ -15,4 +15,5 @@ lib64
 *.keras
 temp.txt
 *.png
-gallery/
+predictionModels/logs/*
+predictionModels/gallery/*
