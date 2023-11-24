@@ -15,17 +15,20 @@ class Server(): # The main server handler class
     def __init__(self):
         """Initializes all attributes of the server class and calls the setupDBConnection function.
         """
+        self.__maxQueueSize = 32767 # MAC devices need 32767 or lower
         self.__DBconneciton = False # The connection agent
         self.__columns = ['masterList', 'pollingData', 'presets', 'users', 'auth'] # The "columns" in our SHERLOCK mongoDB. SHERLOCK['masterList']
         self.__requestTypes = ['insert', 'remove', 'request', 'update', 'setting'] # Types of requests the server can handle
         self.__httpPorts = [80, 443] # [HTTP, HTTPS] ports
         self.__pollingSpeed = 60/12 # The seconds between each master list poll
         self.__sampleSites = ['www.google.com', 'www.instagram.com', 'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com'] # The sample of sites to use
-        self.__requestsQ = mp.Queue(maxsize=32767) # The request queue, only a clinet will put to this queue
-        self.__dataQ = mp.Queue(maxsize=32767) # The request queue, only the server will put to this queue
+        self.__requestsQ = mp.Queue(maxsize=self.__maxQueueSize) # The request queue, only a clinet will put to this queue
+        self.__dataQ = mp.Queue(maxsize=self.__maxQueueSize) # The request queue, only the server will put to this queue
         self.__processes = {} # Process handles identifiers and handles for all processes created by the server
         self.__adminID = False
         self.__predictors = {}
+        self.__parentPipe, self.__childPipe = mp.Pipe()
+        self.__pollingQ = mp.Queue(maxsize=self.__maxQueueSize)
         self._setupDBConnection()
 
     def __del__(self): # WIP
@@ -51,7 +54,7 @@ class Server(): # The main server handler class
         print('Queue: Data')
         print('\tClosed: '+str(self.__dataQ.close()==None))
         print('\tJoined: '+str(self.__dataQ.join_thread()==None))
-        del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes, self.__adminID, self.__predictors
+        del self.__DBconneciton, self.__columns, self.__requestTypes, self.__httpPorts, self.__pollingSpeed, self.__sampleSites, self.__requestsQ, self.__dataQ, self.__processes, self.__adminID, self.__predictors, self.__parentPipe, self.__childPipe, self.__pollingQ
     
     def _checkForPresets(self):
         """Checks for the existence of the preset collection within the database and creates a default one if the collection could not be verified.
@@ -361,7 +364,12 @@ class Server(): # The main server handler class
                     if isinstance(newRequest['query'], dict):
                         self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestFromDB(newRequest['column'], newRequest['query'])})#C.A.
                 elif newRequest['column'] in 'auth':
-                    self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestFromDB(newRequest['column'], newRequest['query'])})
+                    #self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestFromDB(newRequest['column'], newRequest['query'])})
+                    data = self.requestFromDB(newRequest['column'], newRequest['query'])
+                    if data == None:
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':False})
+                    else:
+                        self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':self.requestFromDB(newRequest['column'], newRequest['query'])})
                     #temp = self.requestFromDB(newRequest['column'], )
                     #if newRequest['query'] == '':
                         #if bcrypt.checkpw(newRequest['query']['password'], passwordcheck):
@@ -498,23 +506,22 @@ class Server(): # The main server handler class
         predictionModelTrainingTimerStart = time.time()
         while True:
             self._checkForRequests()
-            mainLoopTimerEnd = time.time()
-            dataQTimerEnd = time.time()
-            predictionModelTrainingTimerEnd = time.time()
-            if (mainLoopTimerEnd-mainLoopTimerStart) >= self.__pollingSpeed:
+            if (time.time()-mainLoopTimerStart) >= self.__pollingSpeed:
                 mainLoopTimerStart = time.time()
                 self._pollWebsites()
-            if (dataQTimerEnd-dataQTimerStart) >= 60:
+            if (time.time()-dataQTimerStart) >= 60:
                 dataQTimerStart = time.time()
                 self._clearDataQ()
-            if (predictionModelTrainingTimerEnd-predictionModelTrainingTimerStart) >= 60*15:#60*5 # 5 minutes
+            if (time.time()-predictionModelTrainingTimerStart) >= 60*15:#60*5 # 5 minutes
+                predictionModelTrainingTimerStart = time.time()
                 self._CheckPredictions()
 
     def startServer(self):
         """Creates the flask app in a separate processes, starts that process, and then intiates the mainloop. 
         """
         #self.test()
-        self.__processes['app'] = mp.Process(name ='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
+        #self.__processes['polling'] = mp.Process(name='Polling', target=pollSites, args=(self.__childPipe, self.__pollQ))
+        self.__processes['app'] = mp.Process(name='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['app'].start()
         self._mainLoop()
 
@@ -552,6 +559,9 @@ def testServer():
     newServer = Server()
     #newServer._pollWebsites()
     #newServer.sendToDB('pollingData', {'website':'www.google.com', 'timestamp':time.ctime(), 'data':1035100})
+
+def pollSites(pipe:mp.Pipe, pollQ:mp.Queue):
+    pass
 
 if __name__ == '__main__':
     testServer()
