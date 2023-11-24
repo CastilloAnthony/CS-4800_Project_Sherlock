@@ -474,7 +474,7 @@ class Server(): # The main server handler class
             for i, v in enumerate(self.__processes):
                 if  '_Predictor' in v and self.__processes[v].is_alive():
                     return
-            while len(self.__processes) > 1:
+            while len(self.__processes) > 2:
                 for i in list(self.__processes):
                     if '_Predictor' in i and not self.__processes[i].is_alive():
                         print('Process: '+i)
@@ -508,7 +508,10 @@ class Server(): # The main server handler class
             self._checkForRequests()
             if (time.time()-mainLoopTimerStart) >= self.__pollingSpeed:
                 mainLoopTimerStart = time.time()
-                self._pollWebsites()
+                self.__parentPipe.send(self.requestManyFromDB('masterList', {}))
+                while not self.__pollingQ.empty():
+                    self.sendToDB('pollingData', self.__pollingQ.get())
+                #self._pollWebsites()
             if (time.time()-dataQTimerStart) >= 60:
                 dataQTimerStart = time.time()
                 self._clearDataQ()
@@ -520,8 +523,9 @@ class Server(): # The main server handler class
         """Creates the flask app in a separate processes, starts that process, and then intiates the mainloop. 
         """
         #self.test()
-        #self.__processes['polling'] = mp.Process(name='Polling', target=pollSites, args=(self.__childPipe, self.__pollQ))
+        self.__processes['polling'] = mp.Process(name='Polling', target=pollSites, args=(self.__childPipe, self.__pollingQ, self.__httpPorts, self.__pollingSpeed,))
         self.__processes['app'] = mp.Process(name='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
+        self.__processes['polling'].start()
         self.__processes['app'].start()
         self._mainLoop()
 
@@ -560,8 +564,30 @@ def testServer():
     #newServer._pollWebsites()
     #newServer.sendToDB('pollingData', {'website':'www.google.com', 'timestamp':time.ctime(), 'data':1035100})
 
-def pollSites(pipe:mp.Pipe, pollQ:mp.Queue):
-    pass
+def pollSites(pipe:mp.Pipe, pollQ:mp.Queue, ports:list, pollingSpeed:int,):
+    """Funciton for requesting the masterlist from the database and for recording the latency for connections to each url in the masterlist. 
+    """
+    pollSitesStart = 0
+    masterList = []
+    while True:
+        if pipe.poll():
+            for object in pipe.recv():
+                if object['url'] not in masterList:
+                    masterList.append(object['url'])
+        if (time.time()-pollSitesStart) >= pollingSpeed:
+            print(str(time.ctime())+' - Polling sites...')
+            pollSitesStart = time.time()
+            for site in masterList:
+                for port in ports:
+                    try:
+                        latencyTimerStart = time.time()
+                        temp = socket.create_connection((site, port))
+                        temp.close()
+                        latencyTimerEnd = time.time()
+                        pollQ.put({'url':site, 'port':port, 'timestamp':time.time(), 'up':True, 'latency':latencyTimerEnd-latencyTimerStart})
+                        break
+                    except:
+                        pollQ.put({'url':site, 'port':port, 'timestamp':time.time(), 'up':False, 'latency':np.nan})
 
 if __name__ == '__main__':
     testServer()
