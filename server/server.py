@@ -428,7 +428,7 @@ class Server(): # The main server handler class
         
 
     def _pollWebsites(self):
-        """Funciton for requesting the masterlist from the database and for recording the latency for connections to each url in the masterlist. 
+        """DEPRECATED, Funciton for requesting the masterlist from the database and for recording the latency for connections to each url in the masterlist. 
         """
         print(str(time.ctime())+' - Polling sites...')
         masterList = self.requestManyFromDB('masterList', {})
@@ -565,7 +565,7 @@ def testServer():
     #newServer.sendToDB('pollingData', {'website':'www.google.com', 'timestamp':time.ctime(), 'data':1035100})
 
 def pollSites(pipe:mp.Pipe, pollQ:mp.Queue, ports:list, pollingSpeed:int,):
-    """Funciton for requesting the masterlist from the database and for recording the latency for connections to each url in the masterlist. 
+    """Funciton for requesting the masterlist from the database and for recording the latency for connections to each url in the masterlist. Note: multiprocessing safe
     """
     pollSitesStart = 0
     masterList = []
