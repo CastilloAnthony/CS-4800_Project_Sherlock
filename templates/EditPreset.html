@@ -35,7 +35,7 @@
                 }
 
                 -->
-                <div style="color:white;">FROM THIS LIST PICK WHICH ONES YOU WOULD LIKE TO EDIT</div>
+                <div style="color:white;">Choose which preset you would like to edit:</div>
                 <br><br>
                 {% for item in presets['presets'] %}<!--data['presets'] == presets[presets]-->
                     <input type="checkbox" name="selected_option[]" value="{{ item }}"> {{ item['name'] }}<br>{{item['presetLists']}} || timestamp: {{item['timestamp']}}<br>

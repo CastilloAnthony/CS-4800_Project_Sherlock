@@ -1,7 +1,10 @@
 ---TODO----
 1. Change checkbox form to only accept one value at time (change to multiple choice form and populate)
-2. View Preset... bunch of graphs.
-3. editPresetHTML Div.
+2. View Preset
+3. empty responses
+    -edit preset, if no preset is selected, prompt for a selection (exception handling)
+        (see controller)
+
 ---SUGGESTIONS----
 1. Make sure add preset checks for empty names.. set default to "PresetX" 
 -   where x is the number preset, ie. Preset1, Preset2, Preset3...
@@ -9,3 +12,7 @@
 - into form and edit old preset instead of creating new preset altogether..
 3. Add an "About" page (use coding/binary font?)
 4. Code Named S.H.E.R.L.O.C.K.-- transformation JS
+5. Intermediaries:
+    - task completed successfully messages
+6. access username and display it on screen. corner identifier (access 'data', then 'username')
+7. Login page- default to login page on start, also match theme.

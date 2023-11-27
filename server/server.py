@@ -5,7 +5,7 @@ import socket
 import numpy as np
 from server.DBconnectionAgent import DBConnectionAgent
 import client.client 
-from controllers.predictionModel import PredictionModel, startPrediction # Temporary, testing
+from controllers.predictionModel import startPrediction
 from controllers.graphGenerator import GraphGenerator
 from uuid import uuid4
 import bcrypt
@@ -29,6 +29,7 @@ class Server(): # The main server handler class
         self.__predictors = {}
         self.__parentPipe, self.__childPipe = mp.Pipe()
         self.__pollingQ = mp.Queue(maxsize=self.__maxQueueSize)
+        self.__graphGen = GraphGenerator(self.__requestsQ, self.__dataQ)
         self._setupDBConnection()
 
     def __del__(self): # WIP
@@ -408,7 +409,7 @@ class Server(): # The main server handler class
         initial = None
         while not self.__dataQ.empty():
             tempData = self.__dataQ.get()
-            print(str(time.ctime())+' - Deleted data from '+str(time.ctime(tempData['timestamp']))+' with id: '+str(tempData['id']))
+            print(str(time.ctime())+' - Deleted dataQ object from '+str(time.ctime(tempData['timestamp']))+' with id: '+str(tempData['id']))
         '''
         while not self.__dataQ.empty():
             if initial == None:
@@ -447,7 +448,7 @@ class Server(): # The main server handler class
     def _CheckPredictions(self):
         """Manages, queues, and starts up new processes for running prediction model training in separate processes.
         """
-        epochs = 100
+        epochs = 1000
         masterList = self.requestManyFromDB('masterList', {})
         for object in masterList:
             if not object['url']+'_Predictor' in self.__processes:
@@ -499,7 +500,7 @@ class Server(): # The main server handler class
     def _mainLoop(self):
         """The primary loop for the server, calls checkForRequests, checkPredictions and pollWebsites.
         """
-        #self.test()
+        #self.test1()
         #self.test2()
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
         dataQTimerStart = time.time()
@@ -522,36 +523,31 @@ class Server(): # The main server handler class
     def startServer(self):
         """Creates the flask app in a separate processes, starts that process, and then intiates the mainloop. 
         """
-        #self.test()
+        #self.test1()
         self.__processes['polling'] = mp.Process(name='Polling', target=pollSites, args=(self.__childPipe, self.__pollingQ, self.__httpPorts, self.__pollingSpeed,))
         self.__processes['app'] = mp.Process(name='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['polling'].start()
         self.__processes['app'].start()
         self._mainLoop()
 
-    def test(self):
+    def test1(self):
         """Used for testing things at the start of the program
         """
-        #print('Begin test.')
-        
-        masterList = self.requestManyFromDB('masterList', {})
-        for object in masterList:
-            data = self.requestManyFromDB('pollingData', {'url':object['url'], 'timestamp':{'$gte':time.time()-60*60*24*30000000}})
-            tensorDataTime, tensorDataLatency = [], []
-            for i in data:
-                tensorDataTime.append(i['timestamp'])
-                tensorDataLatency.append(i['latency'])
-            tensorData = np.vstack((tensorDataTime, tensorDataLatency))
-            #print('Data gathered, transferring to PredictionModel...')
-            self.__processes[object['url']+'_Predicter'] = mp.Process(name=str(object['url']+'_Predicter'), target=startPrediction, args=(tensorData, object['url'], '15T'))
-            self.__processes[object['url']+'_Predicter'].start()
-            break
-            #predModel = PredictionModel()
-            #predicitedData = predModel.predictOnData(tensorData, object['url'], sampleRate='15T', eposch=10*10**2, predictions=60*60*6)
-            #print('predictiedData:')
-            #print('length: ', len(predicitedData[0]), len(predicitedData[1]))
-            #print('Completed test.')
-        print('All models are processing.')
+        newRequest = {'id':uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'graph', 'query':{'url':'wwww.google.com', 'timeRange':time.time()-60*60*24}}
+        print('Begin test1.')
+        if newRequest['column'] == 'graph':
+            data = self.requestManyFromDB('pollingData', {'url':newRequest['query']['url'], 'timestamp':{'$gte':newRequest['query']['timeRange']}})
+        tensorDataTime, tensorDataLatency = [], []
+        for i in data:
+            tensorDataTime.append(i['timestamp'])
+            tensorDataLatency.append(i['latency'])
+        tensorData = np.vstack((tensorDataTime, tensorDataLatency))
+        duration = 300
+        interval = 15
+        output = self.__graphGen.generate_graph(tensorData, newRequest['query']['url'], duration, interval)
+        print(output)
+        #self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':output})
+        print('End test1.')
         
     def test2(self):
         graph = GraphGenerator()
@@ -575,7 +571,7 @@ def pollSites(pipe:mp.Pipe, pollQ:mp.Queue, ports:list, pollingSpeed:int,):
                 if object['url'] not in masterList:
                     masterList.append(object['url'])
         if (time.time()-pollSitesStart) >= pollingSpeed:
-            print(str(time.ctime())+' - Polling sites...')
+            #print(str(time.ctime())+' - Polling sites...')
             pollSitesStart = time.time()
             for site in masterList:
                 for port in ports:
