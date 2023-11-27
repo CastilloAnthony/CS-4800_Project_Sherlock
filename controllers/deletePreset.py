@@ -45,7 +45,7 @@ class DeletePreset(): # Controller
         masterListRequest = {
             'id': uuid.uuid4(),
             'request_type': 'request',
-            'column': 'users',#masterList
+            'column': 'users',
             'query': {"email":self.curr_email}
         }
         temp = requestData(masterListRequest, self.__requestQ, self.__dataQ)

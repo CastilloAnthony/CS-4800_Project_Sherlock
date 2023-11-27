@@ -57,6 +57,7 @@ class MyFlaskApp:
         self.app.add_url_rule('/deletePreset/newDeletedPreset', 'newDeletedPreset', self.newDeletedPreset, methods=['POST'])
         #VIEWPRESET
         self.app.add_url_rule('/viewPreset', 'viewPreset', self.viewPreset)
+        self.app.add_url_rule('/viewPreset/newViewPreset', '/viewPreset/newViewPreset', self.newViewPreset, methods=['POST'])
         #EDITPRESET
         self.app.add_url_rule('/editPreset', 'editPreset', self.editPreset)
         self.app.add_url_rule('/editPreset/newEditedPreset', 'newEditedPreset', self.newEditedPreset, methods=['POST'])
@@ -271,8 +272,17 @@ class MyFlaskApp:
         Returns:
             html: viewPreset.html
         """
-        return render_template('viewPreset.html')
+        self.viewPresetClass.getEmail(self.curr_email)
+        return render_template('viewPreset.html', presets = self.viewPresetClass.query())
     
+    def newViewPreset(self):
+        # grab selected website
+        # in viewWebsite class use that and use the 
+        # website as a parameter to generateGraph('https://csustan.edu', 300, 15)
+        # that gives me a picture
+        # print(self.viewWebsiteClass.viewWebsite())
+        return render_template('viewPresetNew.html', plot_html = self.viewWebsiteClass.viewWebsite())
+        
     #TODO: grab graphs to put into this
     def viewWebsite(self):
         """_summary_: grab all urls and let user choose which one
@@ -381,13 +391,6 @@ class MyFlaskApp:
         # Redirect to the /home route and render the home.html template
         return redirect(url_for('home'))
 
-
-
-
-
-
-
-
     ################################
     #      TECHNICAL FUNCTIONS     #
     ################################
@@ -396,24 +399,6 @@ class MyFlaskApp:
 
     def newRequest(self, queryRequest):
         pass
-
-    # NOT USED
-    # def checkForData(self, queryRequest):
-    #     #ANTHONY
-    #     initialDataID = False
-    #     while self.app.dataQ.empty() != True:
-    #         newData = self.app.dataQ.get()
-    #         if newData['id'] == initialDataID:
-    #             self.app.requestQ.put(queryRequest)
-    #             time.sleep(1) #import time
-    #             initialDataID = False
-    #         elif initialDataID == False:
-    #             initialDataID = newData['id']
-    #         if newData['id'] == queryRequest['id']:
-    #             if newData['data'] is not False:
-    #                 return newData
-    #         else:
-    #             self.app.dataQ.put(newData)
 
 def startFlask(requestQ, dataQ):
     newFlask = MyFlaskApp(requestQ, dataQ)

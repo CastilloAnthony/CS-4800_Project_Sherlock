@@ -1,15 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
     <!--CHRISTIAN-->
-    <!DOCTYPE html>
-    <html>
+    
         <head>
             <meta charset="UTF-8">
-            <title>View Preset</title>
+            <title>Delete Preset</title>
             <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style1.css') }}">
         </head>
         <body>
-            <h1  style="text-align:center;color:white;">View Preset</h1><br>
+            <h1  style="text-align:center;color:white;">Delete Preset</h1><br>
+            <div>
+            <form action="viewPreset/newViewPreset" style="display:inline-block" method="POST">
+                <p>CHOOSE A PRESET TO BE VIEWED</p>
+                <!--
+                    Need a name for the respective preset so the user knows what to ask for later
+                    Make it easier to recall for them. 
+                -->
+                <br><br>
+                <!--
+                    [ 
+                    {
+                    '_id': ObjectId('65565327c3a6e4404edd07d9'), 
+                    'id': 'ee76936a-d4b0-4050-986d-b4a71041138b', 
+                    'username': 'ca', 
+                    'email': 'ca', 
+                    'websitesList': ['https://www.youtube.com/watch?v=Kw0azb-lQTk', 'https://www.youtube.com/watch?v=fU-hbVHNrzo'], 
+                    'presets': [{'name': 'ca', 'presetLists': ['www.google.com', 'www.instagram.com'], 'timestamp': 1700173818.6764941}, {'name': 'taco', 'presetLists': ['www.google.com', 'www.instagram.com', 'www.csustan.edu'], 'timestamp': 1700174609.7962203}, {'name': 'Big Ben', 'presetLists': ['www.google.com', 'www.instagram.com', 'chat.openai.com', 'www.reddit.com'], 'timestamp': 1700174848.542619}
+                    }
+                    ]
+                -->
+                
+                {% for preset in presets['presets'] %}
+                    <!--<label class="background">
+                        
+                            We want to look at the inputs name when returning these back to 
+                        
+                        <input type="checkbox" name="presetsList" value="{{ url }}">{{ url }}<br>
+                    </label><br>-->
+                    
+                    <input type="checkbox" name="selected_options[]" value="{{preset['name']}}"> {{ preset['name'] }} <br> {{preset['presetLists'] }}<br>
+                    
+                {% endfor %}
+                <input type="submit" value="Submit">
+            </form>
+            </div>
         </body>
-    </html>
+    
 {% endblock %}
