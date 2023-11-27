@@ -281,7 +281,7 @@ class MyFlaskApp:
         # website as a parameter to generateGraph('https://csustan.edu', 300, 15)
         # that gives me a picture
         # print(self.viewWebsiteClass.viewWebsite())
-        return render_template('viewPresetNew.html', plot_html = self.viewWebsiteClass.viewWebsite())
+        return render_template('viewPresetNew.html', plot_html = self.viewPresetClass.viewPreset())
         
     #TODO: grab graphs to put into this
     def viewWebsite(self):

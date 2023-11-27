@@ -5,11 +5,13 @@ from flask import Flask, render_template, request
 import numpy as np
 from controllers.graphGenerator import GraphGenerator
 from controllers.queueManager import requestData
+from controllers.editPreset import EditPreset
 
 class ViewPreset():
     def __init__(self, requestQ, dataQ):
         self.__requestQ, self.__dataQ = requestQ, dataQ
         self.graph_generator = GraphGenerator(requestQ, dataQ)
+        self.EditPreset = EditPreset(requestQ, dataQ)
         self.curr_email = ''
 
     def __del__(self):
@@ -46,9 +48,12 @@ class ViewPreset():
         Returns:
             picture: returns picture or plot that will be rendered in client.py
         """
-        
-        presetList = request.form['selected_options[]']
-        #get a dictionary for each website and put it into a list
+        #This will be a stringed thing that looks like a dictionary
+        presetStringedDict = request.form['selected_options[]']
+        #lets make it into a list
+        presetDict = self.EditPreset.parseStringToDict(presetStringedDict)
+        print(presetDict)
+        presetList = presetDict['presetLists']
         listOfWebsites = []
         #iterate through list of websites in presetList
         for i in presetList:
@@ -60,7 +65,7 @@ class ViewPreset():
             }
             data = requestData(pollingDataRequest, self.__requestQ, self.__dataQ)["data"] #line implented by Christian
             listOfWebsites.append(data)
-        #from the information given in the list above full of dictionaries
+        # constant for now but maybe later make variable
         duration = 300 
         interval = 15
         tensorList = []
@@ -72,8 +77,7 @@ class ViewPreset():
                 tensorDataLatency.append(i['latency'])
             tensorData = np.vstack((tensorDataTime, tensorDataLatency))
             tensorList.append(tensorData)
-            # constant for now but maybe later make a 
-
+            
         #sending a list with tensorData, the url, duration, and interval
         temp = self.graph_generator.generate_graph(tensorList, presetList, duration, interval)
         return temp

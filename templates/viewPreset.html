@@ -38,7 +38,7 @@
                         <input type="checkbox" name="presetsList" value="{{ url }}">{{ url }}<br>
                     </label><br>-->
                     
-                    <input type="checkbox" name="selected_options[]" value="{{preset['name']}}"> {{ preset['name'] }} <br> {{preset['presetLists'] }}<br>
+                    <input type="checkbox" name="selected_options[]" value="{{preset}}"> {{ preset['name'] }} <br> {{preset['presetLists'] }}<br>
                     
                 {% endfor %}
                 <input type="submit" value="Submit">
