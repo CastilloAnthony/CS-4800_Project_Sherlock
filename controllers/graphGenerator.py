@@ -186,4 +186,5 @@ class GraphGenerator:
        
     #def viewPreset(self):
         #send generated graph as a string with an array for each website to viewPreset.py
+        #for loop?
         
