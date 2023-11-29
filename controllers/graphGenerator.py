@@ -1,5 +1,7 @@
-#implemented by Sierra
-#tested by Anthony
+#written by: Sierra
+#tested by: Sierra, Anthony, Christian
+#debugged by: Anthony, Christian
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -121,7 +123,8 @@ class GraphGenerator:
             
             return [bytes_received, bytes_sent, bytes_total]
     '''
-
+    def viewPreset(self):
+        #provide 3 graphs or one graph with all the overlays
     def generate_graph(self, tensorData, url, duration=300, interval=15):
         time_values, latency_values = tensorData[0], tensorData[1] #self.latency(psutil.net_io_counters(), duration, interval) #line implented by Anthony
 
@@ -138,7 +141,11 @@ class GraphGenerator:
         
         fig, ax = plt.subplots(figsize=(16*0.65, 9*0.65))
         #fig.autofmt_xdate() #line implemented by Anthony
+<<<<<<< Updated upstream
         # ax.figure(figsize=(16*0.65, 9*0.65))
+=======
+        plt.figure(figsize=(16*0.65, 9*0.65))
+>>>>>>> Stashed changes
         ax.plot(time_values.astype('datetime64[s]')-np.timedelta64(8, 'h'), latency_values * 100, label='Latency (ms)') #line altered by Anthony # WARNING: Hardcoded timedelta to be PST
         #plt.plot(foresight[0], foresight[1], label='Prediction (ms)')
         ax.set_ylabel('Latency (ms)')
@@ -172,7 +179,8 @@ class GraphGenerator:
         plt.savefig(img_buffer, format='png')
 
         img_str = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
-        plt.close()
+        #plt.close()
+        plt.clf() #line implemented by Anthony
         
         #plot_html = mpld3.fig_to_html(fig)
     
@@ -181,4 +189,6 @@ class GraphGenerator:
         return img_str #line imnplemented by Christian 
         # image = plt #line altered by Anthony and Christian
         # return image #line implemented by Christian
+        #send singular graph to display all the chosen websites to viewPreset.py
+            #recieve URLs and output a single graph with lines overlayed to display each website
         
