@@ -141,11 +141,7 @@ class GraphGenerator:
         
         fig, ax = plt.subplots(figsize=(16*0.65, 9*0.65))
         #fig.autofmt_xdate() #line implemented by Anthony
-<<<<<<< Updated upstream
         # ax.figure(figsize=(16*0.65, 9*0.65))
-=======
-        plt.figure(figsize=(16*0.65, 9*0.65))
->>>>>>> Stashed changes
         ax.plot(time_values.astype('datetime64[s]')-np.timedelta64(8, 'h'), latency_values * 100, label='Latency (ms)') #line altered by Anthony # WARNING: Hardcoded timedelta to be PST
         #plt.plot(foresight[0], foresight[1], label='Prediction (ms)')
         ax.set_ylabel('Latency (ms)')
