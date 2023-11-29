@@ -4,6 +4,7 @@
 3. empty responses
     -edit preset, if no preset is selected, prompt for a selection (exception handling)
         (see controller)
+4. insert ga.html latency table into homepage.html
 
 ---SUGGESTIONS----
 1. Make sure add preset checks for empty names.. set default to "PresetX" 
@@ -14,5 +15,5 @@
 4. Code Named S.H.E.R.L.O.C.K.-- transformation JS
 5. Intermediaries:
     - task completed successfully messages
-6. access username and display it on screen. corner identifier (access 'data', then 'username')
+6. access username and display it on screen
 7. Login page- default to login page on start, also match theme.

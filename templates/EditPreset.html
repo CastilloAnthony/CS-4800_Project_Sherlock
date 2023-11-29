@@ -36,11 +36,11 @@
 
                 -->
                 <div style="color:white;">Choose which preset you would like to edit:</div>
-                <br><br>
+                <br>
                 {% for item in presets['presets'] %}<!--data['presets'] == presets[presets]-->
                     <input type="checkbox" name="selected_option[]" value="{{ item }}"> {{ item['name'] }}<br>{{item['presetLists']}} || timestamp: {{item['timestamp']}}<br>
                 {% endfor %}
-                <button type="submit">Enter</button>
+                <input type="submit" value="Submit">
             </form>
             </div>
         </body>

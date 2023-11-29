@@ -170,7 +170,8 @@ class MyFlaskApp:
             email = session["email"]
             self.curr_email = email
             self.addPresetClass.getEmail(self.curr_email)
-            return render_template('homepage.html', email=email)#changed from auth/logged_in.html
+            #TODO: pass username as context w/ or instead of email.
+            return render_template('homepage.html', email=email) #changed from auth/logged_in.html
         else:
             return redirect(url_for("login"))
     #FINISHED

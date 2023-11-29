@@ -8,15 +8,10 @@
             <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style1.css') }}">
         </head>
         <body>
-            <h1  style="text-align:center;color:white;">Delete Preset</h1><br>
+            <h1  style="text-align:center;color:white;">View Preset</h1><br>
             <div>
             <form action="viewPreset/newViewPreset" style="display:inline-block" method="POST">
-                <p>CHOOSE A PRESET TO BE VIEWED</p>
-                <!--
-                    Need a name for the respective preset so the user knows what to ask for later
-                    Make it easier to recall for them. 
-                -->
-                <br><br>
+                <p style="text-align: center;"><strong>Choose a preset to view its graph:</strong></p>
                 <!--
                     [ 
                     {
@@ -29,7 +24,6 @@
                     }
                     ]
                 -->
-                
                 {% for preset in presets['presets'] %}
                     <!--<label class="background">
                         
@@ -41,6 +35,7 @@
                     <input type="checkbox" name="selected_options[]" value="{{preset}}"> {{ preset['name'] }} <br> {{preset['presetLists'] }}<br>
                     
                 {% endfor %}
+                <br>
                 <input type="submit" value="Submit">
             </form>
             </div>

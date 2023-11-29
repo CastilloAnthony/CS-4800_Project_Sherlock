@@ -94,12 +94,12 @@ form {
 }
 
 /*button styling*/
-button {
+input[type=submit] {
     background-color: gray;
     color: black;
 }
 
- button:hover {
+input[type=submit]:hover {
     background-color: #4CAF50;
     color: black;
  }

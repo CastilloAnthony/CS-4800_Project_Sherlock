@@ -9,7 +9,7 @@
         </head>
 
         <body>
-            <h1 style="text-align: center; color:white">Preset Creation List</h1>
+            <h1 style="text-align: center; color:white">Preset Creation Station</h1>
             <br><br>
             <!--
                 I am giving the value in the form of: 
@@ -30,7 +30,7 @@
                     Make it easier to recall for them. 
                 -->
                 <label for="fname">Preset List Name (Please Pick Something You Will Remember):</label><br>
-                Preset Name: <input type="text" name="name">
+                Preset Name: <input type="text" name="name" value="presetDefault">
                 <br><br>
                 {% for url in masterList['data'] %}
                     <!--
@@ -41,8 +41,7 @@
                     <input type="checkbox" name="selected_options[]" value="{{ url }}"> {{ url }}<br>
                     
                 {% endfor %}
-                <!--input type="submit" value="Submit"-->
-                <button type="submit">Submit</button>
+                <input type="submit" value="Submit">
             </form>
             </div>
         </body>

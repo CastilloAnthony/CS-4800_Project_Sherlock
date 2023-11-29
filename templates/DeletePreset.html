@@ -11,12 +11,7 @@
             <h1  style="text-align:center;color:white;">Delete Preset</h1><br>
             <div>
             <form action="deletePreset/newDeletedPreset" style="display:inline-block" method="POST">
-                <p>CHOOSE A PRESET TO BE DELETED</p>
-                <!--
-                    Need a name for the respective preset so the user knows what to ask for later
-                    Make it easier to recall for them. 
-                -->
-                <br><br>
+                <p style="text-align: center;"><strong>Choose a preset to delete:</strong></p>
                 <!--
                     [ 
                     {
@@ -47,6 +42,7 @@
                     <input type="checkbox" name="selected_options[]" value="{{preset['name']}}"> {{ preset['name'] }} <br> {{preset['presetLists'] }}<br>
                     
                 {% endfor %}
+                <br>
                 <input type="submit" value="Submit">
             </form>
             </div>

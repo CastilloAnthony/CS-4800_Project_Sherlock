@@ -9,8 +9,6 @@
         </head>
         <body>
             <h1 style="text-align:center;color:white;">View Website</h1><br>
-            <h1 style="color:white">Global List</h1>
-            <br><br>
             <!--
                 I am giving the value in the form of: 
             {'id': UUID('36d8c82d-4a56-4860-8f71-aff5f350f45e'), 
@@ -22,22 +20,19 @@
             timestamp
             data
             -->
-            
+            <div>
             <form action="viewWebsite/newViewWebsite" style="display:inline-block" method="POST">
-                <!--
-                    Need a name for the respective preset so the user knows what to ask for later
-                    Make it easier to recall for them. 
-                -->
-                <label for="fname">Pick A Website to View:</label><br>
+                <label for="fname">Pick a website to view its graph:</label><br><br>
                 {% for url in masterList['data'] %}
                     <!--
                         will change to only be able to accept one value at time:
-                        either through uncheck if more than one checkbox is chosen or to single choice.
+                        either through uncheck if more than one checkbox is chosen or radio buttons.
                     -->
                     <input type="checkbox" name="selected_options[]" value="{{ url }}"> {{ url }}<br>
                     
                 {% endfor %}
-                <input type="submit" value="Submit">
+                <br><input type="submit" value="Submit">
+                </div>
             </form>
         </body>
 {% endblock %}

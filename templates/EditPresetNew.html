@@ -60,7 +60,7 @@
                     Make it easier to recall for them. 
                 -->
                 <label for="fname">Preset List Name (Please Pick Something You Will Remember):</label><br>
-                Preset Name: <input type="text" name="name">
+                Preset Name: <input type="text" name="name" value="{{oldPreset['name']}}">
                 <br><br>
                 {% for url in masterList['data'] %}
                     <!--
@@ -71,7 +71,7 @@
                     <input type="checkbox" name="selected_options[]" value="{{ url }}"> {{ url }}<br>
                     
                 {% endfor %}
-                <button type="submit">Enter</button>
+                <input type="submit" value="Submit">
             </form>
         </body>
     
