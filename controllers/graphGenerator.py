@@ -123,7 +123,7 @@ class GraphGenerator:
             
             return [bytes_received, bytes_sent, bytes_total]
     '''
-    def viewPreset(self):
+    #def viewPreset(self):
         #provide 3 graphs or one graph with all the overlays
     def generate_graph(self, tensorData, url, duration=300, interval=15):
         time_values, latency_values = tensorData[0], tensorData[1] #self.latency(psutil.net_io_counters(), duration, interval) #line implented by Anthony
