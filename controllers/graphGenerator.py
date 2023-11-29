@@ -123,8 +123,6 @@ class GraphGenerator:
             
             return [bytes_received, bytes_sent, bytes_total]
     '''
-    #def viewPreset(self):
-        #provide 3 graphs or one graph with all the overlays
     def generate_graph(self, tensorData, url, duration=300, interval=15):
         time_values, latency_values = tensorData[0], tensorData[1] #self.latency(psutil.net_io_counters(), duration, interval) #line implented by Anthony
 
@@ -185,6 +183,7 @@ class GraphGenerator:
         return img_str #line imnplemented by Christian 
         # image = plt #line altered by Anthony and Christian
         # return image #line implemented by Christian
-        #send singular graph to display all the chosen websites to viewPreset.py
-            #recieve URLs and output a single graph with lines overlayed to display each website
+       
+    #def viewPreset(self):
+        #send generated graph as a string with an array for each website to viewPreset.py
         
