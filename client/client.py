@@ -10,6 +10,8 @@ from multiprocessing import Queue
 #CLASS IMPORTATION
 from controllers.login import Login
 
+from controllers.homepage import Homepage
+
 from controllers.addPreset import AddPreset
 from controllers.deletePreset import DeletePreset 
 from controllers.editPreset import EditPreset 
@@ -76,8 +78,9 @@ class MyFlaskApp:
         
         
         #CLASS_INITIALIZATION
-        
         self.loginClass = Login(self.app.requestQ, self.app.dataQ)
+        
+        self.homeClass = Homepage(self.app.requestQ, self.app.dataQ)
         
         self.addPresetClass = AddPreset(self.app.requestQ, self.app.dataQ)
         self.deletePresetClass = DeletePreset(self.app.requestQ, self.app.dataQ)
@@ -244,7 +247,9 @@ class MyFlaskApp:
         """
         # works just fine
         #print(self.viewWebsiteClass.query1())
-        return render_template('homepage.html', email=self.curr_email) #data=self.viewWebsiteClass.query1())
+        self.homeClass.getEmail(self.curr_email)
+        
+        return render_template('homepage.html', userName=self.homeClass.query()) #data=self.viewWebsiteClass.query1())
     
     #FINISHED
     def addPreset(self):

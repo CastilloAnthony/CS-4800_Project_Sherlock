@@ -1,19 +1,19 @@
 ---TODO----
-1. Change checkbox form to only accept one value at time (change to multiple choice form and populate)
-2. View Preset
-3. empty responses
+1. Change checkbox form to only accept one value at time (change to multiple choice form and populate) DONE
+2. View Preset 
+3. empty responses DONE
     -edit preset, if no preset is selected, prompt for a selection (exception handling)
         (see controller)
-4. insert ga.html latency table into homepage.html
+4. insert ga.html latency table into homepage.html // 4.28 seconds // Too Slow for users
 
 ---SUGGESTIONS----
-1. Make sure add preset checks for empty names.. set default to "PresetX" 
+1. Make sure add preset checks for empty names.. set default to "PresetX" DONE
 -   where x is the number preset, ie. Preset1, Preset2, Preset3...
-2. Change edit preset(?)- works well. Might be more intiutive to pass old preset back
-- into form and edit old preset instead of creating new preset altogether..
-3. Add an "About" page (use coding/binary font?)
+2. Change edit preset(?)- works well. Might be more intiutive to pass old preset back 
+- into form and edit old preset instead of creating new preset altogether.. 
+3. Add an "About" page (use coding/binary font?) 
 4. Code Named S.H.E.R.L.O.C.K.-- transformation JS
 5. Intermediaries:
     - task completed successfully messages
-6. access username and display it on screen
+6. access username and display it on screen DONE
 7. Login page- default to login page on start, also match theme.
