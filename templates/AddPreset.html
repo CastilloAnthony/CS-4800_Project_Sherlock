@@ -24,13 +24,13 @@
             -->
             <div>
             <!--form action="addPreset/newAddedPreset" style="display:inline-block" method="POST"-->
-            <form action="addPreset/newAddedPreset" method="POST">
+            <form action="addPreset/newAddedPreset" method="POST" onsubmit="return validateForm() && validateForm2()" id="myForm">
                 <!--
                     Need a name for the respective preset so the user knows what to ask for later
                     Make it easier to recall for them. 
                 -->
                 <label for="fname">Preset List Name (Please Pick Something You Will Remember):</label><br>
-                Preset Name: <input type="text" name="name" value="presetDefault">
+                Preset Name: <input type="text" name="name" id="urlInput">
                 <br><br>
                 {% for url in masterList['data'] %}
                     <!--
@@ -43,6 +43,9 @@
                 {% endfor %}
                 <input type="submit" value="Submit">
             </form>
+            <script src="{{ url_for('static', filename='js/noEmpty.js') }}"></script>
+
+
             </div>
         </body>
 {% endblock %}

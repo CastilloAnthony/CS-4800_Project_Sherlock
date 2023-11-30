@@ -149,5 +149,5 @@ class ViewWebsite():
         interval = 15
         # gives me graph
         temp = self.graph_generator.generate_graph(tensorData, url, duration, interval)
-        return temp, url
+        return temp
     

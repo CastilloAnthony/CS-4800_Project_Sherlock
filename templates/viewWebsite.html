@@ -21,18 +21,21 @@
             data
             -->
             <div>
-            <form action="viewWebsite/newViewWebsite" style="display:inline-block" method="POST">
+            <form action="viewWebsite/newViewWebsite" style="display:inline-block" method="POST" onsubmit="return validateForm3()" id="myForm">
                 <label for="fname">Pick a website to view its graph:</label><br><br>
                 {% for url in masterList['data'] %}
                     <!--
                         will change to only be able to accept one value at time:
                         either through uncheck if more than one checkbox is chosen or radio buttons.
                     -->
-                    <input type="checkbox" name="selected_options[]" value="{{ url }}"> {{ url }}<br>
+                    <input type="radio" name="selected_option" value="{{ url }}"> {{ url }}<br>
                     
                 {% endfor %}
                 <br><input type="submit" value="Submit">
                 </div>
             </form>
+
+            <script src="{{ url_for('static', filename='js/noEmpty.js') }}"></script>
+
         </body>
 {% endblock %}

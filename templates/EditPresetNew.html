@@ -38,7 +38,7 @@
             timestamp
             data
             -->
-            <form action="newEditedPreset/edit" style="display:inline-block" method="POST">
+            <form action="newEditedPreset/edit" style="display:inline-block" method="POST" onsubmit="return validateForm() && validateForm2()" id="myForm">
                 <div class="collection"> OLD PRESET
                     <div class="titles">NAME</div>
                     <div class="info">
@@ -60,7 +60,7 @@
                     Make it easier to recall for them. 
                 -->
                 <label for="fname">Preset List Name (Please Pick Something You Will Remember):</label><br>
-                Preset Name: <input type="text" name="name" value="{{oldPreset['name']}}">
+                Preset Name: <input type="text" name="name" value="{{oldPreset['name']}}" id="urlInput">
                 <br><br>
                 {% for url in masterList['data'] %}
                     <!--
@@ -73,6 +73,7 @@
                 {% endfor %}
                 <input type="submit" value="Submit">
             </form>
+            <script src="{{ url_for('static', filename='js/noEmpty.js') }}"></script>
         </body>
     
 {% endblock %}

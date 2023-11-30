@@ -10,39 +10,21 @@
         <body>
             <h1  style="text-align:center;color:white;">Edit Preset</h1><br>
             <div>
-            <form action="editPreset/newEditedPreset" style="display:inline-block" method="POST">
-                <!--
-                    Need a name for the respective preset so the user knows what to ask for later
-                    Make it easier to recall for them. 
-                -->
-                <!--
-                'data': 
-                {
-                    '_id': ObjectId('65565327c3a6e4404edd07d9'), 
-                    'id': 'ee76936a-d4b0-4050-986d-b4a71041138b', 
-                    'username': 'ca', 
-                    'email': 'ca', 
-                    'websitesList': [
-                        'https://www.youtube.com/watch?v=fU-hbVHNrzo', 'https://www.emuparadise.me/roms-isos-games.php'
-                        ], 
-                    'presets': [
-                        {
-                            'name': 'Big Ben', 
-                            'presetLists': ['www.google.com', 'www.instagram.com', 'chat.openai.com', 'www.reddit.com'], 
-                            'timestamp': 1700174848.542619
-                        }
-                    ]
-                }
 
-                -->
-                <div style="color:white;">Choose which preset you would like to edit:</div>
-                <br>
-                {% for item in presets['presets'] %}<!--data['presets'] == presets[presets]-->
-                    <input type="checkbox" name="selected_option[]" value="{{ item }}"> {{ item['name'] }}<br>{{item['presetLists']}} || timestamp: {{item['timestamp']}}<br>
+            <form action="editPreset/newEditedPreset" style="display:inline-block" method="POST" onsubmit="return validateForm3()" id="myForm">
+                
+                <div style="color:white;">Choose which preset you would like to edit:</div><br>
+
+                {% for item in presets['presets'] %}
+
+                    <input type="radio" name="selected_option[]" value="{{ item }}"> {{ item['name'] }}<br>{{item['presetLists']}} || timestamp: {{item['timestamp']}}<br>
+                
                 {% endfor %}
                 <input type="submit" value="Submit">
             </form>
+
             </div>
+            <script src="{{ url_for('static', filename='js/noEmpty.js') }}"></script>
         </body>
     
 {% endblock %}

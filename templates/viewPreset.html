@@ -10,7 +10,7 @@
         <body>
             <h1  style="text-align:center;color:white;">View Preset</h1><br>
             <div>
-            <form action="viewPreset/newViewPreset" style="display:inline-block" method="POST">
+            <form action="viewPreset/newViewPreset" style="display:inline-block" method="POST" onsubmit="return validateForm3()" id="myForm">
                 <p style="text-align: center;"><strong>Choose a preset to view its graph:</strong></p>
                 <!--
                     [ 
@@ -32,13 +32,15 @@
                         <input type="checkbox" name="presetsList" value="{{ url }}">{{ url }}<br>
                     </label><br>-->
                     
-                    <input type="checkbox" name="selected_options[]" value="{{preset}}"> {{ preset['name'] }} <br> {{preset['presetLists'] }}<br>
+                    <input type="radio" name="selected_options[]" value="{{preset}}"> {{ preset['name'] }} <br> {{preset['presetLists'] }}<br>
                     
                 {% endfor %}
                 <br>
                 <input type="submit" value="Submit">
             </form>
             </div>
+            <script src="{{ url_for('static', filename='js/noEmpty.js') }}"></script>
+
         </body>
     
 {% endblock %}
