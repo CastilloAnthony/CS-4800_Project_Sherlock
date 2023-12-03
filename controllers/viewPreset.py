@@ -52,7 +52,6 @@ class ViewPreset():
         presetStringedDict = request.form['selected_options[]']
         #lets make it into a list
         presetDict = self.EditPreset.parseStringToDict(presetStringedDict)
-        print(presetDict)
         presetList = presetDict['presetLists']
         listOfWebsites = []
         #iterate through list of websites in presetList
@@ -79,5 +78,5 @@ class ViewPreset():
             tensorList.append(tensorData)
             
         #sending a list with tensorData, the url, duration, and interval
-        temp = self.graph_generator.generate_graph(tensorList, presetList, duration, interval)
+        temp = self.graph_generator.generateGraphs(tensorList, presetList, duration, interval)
         return temp

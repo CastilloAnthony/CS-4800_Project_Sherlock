@@ -187,4 +187,11 @@ class GraphGenerator:
     #def viewPreset(self):
         #send generated graph as a string with an array for each website to viewPreset.py
         #for loop?
-        
+    
+    def generateGraphs(self, tensorList, presetList, duration, interval):
+        #iterate through tensorList and presetList simultaneously and call generate_graph on them
+        graphList = []
+        for i in range(0, len(tensorList)):
+            graphList.append(self.generate_graph(tensorList[i], presetList[i], duration, interval))
+        return graphList
+            

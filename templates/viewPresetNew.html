@@ -24,7 +24,9 @@
         <body>
             <h1 style="text-align:center;color:white;">View Preset</h1><br>
             <div class="website">
-                <img src="data:image/png;base64,{{ plot_html }}" alt="Matplotlib Plot">
+                {%for url in plot_html%}
+                    <img src="data:image/png;base64,{{ url }}" alt="Matplotlib Plot">
+                {%endfor%}
             </div>
             
         </body>
