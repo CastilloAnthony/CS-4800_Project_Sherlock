@@ -298,13 +298,14 @@ class MyFlaskApp:
         """
         #buttons to pick the website
         return render_template('viewWebsite.html', masterList = self.viewWebsiteClass.query2())
+    
     def newViewWebsite(self):
         # grab selected website
         # in viewWebsite class use that and use the 
         # website as a parameter to generateGraph('https://csustan.edu', 300, 15)
         # that gives me a picture
         # print(self.viewWebsiteClass.viewWebsite())
-        return render_template('viewWebsiteNew.html', plot_html = self.viewWebsiteClass.viewWebsite())
+        return render_template('viewWebsiteNew.html', plot_html=self.viewWebsiteClass.viewWebsite())
         
     #FINISHED
     def deletePreset(self):

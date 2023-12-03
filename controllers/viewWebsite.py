@@ -131,7 +131,8 @@ class ViewWebsite():
         Returns:
             picture: returns picture or plot that will be rendered in client.py
         """
-        url = request.form['selected_options[]']
+        url = request.form['selected_option']
+        
         pollingDataRequest = {
             'id': uuid.uuid4(),
             'request_type': 'request',
@@ -149,5 +150,6 @@ class ViewWebsite():
         interval = 15
         # gives me graph
         temp = self.graph_generator.generate_graph(tensorData, url, duration, interval)
+        
         return temp
     
