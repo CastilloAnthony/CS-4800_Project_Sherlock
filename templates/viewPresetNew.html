@@ -1,34 +1,66 @@
 {% extends "base.html" %}
 {% block content %}
-    <!--CHRISTIAN-->
-    
-        <head>
-            <meta charset="UTF-8">
-            <title>View Preset</title>
-            <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style1.css') }}">
-            <style>
-                .header{
-                    text-align:center;
-                    color:white;
-                    font-family: 'Arial', sans-serif;
-                    font-size: 16px; 
-                }
-                .website{
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 70vh; 
-                }
-            </style>
-        </head>
-        <body>
-            <h1 style="text-align:center;color:white;">View Preset</h1><br>
-            <div class="website">
-                {%for url in plot_html%}
-                    <img src="data:image/png;base64,{{ url }}" alt="Matplotlib Plot">
-                {%endfor%}
-            </div>
-            
-        </body>
-        
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picture Viewer</title>
+    <style>
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+
+<h1 style="text-align: center; color:white;">Picture Viewer</h1>
+
+<div style="text-align: center;">
+    <img id="picture" src="" alt="Current Picture">
+</div>
+
+<!-- Embed Matplotlib plot here -->
+<img id="matplotlibPlot" src="" alt="Matplotlib Plot">
+
+<div style="text-align: center; margin-top: 20px;">
+    <button onclick="showPrevious()">Previous</button>
+    <span id="pictureNumber">1</span>
+    <button onclick="showNext()">Next</button>
+</div>
+
+<script>
+    // List of base64-encoded images
+    var pictureList = {{ plot_html|tojson }};
+
+    var currentPictureIndex = 0;
+    var pictureElement = document.getElementById('picture');
+    var matplotlibPlotElement = document.getElementById('matplotlibPlot');
+    var pictureNumberElement = document.getElementById('pictureNumber');
+
+    function updatePicture() {
+        pictureElement.src = pictureList[currentPictureIndex];
+        matplotlibPlotElement.src = "data:image/png;base64," + pictureList[currentPictureIndex];
+        pictureNumberElement.textContent = currentPictureIndex + 1;
+    }
+
+    function showNext() {
+        currentPictureIndex = (currentPictureIndex + 1) % pictureList.length;
+        updatePicture();
+    }
+
+    function showPrevious() {
+        currentPictureIndex = (currentPictureIndex - 1 + pictureList.length) % pictureList.length;
+        updatePicture();
+    }
+
+    // Show the initial picture
+    updatePicture();
+</script>
+
+</body>
+</html>
 {% endblock %}

@@ -52,3 +52,71 @@ Adsfa
 -------
 //
 -------
+
+
+
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picture Viewer</title>
+    <style>
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+
+<h1 style="text-align: center;">Picture Viewer</h1>
+
+<div style="text-align: center;">
+    <img id="picture" src="" alt="Current Picture">
+</div>
+
+{{plot_html}}
+<div style="text-align: center; margin-top: 20px;">
+    <button onclick="showPrevious()">Previous</button>
+    <span id="pictureNumber">1</span>
+    <button onclick="showNext()">Next</button>
+</div>
+
+<script>
+    // List of picture URLs
+    var pictureList = {{plot_html}};
+
+    var currentPictureIndex = 0;
+    var pictureElement = document.getElementById('picture');
+    var pictureNumberElement = document.getElementById('pictureNumber');
+
+    function updatePicture() {
+        pictureElement.src = pictureList[currentPictureIndex];
+        pictureNumberElement.textContent = currentPictureIndex + 1;
+    }
+
+    function showNext() {
+        currentPictureIndex = (currentPictureIndex + 1) % pictureList.length;
+        updatePicture();
+    }
+
+    function showPrevious() {
+        currentPictureIndex = (currentPictureIndex - 1 + pictureList.length) % pictureList.length;
+        updatePicture();
+    }
+
+    // Show the initial picture
+    updatePicture();
+</script>
+
+</body>
+</html>
+{%endblock%}
+
+
+<img src="data:image/png;base64,{{ url }}" alt="Matplotlib Plot">
