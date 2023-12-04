@@ -208,6 +208,7 @@ class DBConnectionAgent():
             return False
 
     def updateInDB(self, column:str, query:dict, changeTo:dict):
+        #C.A.
         """Updates a single document in the database. 
 
         Args:
@@ -248,6 +249,7 @@ class DBConnectionAgent():
             return False
         
     def update2InDB(self, column:str, query:dict, old:dict, changeTo:dict):
+        #c.a.
         if self.__db != False:
             #remove old preset
             self.__db[column].update_one(

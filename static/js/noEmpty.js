@@ -1,3 +1,4 @@
+//CHRISTIAN
 function validateForm() {
     var urlInput = document.getElementById('urlInput').value;
 
