@@ -38,12 +38,10 @@
     var pictureList = {{ plot_html|tojson }};
 
     var currentPictureIndex = 0;
-    var pictureElement = document.getElementById('picture');
     var matplotlibPlotElement = document.getElementById('matplotlibPlot');
     var pictureNumberElement = document.getElementById('pictureNumber');
 
     function updatePicture() {
-        //pictureElement.src = pictureList[currentPictureIndex];
         matplotlibPlotElement.src = "data:image/png;base64," + pictureList[currentPictureIndex];
         pictureNumberElement.textContent = currentPictureIndex + 1;
     }
