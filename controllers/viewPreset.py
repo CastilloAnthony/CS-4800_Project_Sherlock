@@ -79,4 +79,5 @@ class ViewPreset():
             
         #sending a list with tensorData, the url, duration, and interval
         temp = self.graph_generator.generateGraphs(tensorList, presetList, duration, interval)
+        #temp = self.graph_generator.graphMulti(tensorList, presetList, duration, interval)
         return temp

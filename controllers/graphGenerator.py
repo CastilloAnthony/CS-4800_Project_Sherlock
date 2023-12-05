@@ -143,6 +143,7 @@ class GraphGenerator:
         ax.plot(time_values.astype('datetime64[s]')-np.timedelta64(8, 'h'), latency_values * 100, label='Latency (ms)') #line altered by Anthony # WARNING: Hardcoded timedelta to be PST
         #plt.plot(foresight[0], foresight[1], label='Prediction (ms)')
         ax.set_ylabel('Latency (ms)')
+        ax.set_ylim(0, (latency_values.max() + np.mean(latency_values))*100) #line implemented by Anthony
         '''
         ax.gcf().axes[0].xaxis.set_major_locator(mdates.HourLocator(interval=6, tz=local_tz))
         ax.gcf().axes[0].xaxis.set_minor_locator(mdates.HourLocator(interval=1, tz=local_tz))
@@ -195,3 +196,34 @@ class GraphGenerator:
             graphList.append(self.generate_graph(tensorList[i], presetList[i], duration, interval))
         return graphList
             
+    def graphMulti(self, tensorList, presetList, duration, interval):
+        """Generates a plot with all of the data from each website on the same graph
+
+        Args:
+            tensorList (np.array): A 1-D array of 2-D arrays
+            presetList (list): A list of the names of the presets
+            duration (integer): TBD
+            interval (integer): TBD
+
+        Returns:
+            array of bytecode: The byte code for the produced graph contained within an array.
+        """
+        local_tz = get_localzone()
+        fig, ax = plt.subplots(figsize=(16*0.65, 9*0.65))
+        for i in range(0, len(tensorList)):
+            ax.plot(tensorList[i][0].astype('datetime64[s]')-np.timedelta64(8, 'h'), tensorList[i][1] * 100, label=str(presetList[i]), alpha=0.75, fmt='-', )
+        ax.set_ylabel('Latency (ms)')
+        ax.xaxis.set_major_locator(mdates.HourLocator(interval=6, tz=local_tz))
+        ax.xaxis.set_minor_locator(mdates.HourLocator(interval=1, tz=local_tz))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d %H:%M'))
+        ax.set_ylim(0, 100)
+        fig.autofmt_xdate()
+        ax.set_title('Latency from ' + str(datetime.datetime.now()) + ' of\n' + str(presetList))
+        ax.grid(True)
+        plt.legend()
+        plt.tight_layout()
+        img_buffer = io.BytesIO()
+        plt.savefig(img_buffer, format='png')
+        img_str = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
+        plt.clf()
+        return [img_str]
