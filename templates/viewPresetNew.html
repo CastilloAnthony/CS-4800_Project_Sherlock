@@ -43,7 +43,7 @@
     var pictureNumberElement = document.getElementById('pictureNumber');
 
     function updatePicture() {
-        pictureElement.src = pictureList[currentPictureIndex];
+        //pictureElement.src = pictureList[currentPictureIndex];
         matplotlibPlotElement.src = "data:image/png;base64," + pictureList[currentPictureIndex];
         pictureNumberElement.textContent = currentPictureIndex + 1;
     }
