@@ -5,7 +5,7 @@ import socket
 import numpy as np
 from server.DBconnectionAgent import DBConnectionAgent
 import client.client 
-from controllers.predictionModel import startPrediction
+#from controllers.predictionModel import startPrediction
 from controllers.graphGenerator import GraphGenerator
 from uuid import uuid4
 import bcrypt
@@ -504,7 +504,7 @@ class Server(): # The main server handler class
         #self.test2()
         mainLoopTimerStart = 0 # We want to always poll site when the system first comes online
         dataQTimerStart = time.time()
-        predictionModelTrainingTimerStart = time.time()
+        #predictionModelTrainingTimerStart = time.time()
         while True:
             self._checkForRequests()
             if (time.time()-mainLoopTimerStart) >= self.__pollingSpeed:
@@ -516,49 +516,20 @@ class Server(): # The main server handler class
             if (time.time()-dataQTimerStart) >= 60:
                 dataQTimerStart = time.time()
                 self._clearDataQ()
-            if (time.time()-predictionModelTrainingTimerStart) >= 60*15:#60*5 # 5 minutes
-                predictionModelTrainingTimerStart = time.time()
-                self._CheckPredictions()
+            #if (time.time()-predictionModelTrainingTimerStart) >= 60*15:#60*5 # 5 minutes
+                #predictionModelTrainingTimerStart = time.time()
+                #self._CheckPredictions()
 
     def startServer(self):
         """Creates the flask app in a separate processes, starts that process, and then intiates the mainloop. 
         """
-        #self.test1()
         self.__processes['polling'] = mp.Process(name='Polling', target=pollSites, args=(self.__childPipe, self.__pollingQ, self.__httpPorts, self.__pollingSpeed,))
         self.__processes['app'] = mp.Process(name='Flask', target=client.client.startFlask, args=(self.__requestsQ, self.__dataQ))
         self.__processes['polling'].start()
         self.__processes['app'].start()
         self._mainLoop()
 
-    def test1(self):
-        """Used for testing things at the start of the program
-        """
-        newRequest = {'id':uuid4(), 'timestamp':time.time(), 'request_type':'request', 'column':'graph', 'query':{'url':'wwww.google.com', 'timeRange':time.time()-60*60*24}}
-        print('Begin test1.')
-        if newRequest['column'] == 'graph':
-            data = self.requestManyFromDB('pollingData', {'url':newRequest['query']['url'], 'timestamp':{'$gte':newRequest['query']['timeRange']}})
-        tensorDataTime, tensorDataLatency = [], []
-        for i in data:
-            tensorDataTime.append(i['timestamp'])
-            tensorDataLatency.append(i['latency'])
-        tensorData = np.vstack((tensorDataTime, tensorDataLatency))
-        duration = 300
-        interval = 15
-        output = self.__graphGen.generate_graph(tensorData, newRequest['query']['url'], duration, interval)
-        print(output)
-        #self.__dataQ.put({'id':newRequest['id'], 'timestamp':time.time(), 'data':output})
-        print('End test1.')
-        
-    def test2(self):
-        graph = GraphGenerator()
-        data = self.requestManyFromDB('pollingData', {'url':'www.google.com'})
-        # add functions needed to generate graph from GenerateGraph
 # end Server
-
-def testServer():
-    newServer = Server()
-    #newServer._pollWebsites()
-    #newServer.sendToDB('pollingData', {'website':'www.google.com', 'timestamp':time.ctime(), 'data':1035100})
 
 def pollSites(pipe:mp.Pipe, pollQ:mp.Queue, ports:list, pollingSpeed:int,):
     """Funciton for requesting the masterlist from the database and for recording the latency for connections to each url in the masterlist. Note: multiprocessing safe
