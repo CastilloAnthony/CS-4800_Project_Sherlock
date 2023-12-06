@@ -50,6 +50,8 @@ class ViewPreset():
         """
         #This will be a stringed thing that looks like a dictionary
         presetStringedDict = request.form['selected_options[]']
+        slider = int(request.form['slider'])
+        
         #lets make it into a list
         presetDict = self.EditPreset.parseStringToDict(presetStringedDict)
         presetList = presetDict['presetLists']
@@ -60,7 +62,7 @@ class ViewPreset():
                 'id': uuid.uuid4(),
                 'request_type': 'request',
                 'column': 'pollingData',
-                'query': {'url':i, 'timestamp':{'$gte':time.time()-60*60*24}}
+                'query': {'url':i, 'timestamp':{'$gte':time.time()-60*60*slider}}
             }
             data = requestData(pollingDataRequest, self.__requestQ, self.__dataQ)["data"] #line implented by Christian
             listOfWebsites.append(data)
