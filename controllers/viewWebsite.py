@@ -131,13 +131,14 @@ class ViewWebsite():
         Returns:
             picture: returns picture or plot that will be rendered in client.py
         """
+        slider = int(request.form['slider'])
         url = request.form['selected_option']
         
         pollingDataRequest = {
             'id': uuid.uuid4(),
             'request_type': 'request',
             'column': 'pollingData',
-            'query': {'url':url, 'timestamp':{'$gte':time.time()-60*60*24}}
+            'query': {'url':url, 'timestamp':{'$gte':time.time()-60*60*slider}}
         }
         data = requestData(pollingDataRequest, self.__requestQ, self.__dataQ)["data"] #line implented by Christian
         tensorDataTime, tensorDataLatency = [], []

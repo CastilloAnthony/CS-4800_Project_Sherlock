@@ -1,23 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slider in Form</title>
+  <style>
+    /* Add some basic styling to the slider */
+    input[type="range"] {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+    }
 
-<h4 style="text-align:center;color:white;">
-    Latency is in milliseconds and is averaged from the 60 insertions that happened in the last minute
-</h4><br>
-<table style="margin-left: auto; margin-right: auto;color:white;">
-    <thead>
-        <tr>
-            <th>URL</th>
-            <th>....</th>
-            <th>Latency</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for url, value in data.items() %}
-        <tr>
-            <td>{{ url }} </td> 
-            <td>....</td> 
+    /* Style the container for better visualization */
+    .slider-container {
+      width: 50%;
+      margin: auto;
+    }
 
-            <td>{{ value }} ms</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    /* Style the label for better visualization */
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="slider-container">
+    <!-- Wrap the slider in a form -->
+    <form action="/path/to/your/python/script" method="post">
+      <label for="slider">Select a value:</label>
+      <!-- Set the name attribute to identify the input when submitting the form -->
+      <input type="range" id="slider" name="slider" min="1" max="24" step="1" value="12">
+      <p id="slider-value">Selected value: 12 hours</p>
+
+      <!-- Add a submit button to send the form data to the server -->
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <script>
+    // Add JavaScript to update the displayed value
+    const slider = document.getElementById('slider');
+    const sliderValue = document.getElementById('slider-value');
+
+    slider.addEventListener('input', () => {
+      sliderValue.textContent = `Selected value: ${slider.value} hours`;
+    });
+  </script>
+
+</body>
+</html>
