@@ -53,3 +53,9 @@ This program is designed for California State University Stanislaus' CS-4800 202
   -  bson
   -  re
   -  bcrypt
+
+##### Default User Account Information
+- Username:
+  -  admin@admin.com
+- Password:
+  -  12345
