@@ -35,24 +35,20 @@ This program is designed for California State University Stanislaus' CS-4800 202
 - IDE (Recommending VS Code)
 - MongoDB
 - Python 3
-  -  pymongo
-  -  flask
-  -  numpy
-  -  pandas
-  -  matplotlib
-  -  seaborn
-  -  datetime
-  -  pytz
-  -  psutil
-  -  tensorflow
-  -  uuid
-  -  time
-  -  multiprocessing
-  -  socket
-  -  webbrowser
-  -  bson
-  -  re
-  -  bcrypt
+  -  Flask==3.0.0
+  -  matplotlib==3.6.3
+  -  mpld3==0.5.9
+  -  numpy==1.24.1
+  -  pandas==1.5.3
+  -  psutil==5.9.4
+  -  pymongo==4.5.0
+  -  python_bcrypt==0.3.2
+  -  pytz==2022.7.1
+  -  Requests==2.31.0
+  -  seaborn==0.13.0
+  -  tensorflow==2.14.0
+  -  tensorflow_intel==2.14.0
+  -  tzlocal==5.2
 
 ##### Default User Account Information
 - Username:
