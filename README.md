@@ -33,7 +33,9 @@ This program is designed for California State University Stanislaus' CS-4800 202
 
 #### Requirements/Dependancies
 - IDE (Recommending VS Code)
-- MongoDB
+- MongoDB Community Server
+  - Can be acquired here: https://www.mongodb.com/try/download/community
+  - Must be ran as a service (or possibly as a daemon).
 - Python 3
   -  Flask==3.0.0
   -  matplotlib==3.6.3
