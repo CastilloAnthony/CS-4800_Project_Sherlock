@@ -50,6 +50,13 @@ This program is designed for California State University Stanislaus' CS-4800 202
   -  tensorflow_intel==2.14.0
   -  tzlocal==5.2
 
+##### Running the program
+To start the program you must execute, in a terminal, the start.py file located in the root of the project. Once the program has started it will open up a website in your default browser using http://127.0.0.1:7777 as the URL.
+Note: You may first need to first install the necessary dependents for the script to run successfully. See the console command below.
+```console
+pip install -r requirements.txt  
+```
+
 ##### Default User Account Information
 - Username:
   -  admin@admin.com
