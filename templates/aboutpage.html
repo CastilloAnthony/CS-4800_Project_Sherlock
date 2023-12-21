@@ -1,0 +1,51 @@
+<!--CHRISTIAN-->
+{% extends "base.html" %}
+{%block content%}
+    
+    <head>
+        <meta charset="UTF-8">
+        <title>About</title>
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style1.css') }}">
+
+        <style>
+            section {
+                color: white;
+                background-color: rgba(52, 169, 67, 50%);
+                border-radius: 10px;
+            
+                margin: auto;
+                width: 70%;
+                height: auto;
+                text-align: justify;
+                padding: 10px
+            }
+        </style>
+
+    </head>
+
+    <body>
+        <h1 style="text-align: center; color:white">About Us</h1>
+        <section>
+            The creators of Project S.H.E.R.L.O.C.K. are a dynamic and dedicated team of individuals hailing from California State University Stanislaus' CS-4800 2023 Fall class. Each team member brings a unique set of skills and perspectives to the project, contributing to its success.<br>
+
+            Meet the Makers:<br>
+
+            1. **<b>Christian Alameda</b>:**
+            - An innovative mind, Christian Alameda is a driving force behind the project. With a keen interest in technology and problem-solving, he ensures that Project S.H.E.R.L.O.C.K. incorporates cutting-edge solutions and remains at the forefront of server monitoring.<br>
+
+            2. **<b>Anthony Castillo</b>:**
+            - Anthony Castillo adds a touch of precision to the team. His attention to detail and commitment to excellence are evident in the meticulous design and implementation of controllers within the project. Anthony's skills contribute significantly to the reliability of the system.<br>
+
+            3. **<b>Sierra Pangilinan</b>:**
+            - Sierra Pangilinan, with her flair for creativity, plays a pivotal role in the project's user interface and experience. Her contributions to the webui ensure that users can interact seamlessly with the program, making server monitoring an intuitive and user-friendly experience.<br>
+
+            4. **<b>Vel Perez-Barba</b>:**
+            - Vel Perez-Barba is the visionary of the team, consistently pushing the boundaries of what Project S.H.E.R.L.O.C.K. can achieve. With a focus on future enhancements, Vel's work-in-progress feature for tracing connections showcases the team's commitment to continuous improvement.<br>
+
+            **<b>Team Dynamics</b>:**
+            The team operates with a collaborative spirit, where diverse skill sets complement each other. Regular communication and an open exchange of ideas characterize their working environment. Their commitment to the project's success is evident in the disclaimer, acknowledging that all aspects are subject to change, reflecting a proactive and adaptive approach to development.<br>
+
+            In summary, <br>the makers of Project S.H.E.R.L.O.C.K. embody a blend of technical expertise, creativity, precision, and innovation. Together, they have crafted a solution that not only addresses the technical intricacies of server monitoring but also prioritizes user experience and adaptability for future advancements.<br>
+        </section>
+    </body>
+{% endblock %}

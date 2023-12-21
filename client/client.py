@@ -49,6 +49,8 @@ class MyFlaskApp:
         
         #HOMEPAGE
         self.app.add_url_rule('/home', 'home', self.home)
+        #ABOUTPAGE
+        self.app.add_url_rule('/about', 'about', self.about)
         
         #FORPRESETS
         #ADDPRESET
@@ -250,6 +252,14 @@ class MyFlaskApp:
         self.homeClass.getEmail(self.curr_email)
         
         return render_template('homepage.html', userName=self.homeClass.query()) #data=self.viewWebsiteClass.query1())
+    
+    def about(self):
+        """_summary_: just shows an about page that shows what we meant to do with this, as well as describe the makers, and what we believe and hope
+
+        Returns:
+            html: aboutpage.html
+        """
+        return render_template('aboutpage.html') 
     
     #FINISHED
     def addPreset(self):
