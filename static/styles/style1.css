@@ -2,9 +2,12 @@
 html{
     background-image: url('/static/images/sherlock.jpg');
     background-size: cover;
-    /*background-position: center; */
+    background-position: center;
     background-repeat: no-repeat;
-    height: 100vh;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 ul {
