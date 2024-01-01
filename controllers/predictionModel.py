@@ -181,13 +181,13 @@ class PredictionModel():
             tempDataY = np.delete(tempDataY, 0, None)
             self.__size = len(tempDataX)
             ##print(self.__size, int(self.__size*0.7))
-        ##print('Ending Size: ', self.__size, int(self.__size*0.7))
-        #tempData = np.vstack((tempDataX, tempDataY))
-        ##print(tempDataY*100)
-        ##print(np.nanmean(tempDataY), np.nanstd(tempDataY))
-        ##print(tempDataY.mean(), tempDataY.std())
-        #test = np.vstack((tempDataX, tempDataY,))
-        ##print(test)
+        # #print('Ending Size: ', self.__size, int(self.__size*0.7))
+        # tempData = np.vstack((tempDataX, tempDataY))
+        # #print(tempDataY*100)
+        # #print(np.nanmean(tempDataY), np.nanstd(tempDataY))
+        # #print(tempDataY.mean(), tempDataY.std())
+        # test = np.vstack((tempDataX, tempDataY,))
+        # #print(test)
         # \/ Modify this \/
         tempDF = pd.DataFrame({'timestamp':tempDataX, 'latency':tempDataY,}, index=pd.to_datetime(tempDataX, unit='s'))#.resample(self.__sampleRate).mean()
         self.__originalDataCleaned = tempDF
@@ -226,6 +226,7 @@ class PredictionModel():
         self.__val_data = np.vstack((val_dataX, val_dataY))
         self.__test_data = np.vstack((test_dataX, test_dataY))
         '''
+        
         self.__train_data = np.vstack((tempDF['timestamp'][0:int(self.__size*0.7)], tempDF['latency'][0:int(self.__size*0.7)]))
         self.__val_data = np.vstack((tempDF['timestamp'][int(self.__size*0.7):int(self.__size*0.9)], tempDF['latency'][int(self.__size*0.7):int(self.__size*0.9)]))
         self.__test_data = np.vstack((tempDF['timestamp'][int(self.__size*0.9):], tempDF['latency'][int(self.__size*0.9):]))
@@ -638,7 +639,7 @@ class PredictionModel():
     #         elif 2*k == number:
     #             return False
     #         else:
-    #             k +=1
+    #             k += 1
     #     return None
 
 def startPrediction(data:np.array, name:str='Unknown', epochs:int=10*10**2, sampleRate:str='15T', predictions:int=60*60*6, ):
