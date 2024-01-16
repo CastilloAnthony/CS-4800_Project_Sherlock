@@ -1,7 +1,7 @@
+<!--extended from Christian's viewWebsite.html-->
+<!--placeholder for second viewWebsite page-->
 {% extends "base.html" %}
-{% block content %}
-    <!--CHRISTIAN-->
-    
+{% block content %}  
         <head>
             <meta charset="UTF-8">
             <title>View Websites</title>
@@ -30,7 +30,7 @@
         
         </head>
         <body>
-            <h1 style="text-align:center;color:white;">View Website</h1><br>
+            <h1 style="text-align:center;color:white;">WIP</h1><br>
             <!--
                 I am giving the value in the form of: 
             {'id': UUID('36d8c82d-4a56-4860-8f71-aff5f350f45e'), 
@@ -43,7 +43,7 @@
             data
             -->
             <div>
-            
+            <!--TODO: change action to viewWebsite/viewWebsiteWebList/newViewWebsite-->
             <form action="viewWebsite/newViewWebsite" style="display:inline-block" method="POST" onsubmit="return validateForm3()" id="myForm">
                 <div class="slider-container">
                     <label for="slider">Select a timeframe:</label>
@@ -63,7 +63,7 @@
 
                 
                 <label for="fname">Pick a website to view its graph:</label><br><br>
-                {% for url in masterList['data'] %}
+                {% for url in masterList['data']['websitesList'] %}
 
                     <input type="radio" name="selected_option" value="{{ url }}"> {{ url }}<br>
                     
@@ -71,10 +71,7 @@
                 <br><input type="submit" value="Submit">
             </form>
             </div>
-            <a class="weblist" href="/viewWebsite/viewWebsiteWebList">
-                <input type="submit" value="Web List">
-            </a>
-    
+
             <script src="{{ url_for('static', filename='js/noEmpty.js') }}"></script>
 
         </body>
