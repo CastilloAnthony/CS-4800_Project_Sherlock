@@ -77,6 +77,7 @@ class MyFlaskApp:
         #VIEWEBSITE
         self.app.add_url_rule('/viewWebsite', 'viewWebsite', self.viewWebsite)
         self.app.add_url_rule('/viewWebsite/newViewWebsite', '/viewWebsite/newViewWebsite', self.newViewWebsite, methods=['POST'])
+        self.app.add_url_rule('/viewWebsite/viewWebsiteWebList', '/viewWebsite/viewWebsiteWebList', self.viewWebsiteWebList)
         
         
         #CLASS_INITIALIZATION
@@ -301,7 +302,7 @@ class MyFlaskApp:
         
     #TODO: grab graphs to put into this
     def viewWebsite(self):
-        """_summary_: grab all urls and let user choose which one
+        """_summary_: grab all urls in MASTERLIST and let user choose which one
 
         Returns:
             html: viewWebsite.html and list of urls in dictionary format
@@ -316,7 +317,16 @@ class MyFlaskApp:
         # that gives me a picture
         # print(self.viewWebsiteClass.viewWebsite())
         return render_template('viewWebsiteNew.html', plot_html=self.viewWebsiteClass.viewWebsite())
-        
+    
+    def viewWebsiteWebList(self):
+        """_summary_: grab all urls in WEBLIST and let user choose which one
+
+        Returns:
+            html: viewWebsite.html and list of urls in dictionary format
+        """
+        self.viewWebsiteClass.getEmail(self.curr_email)
+        return render_template('viewWebsiteWebList.html', masterList = self.viewWebsiteClass.query3())
+    
     #FINISHED
     def deletePreset(self):
         """_summary_: give email then send in list of presets as well as html
