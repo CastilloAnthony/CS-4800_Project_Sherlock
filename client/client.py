@@ -56,6 +56,7 @@ class MyFlaskApp:
         #ADDPRESET
         self.app.add_url_rule('/addPreset', 'addPreset', self.addPreset)
         self.app.add_url_rule('/addPreset/newAddedPreset', 'newAddedPreset', self.newAddedPreset, methods=['POST'])
+        self.app.add_url_rule('/addPresetWebList', 'addPresetWebList', self.addPresetWebList)
         #DELETEPRESET
         self.app.add_url_rule('/deletePreset', 'deletePreset', self.deletePreset)
         self.app.add_url_rule('/deletePreset/newDeletedPreset', 'newDeletedPreset', self.newDeletedPreset, methods=['POST'])
@@ -282,6 +283,15 @@ class MyFlaskApp:
         # Redirect to the /home route and render the home.html template
         return redirect(url_for('home'))
 
+    def addPresetWebList(self):
+        """_summary_: grabs user's email to query database for user's local webList
+
+        Returns:
+            html: addPresetWebList.html
+        """
+        self.addPresetClass.getEmail(self.curr_email)
+        return render_template('addPresetWebList.html', masterList = self.addPresetClass.query2())
+   
     #TODO: grab graphs to put into this
     def viewPreset(self):
         """_summary_: send in list of presets and let user choose

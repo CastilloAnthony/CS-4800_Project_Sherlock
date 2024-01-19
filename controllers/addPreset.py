@@ -62,6 +62,21 @@ class AddPreset(): # Controller
         #GRABBING
         #return super().checkForData(masterListRequest)7
     
+    def query2(self):
+        """_summary_: grab things from user's webList
+
+        Returns:
+            dict: uuid, id, data
+        """
+        websitesListRequest = {
+            'id': uuid.uuid4(),
+            'request_type': 'request',
+            'column': 'users',
+            'query': {"email":self.curr_email}
+        }
+        temp = requestData(websitesListRequest, self.__requestQ, self.__dataQ)
+        return temp
+    
     def getEmail(self, email):
         """_summary_: simple get function for email which will be the key called in client.py
 
