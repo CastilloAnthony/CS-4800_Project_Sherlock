@@ -13,13 +13,14 @@
 
             <form action="editPreset/newEditedPreset" style="display:inline-block" method="POST" onsubmit="return validateForm3()" id="myForm">
                 
-                <div style="color:white;">Choose which preset you would like to edit:</div><br>
+                <p style="color:white;">Choose which preset you would like to edit:</p><br>
 
                 {% for item in presets['presets'] %}
 
                     <input type="radio" name="selected_option[]" value="{{ item }}"> {{ item['name'] }}<br>{{item['presetLists']}} || timestamp: {{item['timestamp']}}<br>
                 
                 {% endfor %}
+                <br>
                 <input type="submit" value="Submit">
             </form>
 
