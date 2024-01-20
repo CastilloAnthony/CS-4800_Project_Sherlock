@@ -44,7 +44,7 @@
             -->
             <div>
             <!--TODO: change action to viewWebsite/viewWebsiteWebList/newViewWebsite-->
-            <form action="viewWebsite/newViewWebsite" style="display:inline-block" method="POST" onsubmit="return validateForm3()" id="myForm">
+            <form action="/viewWebsite/viewWebsiteWebList/newViewWebsite" style="display:inline-block" method="POST" onsubmit="return validateForm3()" id="myForm">
                 <div class="slider-container">
                     <label for="slider">Select a timeframe:</label>
                     <!-- Set the name attribute to identify the input when submitting the form -->
@@ -71,7 +71,13 @@
                 <br><input type="submit" value="Submit">
             </form>
             </div>
-
+            
+            <br>
+            <div>
+                <a href="/viewWebsite">
+                    <button>Go Back</button>
+                </a>
+            </div>
             <script src="{{ url_for('static', filename='js/noEmpty.js') }}"></script>
 
         </body>

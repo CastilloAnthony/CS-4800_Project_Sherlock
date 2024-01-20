@@ -79,7 +79,7 @@ class MyFlaskApp:
         self.app.add_url_rule('/viewWebsite', 'viewWebsite', self.viewWebsite)
         self.app.add_url_rule('/viewWebsite/newViewWebsite', '/viewWebsite/newViewWebsite', self.newViewWebsite, methods=['POST'])
         self.app.add_url_rule('/viewWebsite/viewWebsiteWebList', '/viewWebsite/viewWebsiteWebList', self.viewWebsiteWebList)
-        
+        self.app.add_url_rule('/viewWebsite/viewWebsiteWebList/newViewWebsite', '/viewWebsite/viewWebsiteWebList/newViewWebsite', self.newViewWebsite, methods=['POST'])
         
         #CLASS_INITIALIZATION
         self.loginClass = Login(self.app.requestQ, self.app.dataQ)
