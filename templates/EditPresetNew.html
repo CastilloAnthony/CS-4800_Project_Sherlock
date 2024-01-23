@@ -38,6 +38,7 @@
             timestamp
             data
             -->
+            <div>
             <form action="newEditedPreset/edit" style="display:inline-block" method="POST" onsubmit="return validateForm() && validateForm2()" id="myForm">
                 <div class="collection"> OLD PRESET
                     <div class="titles">NAME</div>
@@ -59,7 +60,7 @@
                     Need a name for the respective preset so the user knows what to ask for later
                     Make it easier to recall for them. 
                 -->
-                <label for="fname">Preset List Name (Please Pick Something You Will Remember):</label><br>
+                <label for="fname">Please Pick Something You Will Remember:</label><br>
                 Preset Name: <input type="text" name="name" value="{{oldPreset['name']}}" id="urlInput">
                 <br><br>
                 {% for url in masterList['data'] %}
@@ -71,8 +72,10 @@
                     <input type="checkbox" name="selected_options[]" value="{{ url }}"> {{ url }}<br>
                     
                 {% endfor %}
+                <br>
                 <input type="submit" value="Submit">
             </form>
+            </div>
             <script src="{{ url_for('static', filename='js/noEmpty.js') }}"></script>
         </body>
     
