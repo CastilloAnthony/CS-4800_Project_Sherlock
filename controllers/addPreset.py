@@ -63,10 +63,15 @@ class AddPreset(): # Controller
         #return super().checkForData(masterListRequest)7
     
     def query2(self):
+        #by Vel
         """_summary_: grab things from user's webList
 
         Returns:
-            dict: uuid, id, data
+            dict: uuid, id, data 
+            or
+                ID
+                timestamp
+                data: where data has an dict{_ID, ID, username, email, websitesList, presets}
         """
         websitesListRequest = {
             'id': uuid.uuid4(),

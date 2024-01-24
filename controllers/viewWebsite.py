@@ -125,10 +125,15 @@ class ViewWebsite():
         return temp
         
     def query3(self):
+        #by Vel
         """_summary_: grab things from user's webList
 
         Returns:
-            dict: uuid, id, data
+            dict: uuid, id, data 
+            or
+                ID
+                timestamp
+                data: where data has an dict{_ID, ID, username, email, websitesList, presets}
         """
         websitesListRequest = {
             'id': uuid.uuid4(),
