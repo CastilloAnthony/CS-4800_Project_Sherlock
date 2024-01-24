@@ -32,10 +32,8 @@
                 <label for="fname">Please Pick Something You Will Remember</label><br>
                 Preset Name: <input type="text" name="name" id="urlInput">
                 <br><br>
-                {% for url in masterList['data'] %} 
-                    <!--
-                        will be changed from masterList to websitesList.
-                    -->
+                {% for url in masterList['data'] %}
+                
                     <input type="checkbox" name="selected_options[]" value="{{ url }}"> {{ url }}<br>
                     
                 {% endfor %}

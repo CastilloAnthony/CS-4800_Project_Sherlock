@@ -1,6 +1,7 @@
 {%extends "base.html"%}
 {% block content %}
     <!--CHRISTIAN-->
+    <!--editted by Vel-->
     
         <head>
             <meta charset="UTF-8">
@@ -56,19 +57,11 @@
                         {{timestamp}}
                     </div>
                 </div><br>
-                <!--
-                    Need a name for the respective preset so the user knows what to ask for later
-                    Make it easier to recall for them. 
-                -->
                 <label for="fname">Please Pick Something You Will Remember:</label><br>
                 Preset Name: <input type="text" name="name" value="{{oldPreset['name']}}" id="urlInput">
                 <br><br>
-                {% for url in masterList['data'] %}
-                    <!--
-                        Working on getting this to send more than one stupid value. 
-                        I want it to send a list back to addPreset so I can send it to
-                        the database as a list
-                    -->
+                <!--for format of masterlist see query2() in editPreset.py returned dict-->
+                {% for url in masterList['data']['websitesList'] %}
                     <input type="checkbox" name="selected_options[]" value="{{ url }}"> {{ url }}<br>
                     
                 {% endfor %}

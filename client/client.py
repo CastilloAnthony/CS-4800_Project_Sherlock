@@ -267,6 +267,8 @@ class MyFlaskApp:
     def addPreset(self):
         """_summary_: grab the email and send it in so that that class can know who is signed in also render html as well as send in every url we have
 
+        tag: masterList
+
         Returns:
             html: AddPreset.html
         """
@@ -284,7 +286,9 @@ class MyFlaskApp:
         return redirect(url_for('home'))
 
     def addPresetWebList(self):
-        """_summary_: grabs user's email to query database for user's local webList
+        """summary: grabs user's email to query database for user's local webList
+
+        tag: webList
 
         Returns:
             html: addPresetWebList.html
@@ -313,6 +317,8 @@ class MyFlaskApp:
     #TODO: grab graphs to put into this
     def viewWebsite(self):
         """_summary_: grab all urls in MASTERLIST and let user choose which one
+        
+        tag: masterList
 
         Returns:
             html: viewWebsite.html and list of urls in dictionary format
@@ -329,8 +335,10 @@ class MyFlaskApp:
         return render_template('viewWebsiteNew.html', plot_html=self.viewWebsiteClass.viewWebsite())
     
     def viewWebsiteWebList(self):
-        """_summary_: grab all urls in WEBLIST and let user choose which one
+        """summary: grab all urls in weblist and let user choose which one
 
+        tag: webList
+        
         Returns:
             html: viewWebsite.html and list of urls in dictionary format
         """
@@ -361,6 +369,8 @@ class MyFlaskApp:
     def deleteWebsite(self):
         """_summary_: grab email list of websites from users document
 
+        tag: webList
+
         Returns:
             html: send in html, list
         """
@@ -389,6 +399,8 @@ class MyFlaskApp:
     
     def newEditedPreset(self):
         """_summary_: user selected a preset to change, give them the one they changed so they know how to correctly reformat their new one
+        
+        tag: webList
 
         Returns:
             html:old preset as well as a new list of websites to choose to make a preset, as well as timestamp 
@@ -397,8 +409,8 @@ class MyFlaskApp:
         #turn timestamp that is in form: 1700691121.3678615
         #into a date
         timestamp = str(time.ctime(oldPreset['timestamp']))
-        return render_template('EditPresetNew.html', oldPreset=oldPreset,masterList=self.editPresetClass.query1(), timestamp=timestamp)
-    
+        return render_template('EditPresetNew.html', oldPreset=oldPreset,masterList=self.editPresetClass.query2(), timestamp=timestamp)
+
     def edit(self):
         """_summary_: edit is now changed in documents and can go back home
 
