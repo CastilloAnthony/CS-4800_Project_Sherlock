@@ -1,7 +1,8 @@
+<!--extended from Christian's viewWebsite.html
+file created by Vel, editted work by Vel-->
+<!--placeholder for second viewWebsite page-->
 {% extends "base.html" %}
-{% block content %}
-    <!--CHRISTIAN-->
-    
+{% block content %}  
         <head>
             <meta charset="UTF-8">
             <title>View Websites</title>
@@ -31,20 +32,8 @@
         </head>
         <body>
             <h1 style="text-align:center;color:white;">View Website</h1><br>
-            <!--
-                I am giving the value in the form of: 
-            {'id': UUID('36d8c82d-4a56-4860-8f71-aff5f350f45e'), 
-            'timestamp': 1698420651.296685, 'data': ['www.google.com', 'www.instagram.com', 
-            'www.csustan.edu', 'www.microsoft.com', 'www.nasa.gov', 'chat.openai.com', 'www.bbc.co.uk', 
-            'www.reddit.com', 'www.wikipedia.org', 'www.amazon.com']}
-
-            id
-            timestamp
-            data
-            -->
             <div>
-            
-            <form action="viewWebsite/newViewWebsite" style="display:inline-block" method="POST" onsubmit="return validateForm3()" id="myForm">
+            <form action="/viewWebsite/viewWebsiteWebList/newViewWebsite" style="display:inline-block" method="POST" onsubmit="return validateForm3()" id="myForm">
                 <div class="slider-container">
                     <label for="slider">Select a timeframe:</label>
                     <!-- Set the name attribute to identify the input when submitting the form -->
@@ -61,9 +50,12 @@
                     });
                 </script>
 
-                
+                <!--masterList comes in the form:
+                    ID
+                    timestamp
+                    data: where data has an dict{_ID, ID, username, email, websitesList, presets}-->
                 <label for="fname">Pick a website to view its graph:</label><br><br>
-                {% for url in masterList['data'] %}
+                {% for url in masterList['data']['websitesList'] %}
 
                     <input type="radio" name="selected_option" value="{{ url }}"> {{ url }}<br>
                     
@@ -71,14 +63,13 @@
                 <br><input type="submit" value="Submit">
             </form>
             </div>
-
+            
             <br>
             <div>
-                <a href="/viewWebsite/viewWebsiteWebList">
-                    <button>Local WebList</button>
+                <a href="/viewWebsite">
+                    <button>Go Back</button>
                 </a>
             </div>
-    
             <script src="{{ url_for('static', filename='js/noEmpty.js') }}"></script>
 
         </body>

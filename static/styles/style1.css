@@ -44,10 +44,10 @@ form {
     border-radius: 10px;
 
     margin: auto;
-    width: 70%;
-    height: auto;
+    width: 40%;
+    height: fit-content;
     text-align: justify;
-    padding: 10px
+    padding: 15px
 }
 
 .dropdown {
@@ -99,7 +99,7 @@ form {
     padding: 10px;
 }
 
-/*button styling*/
+/*input styling*/
 input[type=submit] {
     background-color: gray;
     color: black;
@@ -109,3 +109,15 @@ input[type=submit]:hover {
     background-color: #4CAF50;
     color: black;
  }
+
+/* button styling*/
+button {
+    text-align: center;
+    background-color: gray;
+    color: black;
+ }
+
+button:hover {
+    background-color:lightseagreen;
+    color: black;
+}

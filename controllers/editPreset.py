@@ -62,6 +62,7 @@ class EditPreset(): # Controller
     
     def query1(self):
         """_summary_: simply making a request to the masterlist to grab all of the urls inside of it
+        (uses no query)
 
         Returns:
             dict: uuid, timstamp, data; where data is all the documents in masterlist
@@ -74,6 +75,23 @@ class EditPreset(): # Controller
             'query': {}
         }
         temp = requestData(masterListRequest, self.__requestQ, self.__dataQ)
+        return temp
+    
+    def query2(self):
+        #by Vel
+        """_summary_: grab things from user's webList (uses email as query)
+
+        Returns:
+            dict: id, timestamp, data: where data has 
+                a dict{_ID, ID, username, email, websitesList, presets}
+        """
+        websitesListRequest = {
+            'id': uuid.uuid4(),
+            'request_type': 'request',
+            'column': 'users',
+            'query': {"email":self.curr_email}
+        }
+        temp = requestData(websitesListRequest, self.__requestQ, self.__dataQ)
         return temp
         
     def parseStringToDict(self, stringedDictionary:str):

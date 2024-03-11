@@ -12,12 +12,8 @@
             
             <div>
             <form action="deleteWebsite/newDeletedWebsite" style="display:inline-block" method="POST">
-                <!--
-                    Need a name for the respective preset so the user knows what to ask for later
-                    Make it easier to recall for them. 
-                -->
-                <div style="color:white;"><strong>Select which website(s) to stop tracking:</strong></div>
-                <br><br>
+                <p style="color:white;">Select which website(s) to stop tracking:</p>
+                <br>
                 <!--
                     [ 
                     {
@@ -37,19 +33,13 @@
                             We want to look at the inputs name when returning these back to 
                         
                         <input type="checkbox" name="presetsList" value="{{ url }}">{{ url }}<br>
-                    </label><br>-->
-
-                    <!--
-                        Working on getting this to send more than one stupid value. 
-                        I want it to send a list back to addPreset so I can send it to
-                        the database as a list
-                    -->
-                    
+                    </label><br>-->                    
                     
                     <input type="checkbox" name="selected_options[]" value="{{ url }}"> {{ url }}<br>
                     
                 {% endfor %}
-                <br><input type="submit" value="Submit">
+                <br>
+                <input type="submit" value="Submit">
             </form>
             </div>
         </body>

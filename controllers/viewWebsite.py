@@ -10,6 +10,7 @@ class ViewWebsite():
     def __init__(self, requestQ, dataQ):
         self.__requestQ, self.__dataQ = requestQ, dataQ
         self.graph_generator = GraphGenerator(requestQ, dataQ)
+        self.curr_email = ''
 
     def __del__(self):
         del self.__requestQ, self.__dataQ
@@ -122,6 +123,29 @@ class ViewWebsite():
         }
         temp = requestData(masterListRequest, self.__requestQ, self.__dataQ)
         return temp
+        
+    def query3(self):
+        #by Vel
+        """_summary_: grab things from user's webList
+
+        Returns:
+            dict: uuid, id, data 
+            or
+                ID
+                timestamp
+                data: where data has an dict{_ID, ID, username, email, websitesList, presets}
+        """
+        websitesListRequest = {
+            'id': uuid.uuid4(),
+            'request_type': 'request',
+            'column': 'users',
+            'query': {"email":self.curr_email}
+        }
+        temp = requestData(websitesListRequest, self.__requestQ, self.__dataQ)
+        return temp
+    
+    def getEmail(self, email):
+        self.curr_email = email
     
     def viewWebsite(self):
         """_summary_: grabs url from html form then asks for respective data to that url in PollingData 

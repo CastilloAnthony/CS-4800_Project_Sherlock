@@ -9,7 +9,7 @@
         </head>
 
         <body>
-            <h1 style="text-align: center; color:white">Preset Creation Station</h1>
+            <h1 style="text-align: center; color:white">Add Preset (MasterList)</h1>
             <br><br>
             <!--
                 I am giving the value in the form of: 
@@ -29,23 +29,25 @@
                     Need a name for the respective preset so the user knows what to ask for later
                     Make it easier to recall for them. 
                 -->
-                <label for="fname">Preset List Name (Please Pick Something You Will Remember):</label><br>
+                <label for="fname">Please Pick Something You Will Remember</label><br>
                 Preset Name: <input type="text" name="name" id="urlInput">
                 <br><br>
                 {% for url in masterList['data'] %}
-                    <!--
-                        Working on getting this to send more than one stupid value. 
-                        I want it to send a list back to addPreset so I can send it to
-                        the database as a list
-                    -->
+                
                     <input type="checkbox" name="selected_options[]" value="{{ url }}"> {{ url }}<br>
                     
                 {% endfor %}
+                <br>
                 <input type="submit" value="Submit">
             </form>
             <script src="{{ url_for('static', filename='js/noEmpty.js') }}"></script>
+            </div>
 
-
+            <br>
+            <div>
+                <a href="/addPresetWebList">
+                    <button>Go Back</button>
+                </a>
             </div>
         </body>
 {% endblock %}

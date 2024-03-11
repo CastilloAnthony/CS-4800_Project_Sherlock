@@ -30,12 +30,11 @@ class MyFlaskApp:
         self.app = Flask(__name__, template_folder='../templates', static_folder='../static')
         # self.admin_view = Blueprint('admin_routes',__name__, template_folder='../templates', static_folder='../static')
         
-        self.app.secret_key = 'your_secret_key_here'
+        self.app.secret_key = 'sherlock'
         
         self.app.requestQ = requestQ
         self.app.dataQ = dataQ
         
-        self.curr_email = ''
         #ROUTECREATING
         #Example: self.app.add_url_rule(route='<route>', name='<name>', function=<function>, OPTIONAL methods=[<typeOfRequest>])
         
@@ -44,7 +43,7 @@ class MyFlaskApp:
         self.app.add_url_rule('/login', 'login', self.login, methods=['POST', 'GET'])
         self.app.add_url_rule('/logout', 'logout', self.logout, methods=['POST', 'GET'])
         self.app.add_url_rule('/', 'index', self.index, methods=['POST', 'GET'])
-        
+        self.app.add_url_rule('/profile', 'profile', self.profile, methods=['POST', 'GET'])
         ########
         
         #HOMEPAGE
@@ -56,6 +55,7 @@ class MyFlaskApp:
         #ADDPRESET
         self.app.add_url_rule('/addPreset', 'addPreset', self.addPreset)
         self.app.add_url_rule('/addPreset/newAddedPreset', 'newAddedPreset', self.newAddedPreset, methods=['POST'])
+        self.app.add_url_rule('/addPresetWebList', 'addPresetWebList', self.addPresetWebList)
         #DELETEPRESET
         self.app.add_url_rule('/deletePreset', 'deletePreset', self.deletePreset)
         self.app.add_url_rule('/deletePreset/newDeletedPreset', 'newDeletedPreset', self.newDeletedPreset, methods=['POST'])
@@ -77,7 +77,8 @@ class MyFlaskApp:
         #VIEWEBSITE
         self.app.add_url_rule('/viewWebsite', 'viewWebsite', self.viewWebsite)
         self.app.add_url_rule('/viewWebsite/newViewWebsite', '/viewWebsite/newViewWebsite', self.newViewWebsite, methods=['POST'])
-        
+        self.app.add_url_rule('/viewWebsite/viewWebsiteWebList', '/viewWebsite/viewWebsiteWebList', self.viewWebsiteWebList)
+        self.app.add_url_rule('/viewWebsite/viewWebsiteWebList/newViewWebsite', '/viewWebsite/viewWebsiteWebList/newViewWebsite', self.newViewWebsite, methods=['POST'])
         
         #CLASS_INITIALIZATION
         self.loginClass = Login(self.app.requestQ, self.app.dataQ)
@@ -108,6 +109,8 @@ class MyFlaskApp:
         Returns:
             html: send them to logged_in.html to back to here so that they can redo their passwords or because they already signed in with those credentials 
         """
+        if 'email' in session or 'name' in session:
+            return redirect(url_for('home'))
         #FOR FIRST TIME LOGGING IN
         message = ''
         # if "email" in session:
@@ -123,7 +126,6 @@ class MyFlaskApp:
             #result needs to be a 
             result = self.register_user(user, email, password1, password2)
             if result == email:
-                self.curr_email = email
                 return render_template('auth/logged_in.html', email=result)
             else:
                 message = result
@@ -137,9 +139,9 @@ class MyFlaskApp:
         Returns:
             url or html: depending we send them to homepage or back to the login because they messed up
         """
+        if "email" in session or 'name' in session:
+            return redirect(url_for('home'))
         message = 'Please login to your account'
-        # if "email" in session:
-        #     return redirect(url_for("logged_in"))
 
         if request.method == "POST":
             email = request.form.get("email")
@@ -153,7 +155,7 @@ class MyFlaskApp:
 
                 if bcrypt.checkpw(password.encode('utf-8'), passwordcheck):
                     session["email"] = email_val
-                    self.curr_email = email_val
+                    session['name'] = email_found['name']
                     return redirect(url_for('home'))#MAY CHANGE
                 else:
                     if "email" in session:
@@ -171,15 +173,14 @@ class MyFlaskApp:
         Returns:
             html or url: depending, we will usually send to homepage tho
         """
-        if "email" in session:
-            email = session["email"]
-            self.curr_email = email
-            self.addPresetClass.getEmail(self.curr_email)
+        if "email" in session or 'name' in session:
+            self.addPresetClass.getEmail(session["email"])
             #TODO: pass username as context w/ or instead of email.
-            return render_template('homepage.html', email=email) #changed from auth/logged_in.html
+            return render_template('homepage.html', email=session["email"]) #changed from auth/logged_in.html
         else:
             return redirect(url_for("login"))
     #FINISHED
+        
     def register_user(self, user, email, password1, password2):
         """_summary_: for checking whether this user with all this information is in our system as well as inserting them into our system if not
 
@@ -193,6 +194,8 @@ class MyFlaskApp:
             str: email that is actually taken from the database so that we know that an insertion occured and that we are now on that document in auth
         """
         # don't have user_database will need to to a query and find_user_by_email as well as name
+        if "email" in session or 'name' in session:
+            return redirect(url_for('home'))
         user_found = self.loginClass.find_user_by_name(user) 
         email_found = self.loginClass.find_user_by_email(email) 
         
@@ -213,6 +216,8 @@ class MyFlaskApp:
         hashed = bcrypt.hashpw(password2.encode('utf-8'), bcrypt.gensalt())
         
         user_input = {'name': user, 'email': email, 'id':str(uuid.uuid4()), 'password': hashed, 'creationTime':time.time()}
+        session['email'] = email
+        session['name'] = user
         self.loginClass.insert_user(user_input)
         user_data = self.loginClass.find_user_by_email(email)
         print('user_data|', user_data)
@@ -226,13 +231,23 @@ class MyFlaskApp:
         Returns:
             html or back to home/registration: either shows the signout page or the homepage 
         """
+        loggedOut = False
         if "email" in session:
             session.pop("email", None)
+            loggedOut = True
+        if 'name' in session:
+            session.pop('name', None)
+            loggedOut = True
+        if loggedOut:
             return render_template("auth/signout.html")
         else:
-            return redirect(url_for('index')) #right now index is home.html but it will be index when done
+            return render_template("auth/signout.html") #right now index is home.html but it will be index when done
     
-    
+    def profile(self):
+        if 'email' in session or 'name' in session:
+            return render_template("profile.html", userName=session['name'])
+        return redirect(url_for('login'))
+        
     
     
     
@@ -249,10 +264,12 @@ class MyFlaskApp:
         """
         # works just fine
         #print(self.viewWebsiteClass.query1())
-        self.homeClass.getEmail(self.curr_email)
+        if 'email' in session:
+            self.homeClass.getEmail(session["email"])
+            return render_template('homepage.html', userName=self.homeClass.query()) #data=self.viewWebsiteClass.query1())
+        else:
+            return render_template('homepage.html', userName='Guest')
         
-        return render_template('homepage.html', userName=self.homeClass.query()) #data=self.viewWebsiteClass.query1())
-    
     def about(self):
         """_summary_: just shows an about page that shows what we meant to do with this, as well as describe the makers, and what we believe and hope
 
@@ -265,10 +282,14 @@ class MyFlaskApp:
     def addPreset(self):
         """_summary_: grab the email and send it in so that that class can know who is signed in also render html as well as send in every url we have
 
+        tag: masterList
+
         Returns:
             html: AddPreset.html
         """
-        self.addPresetClass.getEmail(self.curr_email)
+        if 'email' not in session or 'name' not in session:
+            return redirect(url_for('login'))
+        self.addPresetClass.getEmail(session["email"])
         return render_template('AddPreset.html', masterList=self.addPresetClass.query())
 
     def newAddedPreset(self):
@@ -281,6 +302,19 @@ class MyFlaskApp:
         # Redirect to the /home route and render the home.html template
         return redirect(url_for('home'))
 
+    def addPresetWebList(self):
+        """summary: grabs user's email to query database for user's local webList
+
+        tag: webList
+
+        Returns:
+            html: addPresetWebList.html
+        """
+        if 'email' not in session or 'name' not in session:
+            return redirect(url_for('login'))
+        self.addPresetClass.getEmail(session["email"])
+        return render_template('addPresetWebList.html', masterList = self.addPresetClass.query2())
+   
     #TODO: grab graphs to put into this
     def viewPreset(self):
         """_summary_: send in list of presets and let user choose
@@ -288,7 +322,9 @@ class MyFlaskApp:
         Returns:
             html: viewPreset.html
         """
-        self.viewPresetClass.getEmail(self.curr_email)
+        if 'email' not in session or 'name' not in session:
+            return redirect(url_for('login'))
+        self.viewPresetClass.getEmail(session["email"])
         return render_template('viewPreset.html', presets = self.viewPresetClass.query())
     
     def newViewPreset(self):
@@ -301,7 +337,9 @@ class MyFlaskApp:
         
     #TODO: grab graphs to put into this
     def viewWebsite(self):
-        """_summary_: grab all urls and let user choose which one
+        """_summary_: grab all urls in MASTERLIST and let user choose which one
+        
+        tag: masterList
 
         Returns:
             html: viewWebsite.html and list of urls in dictionary format
@@ -316,7 +354,18 @@ class MyFlaskApp:
         # that gives me a picture
         # print(self.viewWebsiteClass.viewWebsite())
         return render_template('viewWebsiteNew.html', plot_html=self.viewWebsiteClass.viewWebsite())
+    
+    def viewWebsiteWebList(self):
+        """summary: grab all urls in weblist and let user choose which one
+
+        tag: webList
         
+        Returns:
+            html: viewWebsite.html and list of urls in dictionary format
+        """
+        self.viewWebsiteClass.getEmail(session["email"])
+        return render_template('viewWebsiteWebList.html', masterList = self.viewWebsiteClass.query3())
+    
     #FINISHED
     def deletePreset(self):
         """_summary_: give email then send in list of presets as well as html
@@ -324,7 +373,9 @@ class MyFlaskApp:
         Returns:
             html: html and dict
         """
-        self.deletePresetClass.getEmail(self.curr_email)
+        if 'email' not in session or 'name' not in session:
+            return redirect(url_for('login'))
+        self.deletePresetClass.getEmail(session["email"])
         return render_template('DeletePreset.html', presets=self.deletePresetClass.query())
 
     def newDeletedPreset(self):
@@ -341,10 +392,14 @@ class MyFlaskApp:
     def deleteWebsite(self):
         """_summary_: grab email list of websites from users document
 
+        tag: webList
+
         Returns:
             html: send in html, list
         """
-        self.deleteWebsiteClass.getEmail(self.curr_email)
+        if 'email' not in session or 'name' not in session:
+            return redirect(url_for('login'))
+        self.deleteWebsiteClass.getEmail(session["email"])
         return render_template('DeleteWebsite.html', masterList = self.deleteWebsiteClass.query())
     
     def newDeletedWebsite(self):
@@ -364,11 +419,15 @@ class MyFlaskApp:
         Returns:
             html: html and list
         """
-        self.editPresetClass.getEmail(self.curr_email)
+        if 'email' not in session or 'name' not in session:
+            return redirect(url_for('login'))
+        self.editPresetClass.getEmail(session["email"])
         return render_template('EditPreset.html', presets=self.editPresetClass.query())
     
     def newEditedPreset(self):
         """_summary_: user selected a preset to change, give them the one they changed so they know how to correctly reformat their new one
+        
+        tag: webList
 
         Returns:
             html:old preset as well as a new list of websites to choose to make a preset, as well as timestamp 
@@ -377,8 +436,8 @@ class MyFlaskApp:
         #turn timestamp that is in form: 1700691121.3678615
         #into a date
         timestamp = str(time.ctime(oldPreset['timestamp']))
-        return render_template('EditPresetNew.html', oldPreset=oldPreset,masterList=self.editPresetClass.query1(), timestamp=timestamp)
-    
+        return render_template('EditPresetNew.html', oldPreset=oldPreset,masterList=self.editPresetClass.query2(), timestamp=timestamp)
+
     def edit(self):
         """_summary_: edit is now changed in documents and can go back home
 
@@ -395,7 +454,9 @@ class MyFlaskApp:
         Returns:
             html: addWebsite
         """
-        self.addWebsiteClass.getEmail(self.curr_email)
+        if 'email' not in session or 'name' not in session:
+            return redirect(url_for('login'))
+        self.addWebsiteClass.getEmail(session["email"])
         return render_template('AddWebsite.html')
     
     def newAddedWebsite(self):
